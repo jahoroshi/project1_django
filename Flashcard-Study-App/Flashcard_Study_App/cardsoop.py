@@ -137,7 +137,6 @@ class CardBox:
         self.fill_incomplete_lists()
 
 
-
 cardbox = CardBox()
 user_answer = 0
 while user_answer != 3:
