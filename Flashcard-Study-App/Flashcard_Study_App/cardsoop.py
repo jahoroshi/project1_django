@@ -1,5 +1,6 @@
 import random
 from random import randint
+from random import choice
 
 import psycopg2
 from psycopg2 import pool
@@ -58,35 +59,22 @@ class CardBox:
             })
         return box
 
-    def get_card(self):
+    def generate_cur_card(self):
         if not any(self.boxes_set):
             raise Exception('There are no cards')
-        lengths = [len(i) for i in self.boxes_set]
-        weight = [
-            (el * 2 if i == 0 else el) /
-            (sum(lengths) if i != 3 else sum(lengths) ** 2)
-            for i, el in enumerate(lengths)
-        ]
+        lengths = tuple(map(len, self.boxes_set))
+        total_lengths = sum(lengths)
+        base_weights = [4, 3, 1, 0.1]
+        # weight = [4, 3, 1, 0.1]
+        relativ_weights = [i / total_lengths for i in lengths]
+        weight = [x * y for x, y in zip(relativ_weights, base_weights)]
+        if hasattr(self, 'box_number'):
+            weight[self.box_number] /= 1.5
+            print(weight)
+
         box_number, card_number = self.generate_card_position(lengths, weight)
-        current_card = self.boxes_set[box_number][card_number]
 
-        try:
-            self.current_card
-            self.box_number
-        except AttributeError:
-            self.current_card = current_card
-            self.box_number = box_number
-        else:
-            is_box_fill = sum(1 for i in lengths if i) >= 2
-            if self.boxes_set[box_number][card_number]['id'] == self.current_card['id'] and is_box_fill:
-                weight[box_number] = 0
-                box_number, card_number = self.generate_card_position(lengths, weight)
-            elif box_number == self.box_number and is_box_fill:
-                weight[box_number] /= 1.5
-                box_number, card_number = self.generate_card_position(lengths, weight)
-
-        self.box_number = box_number
-        self.card_number = card_number
+        self.box_number, self.card_number = box_number, card_number
         self.current_card = self.boxes_set[box_number][card_number]
 
     def generate_card_position(self, lengths, weight):
@@ -94,13 +82,18 @@ class CardBox:
         card_number = randint(0, max(0, min(lengths[box_number] - 1, (lengths[box_number] - 1) // 2)))
         return box_number, card_number
 
-    def get_card_side_for_display(self):
-        if self.current_card['interval'] in (1, 4):
+    def gen_display_sides(self):
+        interval = self.current_card['interval']
+        if 1 <= interval <= 4:
             self.current_card['interval'] += 2
-            return self.current_card['side1'], self.current_card['side2']
-        elif self.current_card['interval'] in (2, 3):
-            self.current_card['interval'] += 2
-            return self.current_card['side2'], self.current_card['side1']
+
+        if interval in (1, 4):
+            self.current_side = 1
+            return 1
+        elif interval in (2, 3):
+            self.current_side = 2
+            return 2
+
 
     def change_box(self, box_num):
         if (box_num == self.box_number or box_num < self.box_number) and box_num != 3:
@@ -120,7 +113,6 @@ class CardBox:
             else:
                 del self.boxes_set[self.box_number][self.card_number]
 
-
     def fill_incomplete_lists(self):
         for indx, box in enumerate(self.boxes_set[:-1]):
             if not box:
@@ -128,37 +120,63 @@ class CardBox:
                 if not any(self.boxes_set[:-1]):
                     raise Exception('No cards')
 
-    def show_card(self):
-        self.get_card()
-        return self.get_card_side_for_display()
+    def get_card(self):
+        self.generate_cur_card()
+        side_num = self.gen_display_sides()
+        side1 = self.current_card['side1']
+        side2 = self.current_card['side2']
+        return (side2, side1) if side_num == 1 else (side1, side2)
 
     def boxes_processing(self, interval):
         self.change_box(interval)
         self.fill_incomplete_lists()
 
+    @staticmethod
+    def display_substring(card_side, substr):
+        side = card_side.split()
+        return ' '.join(i[:min(substr, len(i))] + '.' * (len(i) - substr) for i in side)
+
+    def provide_options(self):
+        cur_side = self.current_side
+        cb = self.boxes_set[self.box_number]
+        max_box = max((box for box in self.boxes_set if box != cb), key=len)
+
+        extra_words = (choice(max_box)['side1'] if cur_side == 1 else choice(max_box)['side2'] for _ in range(12))
+        extra_words = tuple(set(extra_words))[:4]
+        return extra_words
+
+
+
+
 
 cardbox = CardBox()
 user_answer = 0
-while user_answer != 3:
+while True:
 
     for i, j in enumerate(cardbox.boxes_set):
         print(f' ->> Box {i}: {len(j)} << ', end='')
-    # print('\n')
+    print('\n')
 
-    card = cardbox.show_card()
+    card = cardbox.get_card()
     print(card[0])
-    print('1box num ', cardbox.box_number, 'card num', cardbox.card_number)
-
-    # provide_options = int(input('Показать варианты? 1/0'))
-    display_substring = int(input('Сколько букв открыть?'))
+    print('1.  box num ', cardbox.box_number, ' card num ', cardbox.card_number)
 
     # user_answer = int(input('2 - show answer, 3 - exit: '))
-    user_answer = 2
+    user_answer = 3
     if user_answer == 2:
-        print(card[1])
-        print('2box num ', cardbox.box_number, 'card num', cardbox.card_number)
-        repetition_interval = int(input('repetition interval 0, 1, 2 or 3: '))
-        cardbox.boxes_processing(repetition_interval - 1)
+        sub_str = ''
+        while card[1] != sub_str:
+            display_substr = int(input('Сколько букв открыть?'))
+            sub_str = cardbox.display_substring(card[1], display_substr)
+            print(sub_str)
+    elif user_answer == 3:
+        extra_words = cardbox.provide_options()
+        print(extra_words)
+
+    print(card[1])
+    print('2.  box num ', cardbox.box_number, ' card num ', cardbox.card_number)
+    repetition_interval = int(input('repetition interval 0, 1, 2 or 3: '))
+    cardbox.boxes_processing(repetition_interval - 1)
 
     # print()
     for i in cardbox.boxes_set:
