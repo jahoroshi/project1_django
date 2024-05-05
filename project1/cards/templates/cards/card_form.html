@@ -1,0 +1,20 @@
+{% extends 'cards/base.html'%}
+
+{% block content %}
+    {% if object %}
+        <h2>Edit card</h2>
+    {% else %}
+        <h2> Create New Card</h2>
+    {% endif %}
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <input type="submit" value="Save Card">
+    </form>
+    {% if request.META.HTTP_REFERER %}
+        <a href="{{ request.META.HTTP_REFERER }}">Cansel</a>
+    {% else %}
+        <a href="{% url 'cards_list' %}">Cansel</a>
+    {% endif %}
+{% endblock %}
+

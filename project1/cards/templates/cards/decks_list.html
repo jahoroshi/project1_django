@@ -1,0 +1,27 @@
+{% extends 'cards/base.html' %}
+{% load humanize %}
+
+{% block content %}
+    <h2>My decks</h2>
+<a href="{% url 'deck_create' %}" role="button">Create new deck</a>
+
+
+    {% for deck in object_list %}
+        {% ifchanged %}
+            <article>
+            <a href="{% url 'deck_edit' deck.id%}" role="button">Rename</a>
+            <a href="{% url 'deck_delete' deck.id %}" role="button">Delete</a>
+            <h7>{{ deck.cards_count }} card{{ deck.cards_count | pluralize  }} in deck</h7>
+
+            <h3><a href="{% url 'deck_content' deck.slug %}">Deck {{ deck.name | ordinal}}</a></h3>
+
+
+            <a href="{% url 'card_create' deck.slug %}" role="button">Add new card</a>
+
+
+            </article>
+        {% endifchanged %}
+{#    {% include 'cards/deck.html' %}#}
+    {% endfor %}
+
+{% endblock content %}

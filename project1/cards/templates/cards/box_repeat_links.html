@@ -1,0 +1,9 @@
+{% load humanize %}
+
+{% for box in repetition_boxes %}
+    <a href="{% url 'learn_cards_rep' rep=box.repetition slug=box.slug %}">
+        {{ box.repeat | ordinal }}  <mark>{{ box.card_count }}</mark>
+    </a>
+{% endfor %}
+<br>
+{{ repetition_boxes }}

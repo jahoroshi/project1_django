@@ -1,0 +1,7 @@
+{% load humanize %}
+
+{% for box in categories_boxes %}
+    <a href="{% url 'deck_content' slug=box.slug %}">
+        {{ box.name | ordinal }}  <mark>{{ box.cat_count }}</mark>
+    </a>
+{% endfor %}

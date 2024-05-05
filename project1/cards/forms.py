@@ -1,9 +1,12 @@
 
 from django import forms
-from .models import Mappings, Cards
+from .models import Mappings, Cards, Categories
+from django.shortcuts import get_object_or_404
+
 
 class CardCheckForm(forms.Form):
     card_id = forms.IntegerField(required=True)
+    rating = forms.IntegerField(required=False)
     solved = forms.BooleanField(required=False)
 
 
@@ -32,3 +35,22 @@ class MappingsForm(forms.ModelForm):
     #         instance.save()
     #     return instance
     ...
+
+
+class CardForm(forms.ModelForm):
+    category = forms.ModelChoiceField(queryset=Categories.objects.all().order_by('pk'))
+
+    class Meta:
+        model = Cards
+        fields = ['side1', 'side2', 'category']
+
+    def __init__(self, *args, **kwargs):
+        self.slug = kwargs.pop('slug', None)
+        super(CardForm, self).__init__(*args, **kwargs)
+
+        if self.slug:
+            category = get_object_or_404(Categories, slug=self.slug)
+            self.fields['category'].initial = category.pk
+        elif self.slug is None and kwargs.get('instance'):
+            category = get_object_or_404(Categories, mappings__card=kwargs.get('instance'))
+            self.fields['category'].initial = category.pk

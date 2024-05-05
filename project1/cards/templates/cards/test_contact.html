@@ -1,0 +1,22 @@
+{% extends 'cards/base.html' %}
+
+{% block content %}
+    {{ request.META.HTTP_REFERER }}
+
+    <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+
+        <input type="submit" value="Create">
+
+
+    </form>
+
+<form action="/test_contact/" method="post">
+    {% csrf_token %}
+
+    <label for="your_name">Your name: </label>
+    <input id="your_name" type="text" name="your_name" value="{{ current_name }}">
+    <input type="submit" value="OK">
+</form>
+{% endblock %}

@@ -1,0 +1,14 @@
+<form method="post">
+    {% csrf_token %}
+    <input type="hidden" name="card_id" value="{{ card.id }}">
+    <input type="hidden" name="rating" value="{{ rating }}">
+    {% if rating == 4 %}
+        <input type="submit" value="✅ Light"/>
+    {% elif rating == 3 %}
+        <input type="submit" value="✅ Good"/>
+    {% elif rating == 2 %}
+        <input type="submit" value="✅ Hard"/>
+    {% elif rating == 1 %}
+        <input type="submit" value="❌ Again"/>
+    {% endif %}
+</form>

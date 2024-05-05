@@ -1,0 +1,20 @@
+
+
+{% extends "cards/base.html" %}
+{% load humanize %}
+
+{% block content %}
+    <h2>
+        {{ deck_name }}
+    </h2>
+    {% include 'cards/create_new_card.html' %}
+    <br>
+    <a href="{% url 'learn_cards' slug %}">Study cards</a>
+
+    {% for card in object_list %}
+        {% ifchanged %}
+            <h3>🗃 Repetition {{ card.repetition | ordinal}}</h3>
+        {% endifchanged %}
+        {% include "cards/card.html" %}
+    {% endfor %}
+{% endblock content %}

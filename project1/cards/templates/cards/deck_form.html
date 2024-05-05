@@ -1,0 +1,26 @@
+{% extends 'cards/base.html' %}
+
+{% block content %}
+    {{ request.META.HTTP_REFERER }}
+{% if object %}
+    <h2>Edit deck</h2>
+{% else %}
+    <h2>Create desk</h2>
+{% endif %}
+    <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    {% if object %}
+        <input type="submit" value="Save">
+    {% else %}
+        <input type="submit" value="Create">
+    {% endif %}
+
+    </form>
+    {% if request.META.HTTP_REFERER %}
+        <a href="{{ request.META.HTTP_REFERER }}">Cansel</a>
+    {% else %}
+        <a href="{% url 'decks_list' %}">Cansel</a>
+    {% endif %}
+
+{% endblock %}
