@@ -1,20 +1,25 @@
 
 from django import template
+from django.utils import timezone
 
 from cards.models import Categories, Cards, Mappings
+from django.db.models import Q
 
 register = template.Library()
 
-@register.inclusion_tag("cards/mem_rating_in_card.html")
-def boxes_of_rating(rep, slug):
+@register.simple_tag(takes_context=True)
+def boxes_of_rating(context):
     boxes = []
-    rating_scale = ('again', 'hard', 'good', 'easy')
-    rep = (rep,) if rep != 0 else (1, 2, 3, 4)
+    conditions = context.get('conditions')
+    # rating_scale = ('again', 'hard', 'good', 'easy')
+    # rep = (rep,) if rep != 0 else (1, 2, 3, 4)
     for rating in range(1, 5):
-        card_count = Mappings.objects.filter(repetition__in=rep, mem_rating=rating, category__slug=slug).count()
+        card_count = Cards.objects.filter(conditions, mappings__mem_rating=rating).count()
+        # card_count = Mappings.objects.filter(repetition__in=rep, mem_rating=rating, category__slug=slug).count()
         boxes.append({
-            "name": rating_scale[rating-1].capitalize(),
+            # "name": rating_scale[rating-1].capitalize(),
             "card_count": card_count,
+            "number": rating
         })
 
     return ({"rating_boxes": boxes})
@@ -50,4 +55,16 @@ def boxes_of_categories():
     return ({"categories_boxes": boxes})
 
 
+@register.inclusion_tag('cards/study_cards_stats.html')
+def study_cards_stats(slug):
+    stats_box = []
+    cards_review_count = Mappings.objects.filter(
+        review_date__lt=timezone.now(), review_date__isnull=False, category__slug=slug
+    ).count()
+    new_cards_count = Mappings.objects.filter(review_date__isnull=True, category__slug=slug).count()
+    stats_box.append({
+        'cards_review_count': cards_review_count,
+        'new_cards_count': new_cards_count,
+    })
+    return ({"stats_box": stats_box})
 

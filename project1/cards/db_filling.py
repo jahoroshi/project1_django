@@ -7,15 +7,13 @@
 
 # Импортируем настройки Django, чтобы настроить окружение
 import os
-from supermemo2 import SMTwo
+
 import django
-from random import randint
-from django.forms import inlineformset_factory
-from django.db.models import Case, When, Value, F, CharField
+from django.db import connection
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'project_1.settings')
 django.setup()
-from cards.models import Users, Categories, Cards, Mappings, TestSides
+from cards.models import Mappings
 
 # Создаем пользователей
 
@@ -28,7 +26,6 @@ from cards.models import Users, Categories, Cards, Mappings, TestSides
 #                           localdate=django.utils.timezone.now().date(), repetition=0, status='0')
 
 # print('Таблицы базы данных заполнены тестовыми данными.')
-
 
 
 # Mappings.objects.all().delete()
@@ -140,7 +137,6 @@ count = 0
 #         "name": cat['name'],
 #         "cat_count": cat_count
 #     })
-from django.shortcuts import get_object_or_404, redirect
 
 # card = get_object_or_404(Mappings, card_id=112)
 # a = Mappings.objects.filter(card_id=112)
@@ -157,16 +153,15 @@ from django.shortcuts import get_object_or_404, redirect
 #     ).order_by('repetition')
 # # print(queryset2[0].card.side1)
 
-# queryset4 = Categories.objects.select_related('car')
-
-# r = SMTwo.first_review(1)
+# querys
 # for i in range(10):
 #     m = randint(2, 5)
 #     b = SMTwo(r.easiness, r.interval, r.repetitions).review(m)
 #     print(b, f'   Mark {m}')
 #     r = b
 
-slug = 'category-2'
+slug = 'category-1'
+# slug = None
 # a = Cards.objects.filter(mappings__category__slug=slug).annotate(
 #     front_side=Case(
 #         When(mappings__front_side=1, then=F('side1')),
@@ -182,11 +177,32 @@ slug = 'category-2'
 # ).values(
 #     'mappings__repetition', 'front_side', 'back_side', 'id', 'mappings', 'mappings__category__name'
 # )
+# cards_review_count = Mappings.objects.filter(
+#         review_date__lt=timezone.now(), review_date__isnull=False, category__slug=slug
+#     ).count()
+# new_cards_count = Mappings.objects.filter(review_date__isnull=True, category__slug=None if slug else 'category-2').count()
+# print(new_cards_count)
+# print(cards_review_count)
+from django.db.models import Q, Count
 
-# print(a)
-deck = get_object_or_404(Categories, slug=slug)
-cards = Cards.objects.filter(mappings__isnull=True).delete()
-print(len(cards))
-print(cards)
 
-        # deck.delete()
+def query_builder(*args, **kwargs):
+    conditions = Q(category__slug=kwargs['slug'])
+
+    if kwargs['study_mode'] == 'new':
+        conditions &= Q(study_mode='new') | Q(mem_rating__range=(1, 4), study_mode='new')
+
+
+    subquery = Mappings.objects.filter(conditions).order_by('-mem_rating')[:10]
+    queryset = Mappings.objects.filter(id__in=subquery.values('id')).order_by('upd_date')
+    mem_ratings = queryset.values_list('mem_rating').annotate(m=Count('mem_rating')).order_by('mem_rating')
+    print(list(mem_ratings))
+    for i in mem_ratings:
+        print(i)
+    return queryset
+
+a = query_builder(slug='test-new', study_mode='new')
+for i in a:
+    print(i.mem_rating, '     ', i.upd_date)
+print(f"Количество запросов: {len(connection.queries)}")
+

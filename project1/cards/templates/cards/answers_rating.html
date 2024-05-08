@@ -1,0 +1,8 @@
+{% load cards_tags %}
+<div class="button-container">
+
+    {% for box in rating_boxes %}
+        {% include 'cards/card_check_form.html' with rating=box.number count=box.card_count %}
+    {% endfor %}
+
+            </div>

@@ -13,15 +13,14 @@
         <details>
             <summary>Reveal Answer</summary>
             <p>{{ card.back_side }}</p>
-            <hr>
-            <div class="button-container">
-            {% include 'cards/card_check_form.html' with rating=1 %}
-            {% include 'cards/card_check_form.html' with rating=2 %}
-            {% include 'cards/card_check_form.html' with rating=3 %}
-            {% include 'cards/card_check_form.html' with rating=4 %}
-            </div>
-            <hr>
         </details>
-        {% boxes_of_rating repetition slug %}
+
+        <div class="button-container">
+            {% boxes_of_rating as bor %}
+            {% for box in bor.rating_boxes %}
+                {% include 'cards/card_check_form.html' with rating=box.number count=box.card_count %}
+            {% endfor %}
+
+            </div>
     {% endif %}
 </article>

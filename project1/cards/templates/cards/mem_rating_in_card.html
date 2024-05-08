@@ -1,12 +1,3 @@
-{#{% load humanize %}#}
-{##}
-{#{% for box in rating_boxes %}#}
-{#    <a href="{% url 'box' box_num=box.number %}">#}
-{#        {{ box.number | ordinal }} Box <mark>{{ box.card_count }}</mark>#}
-{#    </a>#}
-{#{% endfor %}#}
-
-
 {% for box in rating_boxes %}
     {{ box.name }} <mark>{{ box.card_count }}</mark>
 {% endfor %}

@@ -5,9 +5,8 @@ from django.shortcuts import get_object_or_404
 
 
 class CardCheckForm(forms.Form):
-    card_id = forms.IntegerField(required=True)
+    mappings = forms.IntegerField(required=True)
     rating = forms.IntegerField(required=False)
-    solved = forms.BooleanField(required=False)
 
 
 class AddCardForm(forms.Form):
@@ -39,10 +38,11 @@ class MappingsForm(forms.ModelForm):
 
 class CardForm(forms.ModelForm):
     category = forms.ModelChoiceField(queryset=Categories.objects.all().order_by('pk'))
+    is_two_sides = forms.BooleanField(required=False, label='Two sides')
 
     class Meta:
         model = Cards
-        fields = ['side1', 'side2', 'category']
+        fields = ['side1', 'side2', 'category', 'is_two_sides']
 
     def __init__(self, *args, **kwargs):
         self.slug = kwargs.pop('slug', None)

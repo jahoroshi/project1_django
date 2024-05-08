@@ -1,15 +1,16 @@
-
-
 {% extends "cards/base.html" %}
+{% load cards_tags %}
 {% load humanize %}
 
 {% block content %}
     <h2>
         {{ deck_name }}
     </h2>
+    {% study_cards_stats slug%}
     {% include 'cards/create_new_card.html' %}
     <br>
-    <a href="{% url 'learn_cards' slug %}">Study cards</a>
+    <a href="{% url 'learn_cards' slug %}?study_mode=new">Study new cards</a>
+    <a href="{% url 'learn_cards' slug %}?study_mode=review">Review cards</a>
 
     {% for card in object_list %}
         {% ifchanged %}
