@@ -6,15 +6,17 @@
     <h2>
         {{ deck_name }}
     </h2>
-    {% study_cards_stats slug%}
-    {% include 'cards/create_new_card.html' %}
-    <br>
-    <a href="{% url 'learn_cards' slug %}?study_mode=new">Study new cards</a>
-    <a href="{% url 'learn_cards' slug %}?study_mode=review">Review cards</a>
+    {% deck_study_panel_stats slug %}
+
+{#    <a href="{% url 'import_cards' slug %}">Import cards</a>#}
+{#    {% include 'cards/create_new_card.html' %}#}
+{#    <br>#}
+{#    <a href="{% url 'learn_cards' slug %}?study_mode=new">Study new cards</a>#}
+{#    <a href="{% url 'learn_cards' slug %}?study_mode=review">Review cards</a>#}
+
 
     {% for card in object_list %}
         {% ifchanged %}
-            <h3>🗃 Repetition {{ card.repetition | ordinal}}</h3>
         {% endifchanged %}
         {% include "cards/card.html" %}
     {% endfor %}

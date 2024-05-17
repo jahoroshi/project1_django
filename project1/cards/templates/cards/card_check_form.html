@@ -2,8 +2,10 @@
     {% csrf_token %}
     <input type="hidden" name="mappings" value="{{ card.mappings }}">
     <input type="hidden" name="rating" value="{{ rating }}">
-    {% if rating == 4 %}
-        <input type="submit" value="✅ Light {{ count }}"/>
+    {% if rating == 5 and easiness == 0 %}
+        <input type="submit" value="✅ I already know "/>
+    {% elif rating == 4 %}
+        <input type="submit" value="✅ Light "/>
     {% elif rating == 3 %}
         <input type="submit" value="✅ Good {{ count }}"/>
     {% elif rating == 2 %}

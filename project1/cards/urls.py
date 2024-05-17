@@ -43,6 +43,8 @@ urlpatterns = [
 
     path("deck/<slug:slug>/", views.CardsListView.as_view(), name="deck_content"),
 
+    path("deck/<slug:slug>/import/", views.import_cards, name="import_cards"),
+
     path("learn/<slug:slug>/<int:rep>/", views.BoxView.as_view(), name="learn_cards_rep"),
 
     path("test_contact/", views.test_contact, name="test_contact"),

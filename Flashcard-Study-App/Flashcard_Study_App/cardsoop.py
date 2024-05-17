@@ -55,7 +55,7 @@ class CardBox:
                 'id': el[0],
                 'side1': el[1],
                 'side2': el[2],
-                'interval': randint(1, 2),
+                'show': randint(1, 2),
             })
         return box
 
@@ -83,9 +83,9 @@ class CardBox:
         return box_number, card_number
 
     def gen_display_sides(self):
-        interval = self.current_card['interval']
+        interval = self.current_card['show']
         if 1 <= interval <= 4:
-            self.current_card['interval'] += 2
+            self.current_card['show'] += 2
 
         if interval in (1, 4):
             self.current_side = 1
@@ -97,17 +97,17 @@ class CardBox:
 
     def change_box(self, box_num):
         if (box_num == self.box_number or box_num < self.box_number) and box_num != 3:
-            self.current_card['interval'] -= 2
+            self.current_card['show'] -= 2
         elif box_num > self.box_number:
-            if self.current_card['interval'] in (5, 6):
-                self.current_card['interval'] -= 4
+            if self.current_card['show'] in (5, 6):
+                self.current_card['show'] -= 4
             else:
                 box_num = self.box_number
 
         self.update_data(box_num)
 
         if self.boxes_set[self.box_number]:
-            if self.current_card['interval'] < 5:
+            if self.current_card['show'] < 5:
                 card = self.boxes_set[self.box_number].pop(self.card_number)
                 self.boxes_set[box_num].append(card)
             else:
@@ -183,5 +183,5 @@ while True:
         print()
         print('LENGHT OF BOX -', len(i), end='  /  ')
         for j in i:
-            print(j['interval'], j['side1'][:3], end=' - - - |->')
+            print(j['show'], j['side1'][:3], end=' - - - |->')
     print('\n', '___________________________', '\n')

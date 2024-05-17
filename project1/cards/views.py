@@ -1,24 +1,20 @@
-import json
-import random
-
-from django.db.models import Case, When, Count, F, CharField
-from django.http import HttpResponseRedirect, HttpResponse
+from django.core.cache import cache
+from django.db.models import Count, Case, When, Q, F, IntegerField
+from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy, reverse
-from django.utils import timezone
 from django.views.generic import (
     ListView,
     CreateView,
     UpdateView,
     DeleteView,
-    View,
 )
 
-from .forms import CardCheckForm, CardForm
-from .models import Cards, Mappings, Categories, ActiveStudy
-from django.core.cache import cache
 from cards.check_post_request import CheckReuqest, is_post_unique
-from django.db.models import Q
+from cards.query_builder import build_card_view_queryset
+from .forms import CardCheckForm, CardForm, ImportCardsForm
+from .models import Cards, Mappings, Categories
+from django.utils.timezone import now
 
 
 
@@ -32,7 +28,8 @@ class CardsListView(ListView):
             mappings__category__slug=slug,
             mappings__is_back_side=False
         ).values(
-            'mappings__repetition', 'id', 'mappings', 'mappings__category__name', front_side=F('side1'), back_side=F('side2')
+            'mappings__review_date', 'id', 'mappings', 'mappings__category__name', front_side=F('side1'),
+            back_side=F('side2')
         ).order_by('mappings__repetition')
         return queryset
 
@@ -85,6 +82,34 @@ class CardCreateView(CreateView):
         return kwargs
 
 
+def import_cards(request, *args, **kwargs):
+    if request.method == 'POST':
+        form = ImportCardsForm(request.POST)
+        if form.is_valid():
+            slug = kwargs['slug']
+            category = Categories.objects.get(slug=slug)
+            text = form.cleaned_data['text']
+            words_separator = form.cleaned_data['words_separator']
+            cards_separator = form.cleaned_data['cards_separator']
+            words_separator_custom = form.cleaned_data['words_separator_custom']
+            cards_separator_custom = form.cleaned_data['cards_separator_custom']
+            separators = {'tab': '  ', 'comma': ',', 'words_custom': words_separator_custom, 'new_line': '\r\n',
+                          'semicolon': ';', 'cards_custom': cards_separator_custom}
+
+            words_sep = separators[words_separator]
+            cards_sep = separators[cards_separator]
+            cards = text.split(cards_sep)
+            for card in cards:
+                try:
+                    front_side, back_side = card.split(words_sep)
+                    object_card = Cards.objects.create(side1=front_side.strip(), side2=back_side.strip())
+                    Mappings.objects.create(card=object_card, category=category)
+                except ValueError:
+                    continue
+            return HttpResponseRedirect(reverse('deck_content', args=[slug]))
+    else:
+        form = ImportCardsForm()
+    return render(request, 'cards/cards_import.html', {'form': form})
 
 
 #
@@ -123,55 +148,31 @@ class CardDeleteView(CheckReuqest, DeleteView):
         return reverse_lazy('deck_content', args=[slug])
 
 
-
-def query_builder(*args, **kwargs):
-    conditions = Q(category__slug=kwargs['slug'])
-
-    if kwargs['study_mode'] == 'new':
-        conditions &= Q(study_mode='new') | Q(mem_rating__range=(1, 4), study_mode='new')
-
-    queryset = Mappings.objects.filter(conditions).order_by('mem_rating').limit(10).order_by('-upd_date')
-
-
 class BoxView(ListView):
     model = Cards
     template_name = 'cards/box.html'
     form_class = CardCheckForm
 
     def get_queryset(self):
-        conditions = Q(mappings__category__slug=self.kwargs['slug'])
-        if self.request.GET.get('study_mode') == 'new':
-            conditions &= Q(mappings__review_date__isnull=True)
-        elif self.request.GET.get('study_mode') == 'review':
-            conditions &= Q(mappings__review_date__lt=timezone.now(), mappings__review_date__isnull=False)
-        # if 'rep' in self.kwargs:
-        #     conditions &= Q(mappings__repetition=self.kwargs['rep'])
-        self.kwargs['conditions'] = conditions
-        queryset = Cards.objects.filter(conditions)
+        study_mode = self.request.GET.get('study_mode')
+        self.kwargs['study_mode'] = study_mode
+        slug = self.kwargs['slug']
+        queryset, self.kwargs['ratings_count'] = build_card_view_queryset(slug=slug, study_mode=study_mode)
+        queryset = queryset.first()
 
-        queryset = queryset.annotate(
-            front_side=Case(
-                When(mappings__is_back_side=True, then=F('side2')),
-                default=F('side1'),
-                output_field=CharField(),
-            ),
-            back_side=Case(
-                When(mappings__is_back_side=True, then=F('side1')),
-                default=F('side2'),
-                output_field=CharField(),
-            ),
-        ).values(
-            'mappings__repetition', 'front_side', 'back_side', 'id', 'mappings', 'mappings__category__name'
-        ).order_by('mappings__repetition')
         return queryset
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['repetition'] = self.kwargs.setdefault('rep', 0)
+        context['ratings_count'] = self.kwargs.get('ratings_count', {})
         context['slug'] = self.kwargs['slug']
-        context['conditions'] = self.kwargs['conditions']
+        context['study_mode'] = self.kwargs['study_mode']
         if self.object_list:
-            context['check_card'] = random.choice(self.object_list)
+            # context['my_debug'] = Mappings.objects.filter(id=self.object_list['mappings']).values('id', 'repetition',
+            #                                                                                       'mem_rating',
+            #                                                                                       'easiness',
+            #                                                                                       'study_mode')
+            context['check_card'] = self.object_list
         return context
 
     def post(self, request, *args, **kwargs):
@@ -185,7 +186,12 @@ class BoxView(ListView):
 
 class DecksListView(ListView):
     model = Categories
-    queryset = Categories.objects.annotate(cards_count=Count('mappings'))
+    queryset = Categories.objects.annotate(cards_count=Count('mappings'), reviews_count=Count(
+        Case(
+            When(mappings__review_date__lte=now().date(), then=1),
+            output_field=IntegerField(),
+        )
+    ))
     template_name = 'cards/decks_list.html'
 
     def get_ordering(self):
@@ -220,7 +226,7 @@ def deck_delete(request, pk):
         deck.delete()
         cards.delete()
         return redirect(reverse('decks_list'))
-    return render(request,'cards/delete_object.html', {'deck_name': deck.name})
+    return render(request, 'cards/delete_object.html', {'deck_name': deck.name})
 
 
 def check_post_unique(view_func):
@@ -232,7 +238,9 @@ def check_post_unique(view_func):
                 request.POST = {}
             cache.set(token, 'processed', timeout=50)
         return view_func(request, *args, **kwargs)
+
     return wrapper
+
 
 # @check_post_unique
 def test_contact(request):
@@ -245,7 +253,6 @@ def test_contact(request):
         #     print('DOUBLE POST!!!!')
     return render(request, 'cards/test_contact.html', {})
 
-
 # class CheckReuqest(View):
 #     def post(self, request, *args, **kwargs):
 #         self.object = None
@@ -255,9 +262,3 @@ def test_contact(request):
 #         cache.set(token, 'processed', timeout=50)
 #
 #         return super().post(request, *args, **kwargs)
-
-
-
-
-
-

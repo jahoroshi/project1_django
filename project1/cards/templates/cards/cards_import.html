@@ -1,0 +1,27 @@
+{% extends 'cards/base.html' %}
+
+{% block content %}
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_table }}
+        <input type="submit" value="Create">
+    </form>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var customOptionInput1 = document.getElementById('id_words_separator_custom');
+            var customOptionInput2 = document.getElementById('id_cards_separator_custom');
+            var customRadio1 = document.getElementById('id_words_separator_2');
+            var customRadio2 = document.getElementById('id_cards_separator_2');
+
+            customOptionInput1.addEventListener('focus', function () {
+                customRadio1.checked = true;
+            });
+
+            customOptionInput2.addEventListener('focus', function () {
+                customRadio2.checked = true;
+            });
+        });
+    </script>
+
+{% endblock %}

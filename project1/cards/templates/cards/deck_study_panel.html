@@ -1,0 +1,71 @@
+<h7>New cards for studying: {{ stats_box.0.new_cards_count }}</h7>
+<h7>Cards for review: {{ stats_box.0.cards_review_count }}</h7>
+{% if  stats_box.0.next_review_date %}
+    <div class="countdown-title">Cards will be available in:</div>
+    <div id="countdown" class="countdown-container">
+        <div class="countdown-item">
+            <div id="days" class="countdown-number"></div>
+            <div class="countdown-label">days</div>
+        </div>
+        <div class="countdown-item">
+            <div id="hours" class="countdown-number"></div>
+            <div class="countdown-label">hours</div>
+        </div>
+        <div class="countdown-item">
+            <div id="minutes" class="countdown-number"></div>
+            <div class="countdown-label">minutes</div>
+        </div>
+        <div class="countdown-item">
+            <div id="seconds" class="countdown-number"></div>
+            <div class="countdown-label">seconds</div>
+        </div>
+    </div>
+{% endif %}
+
+<a href="{% url 'import_cards' stats_box.0.slug %}">Import cards</a>
+{% include 'cards/create_new_card.html' %}
+<br>
+{% if stats_box.0.new_cards_count > 0 %}
+    <a href="{% url 'learn_cards' stats_box.0.slug %}?study_mode=new">Study new cards</a>
+{% else %}
+    <a>Study new cards</a>
+{% endif %}
+
+{% if stats_box.0.cards_review_count > 0 %}
+    <a href="{% url 'learn_cards' stats_box.0.slug %}?study_mode=review">Review cards</a>
+{% else %}
+    <a>Review cards</a>
+{% endif %}
+
+<script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Получить конечное время и текущее время из тега данных
+            var endTime = new Date('{{ stats_box.0.next_review_date|date:"Y-m-d H:i:s" }}').getTime();
+            var serverStartTime = new Date('{{ stats_box.0.current_time|date:"Y-m-d H:i:s" }}').getTime();
+            var clientStartTime = new Date().getTime();
+
+            // Функция обновления таймера
+            function updateCountdown() {
+                var now = serverStartTime + (new Date().getTime() - clientStartTime);
+                var timeRemaining = endTime - now;
+
+                if (timeRemaining > 0) {
+                    var days = Math.floor(timeRemaining / (1000 * 60 * 60 * 24));
+                    var hours = Math.floor((timeRemaining % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    var minutes = Math.floor((timeRemaining % (1000 * 60 * 60)) / (1000 * 60));
+                    var seconds = Math.floor((timeRemaining % (1000 * 60)) / 1000);
+
+                    document.getElementById('days').innerHTML = days;
+                    document.getElementById('hours').innerHTML = hours;
+                    document.getElementById('minutes').innerHTML = minutes;
+                    document.getElementById('seconds').innerHTML = seconds;
+                } else {
+                    document.getElementById('countdown').innerHTML = "EXPIRED";
+                }
+            }
+
+            // Обновление таймера каждую секунду
+            setInterval(updateCountdown, 1000);
+            updateCountdown(); // Начальная установка
+        });
+    </script>

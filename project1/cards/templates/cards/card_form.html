@@ -11,10 +11,10 @@
         {{ form.as_p }}
         <input type="submit" value="Save Card">
     </form>
-    {% if request.META.HTTP_REFERER %}
-        <a href="{{ request.META.HTTP_REFERER }}">Cansel</a>
+    {% if request.path %}
+        <a href="{{ request.path }}">Cansel</a>
     {% else %}
-        <a href="{% url 'cards_list' %}">Cansel</a>
+        <a href="{% url 'decks_list' %}">Cansel</a>
     {% endif %}
 {% endblock %}
 

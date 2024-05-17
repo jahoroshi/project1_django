@@ -2,6 +2,8 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.text import slugify
 from transliterate import translit, detect_language
+from cards.compute_study_metrics import compute_study_easiness, scale_easiness, NextReviewDate
+
 NUM_BOXES = 5
 BOXES = range(1, NUM_BOXES + 2)
 
@@ -71,22 +73,40 @@ class Mappings(models.Model):
     is_back_side = models.BooleanField(default=False)
     repetition = models.IntegerField(default='0')
     mem_rating = models.IntegerField(default='0')
-    in_study_process = models.BooleanField(default=False)
-    study_mode = models.CharField(max_length=3, default='new')
-    params = models.JSONField(blank=True, null=True)
+    easiness = models.FloatField(default='0.0')
+    study_mode = models.CharField(max_length=10, default='new')
+    review_params = models.JSONField(blank=True, null=True)
     review_date = models.DateTimeField(blank=True, null=True)
     upd_date = models.DateTimeField(auto_now=True)
+    def my_debug(self):
+        data = (f'ID: {self.id}',
+              f'Repetition: {self.repetition}',
+              f'Easiness: {self.easiness}',
+              f'Mem_rating: {self.mem_rating}',
+              f'Study mode: {self.study_mode}')
+        print('\033[33;40;1m %-15s %-20s %-20s %-35s %-20s\033[0m' % data, '\n')
 
-    def move(self, mark):
-        print(f'mark: {mark}    mem_rating: {self.mem_rating}')
-        if mark == 4 and self.mem_rating == 4:
-            self.repetition += 1
-            self.mem_rating = 1
-            print('if\'ka')
+    def move(self, rating):
+        self.my_debug()
+        if rating == 4:
+            if self.study_mode == 'new':
+                self.study_mode = 'review'
+            rev_params, rev_date = NextReviewDate(self.review_params or {}).review(scale_easiness(self.easiness))
+            self.review_params = rev_params
+            self.review_date = rev_date
+            self.repetition = 0
+            self.mem_rating = 0
+            print(rev_params, '    ', rev_date)
+        elif rating == 5:
+            self.study_mode = 'known'
         else:
-            self.mem_rating = mark
-            print('else')
+            self.easiness = compute_study_easiness(self.easiness, rating, self.repetition)
+            # if self.mem_rating == rating == 1:
+            #     self.easiness = scale_easiness(self.easiness)
+            self.repetition += 1
+            self.mem_rating = rating
         self.save()
+        self.my_debug()
         return self
 
 

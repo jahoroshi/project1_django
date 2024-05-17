@@ -1,11 +1,26 @@
 {% load cards_tags %}
+{% load cards_filters %}
+{% load humanize %}
 <article>
+    {% if card.mappings__review_date %}
+          <h7>  {{ card.mappings__review_date | time_left }} </h7>
+        {% endif %}
+    {% include 'cards/card_check_form.html' with rating=5 easiness=card.mappings__easiness%}
     {% include 'cards/edit_card.html' %}
+    <button onclick="window.location.href = '{% url 'card_delete' slug card.id  %}'" role="button">Delete</button>
+
     <br>
-    <a href="{% url 'card_delete' slug card.id  %}" role="button">Delete</a>
+
 
     <h4>{{ card.front_side }}</h4>
-    <h6>{{ card }}</h6>
+
+    {% for key, value in  my_debug.0.items %}
+       <h7> {{ key }}  {{ value }} </h7>
+
+
+        <br>
+    {% endfor %}
+<br>
     {% if not check_card %}
         <p>{{ card.back_side }}</p>
         <hr>
@@ -16,9 +31,8 @@
         </details>
 
         <div class="button-container">
-            {% boxes_of_rating as bor %}
-            {% for box in bor.rating_boxes %}
-                {% include 'cards/card_check_form.html' with rating=box.number count=box.card_count %}
+            {% for rating, count in ratings_count.items %}
+                {% include 'cards/card_check_form.html' with rating=rating count=count%}
             {% endfor %}
 
             </div>

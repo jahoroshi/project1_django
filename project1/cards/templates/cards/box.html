@@ -1,12 +1,12 @@
 {% extends 'cards/base.html' %}
+{% load cards_tags %}
 {% load humanize %}
 
 {% block content %}
     <h2>Box</h2>
     <h6>{% include 'cards/create_new_card.html' %}</h6>
 
-
-    <mark>{{ object_list | length }}</mark> Card{{ object_list | pluralize }} left in box.
+    <mark>{{ ratings_count | sum_values  }}</mark> Card{{ object_list | pluralize }} in process.
     <hr>
     {% if check_card %}
         {% include 'cards/card.html' with card=check_card%}

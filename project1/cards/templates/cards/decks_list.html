@@ -11,7 +11,8 @@
             <article>
             <a href="{% url 'deck_edit' deck.id%}" role="button">Rename</a>
             <a href="{% url 'deck_delete' deck.id %}" role="button">Delete</a>
-            <h7>{{ deck.cards_count }} card{{ deck.cards_count | pluralize  }} in deck</h7>
+            <h7>Card{{ deck.cards_count | pluralize  }} in deck: {{ deck.cards_count }}</h7>
+            <h7>Card{{ deck.reviews_count | pluralize  }} for today: {{ deck.reviews_count }}</h7>
 
             <h3><a href="{% url 'deck_content' deck.slug %}">Deck {{ deck.name | ordinal}}</a></h3>
 
