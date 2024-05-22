@@ -1,5 +1,6 @@
 from django.urls import path
-from . import views
+
+from cards import views
 
 # from views import add_card
 
@@ -26,8 +27,6 @@ urlpatterns = [
         name="card_edit",
     ),
 
-
-
     path("", views.DecksListView.as_view(), name="decks_list"),
 
     path("deck/new/", views.DeckCreateView.as_view(), name="deck_create"),
@@ -48,4 +47,13 @@ urlpatterns = [
     path("learn/<slug:slug>/<int:rep>/", views.BoxView.as_view(), name="learn_cards_rep"),
 
     path("test_contact/", views.test_contact, name="test_contact"),
+    path('get_card/', views.get_card, name='get_card'),
+    path('get_card/<slug:slug>/', views.get_card, name='get_card'),
+    path('show_back/<int:card_id>/', views.show_back, name='show_back'),
+    path('get_similar_words/<str:mappings_id>/', views.get_similar_words, name='get_similar_words'),
+    path('get_hint/<int:card_id>/', views.get_hint, name='get_hint'),
+    path('submit_answer/<int:card_id>/', views.submit_answer, name='submit_answer'),
+    path('study/<slug:slug>/<int:rep>/', views.study_view, name='study'),
+    path('study/<slug:slug>/', views.study_view, name='study'),
+    path('study/', views.study_view, name='study'),
 ]

@@ -1,6 +1,6 @@
 from django.core.cache import cache
 from django.db.models import Count, Case, When, Q, F, IntegerField
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, Http404
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy, reverse
 from django.views.generic import (
@@ -11,11 +11,11 @@ from django.views.generic import (
 )
 
 from cards.check_post_request import CheckReuqest, is_post_unique
+from cards.exceptions import DeckEmptyException
 from cards.query_builder import build_card_view_queryset
-from .forms import CardCheckForm, CardForm, ImportCardsForm
-from .models import Cards, Mappings, Categories
+from cards.forms import CardCheckForm, CardForm, ImportCardsForm
+from cards.models import Cards, Mappings, Categories
 from django.utils.timezone import now
-
 
 
 class CardsListView(ListView):
@@ -136,7 +136,7 @@ class CardUpdateView(CardCreateView, UpdateView):
             card = Mappings.objects.get(card=self.object)
             card.category = form.cleaned_data['category']
             card.save()
-        return HttpResponseRedirect(reverse('deck_content', args=[slug]))
+        return HttpResponseRedirect(reverse('decks_list'))
 
 
 class CardDeleteView(CheckReuqest, DeleteView):
@@ -157,8 +157,11 @@ class BoxView(ListView):
         study_mode = self.request.GET.get('study_mode')
         self.kwargs['study_mode'] = study_mode
         slug = self.kwargs['slug']
-        queryset, self.kwargs['ratings_count'] = build_card_view_queryset(slug=slug, study_mode=study_mode)
-        queryset = queryset.first()
+        try:
+            queryset, self.kwargs['ratings_count'] = build_card_view_queryset(slug=slug, study_mode=study_mode)
+        except Cards.DoesNotExist:
+            print('s')
+
 
         return queryset
 
