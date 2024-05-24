@@ -7,33 +7,9 @@ from django.http import JsonResponse
 from django.shortcuts import render, get_object_or_404
 
 from cards.models import Cards, Mappings
-from cards.query_builder import build_card_view_queryset
-
-
-# logger = logging.getLogger('cards.views')
-def get_card(request, *args, **kwargs):
-    if request.method == 'POST':
-        body_unicode = request.body.decode('utf-8')
-        body_data = json.loads(body_unicode)
-        rating = body_data['rating']
-        mappings_id = body_data['mappings_id']
-        mappings = get_object_or_404(Mappings, pk=mappings_id)
-        mappings.move(rating)
-    slug = kwargs['slug']
-    study_mode = request.GET.get('study_mode')
-    card, ratings_count = build_card_view_queryset(slug=slug, study_mode=study_mode)
-
-    # logger.debug(f'Retrieved card {card.get("id")} for slug {slug} and study_mode {study_mode}')
-    # logger.debug(f'Ratings count: {ratings_count}')
-
-    return JsonResponse(
-        {'front_side': card.get('front_side'), 'back_side': card.get('back_side'), 'mappings_id': card.get('id')})
-
-
-def show_back(request, card_id):
-    card, ratings_count = build_card_view_queryset(slug='category-2', study_mode='new')
-    return JsonResponse({'back_side': card.get('back_side')})
-
+from cards.services.query_builder import build_card_view_queryset
+from django.http import HttpResponse
+from gtts import gTTS
 
 def get_similar_words(request, mappings_id, segment_length=3):
     mappings = Mappings.objects.filter(id=mappings_id).values(
@@ -77,29 +53,3 @@ def get_similar_words(request, mappings_id, segment_length=3):
     content.append(text)
     random.shuffle(content)
     return JsonResponse({'back_side': text, 'similar_words': content})
-
-
-def get_hint(request, card_id):
-    card = get_object_or_404(Cards, id=card_id)
-    return JsonResponse({'hint': card.hint})
-
-
-def submit_answer(request, card_id):
-    if request.method == 'POST':
-        body_unicode = request.body.decode('utf-8')
-        body_data = json.loads(body_unicode)
-        rating = body_data['rating']
-        print(rating)
-        new_card = random.choice(Cards.objects.all())
-        return JsonResponse({'new_card_id': new_card.id, 'front_side': new_card.front_side})
-
-
-def study_view(request, *args, **kwargs):
-    study_mode = request.GET.get('study_mode')
-    slug = kwargs.get('slug')
-    context = {
-        'csrf_token': request.COOKIES.get('csrftoken'),
-        'slug': slug,
-        'study_mode': study_mode,
-    }
-    return render(request, 'cards/studying_mode.html', context)

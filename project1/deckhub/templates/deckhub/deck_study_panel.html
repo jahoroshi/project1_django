@@ -23,7 +23,7 @@
 {% endif %}
 
 <a href="{% url 'import_cards' stats_box.0.slug %}">Import cards</a>
-{% include 'cards/create_new_card.html' %}
+{% include 'deckhub/create_new_card.html' %}
 <br>
 {% if stats_box.0.new_cards_count > 0 %}
     <a href="{% url 'learn_cards' stats_box.0.slug %}?study_mode=new">Study new cards</a>

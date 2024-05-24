@@ -2,7 +2,7 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.text import slugify
 from transliterate import translit, detect_language
-from cards.compute_study_metrics import compute_study_easiness, scale_easiness, NextReviewDate
+from cards.services.compute_study_metrics import compute_study_easiness, scale_easiness, NextReviewDate
 
 NUM_BOXES = 5
 BOXES = range(1, NUM_BOXES + 2)
@@ -61,7 +61,7 @@ class Cards(models.Model):
     side1 = models.CharField(max_length=255)
     side2 = models.CharField(max_length=255)
     transcription = models.CharField(max_length=255)
-    audio = models.URLField(blank=True, null=True, max_length=100)
+    audio = models.URLField(blank=True, null=True, max_length=255)
     def __str__(self):
         return self.side1
 
@@ -88,7 +88,7 @@ class Mappings(models.Model):
 
     def move(self, rating):
         self.my_debug()
-        if rating == 4:
+        if rating == 4 or self.easiness == 5:
             if self.study_mode == 'new':
                 self.study_mode = 'review'
             rev_params, rev_date = NextReviewDate(self.review_params or {}).review(scale_easiness(self.easiness))
@@ -101,8 +101,8 @@ class Mappings(models.Model):
             self.study_mode = 'known'
         else:
             self.easiness = compute_study_easiness(self.easiness, rating, self.repetition)
-            # if self.mem_rating == rating == 1:
-            #     self.easiness = scale_easiness(self.easiness)
+            if self.mem_rating == rating == 3:
+                self.easiness = min(scale_easiness(self.easiness), 5)
             self.repetition += 1
             self.mem_rating = rating
         self.save()

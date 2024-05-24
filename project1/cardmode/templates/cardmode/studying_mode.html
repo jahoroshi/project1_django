@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Flashcard Study</title>
+    <style>
+        .hidden {
+            display: none;
+        }
+
+        .letter {
+            display: inline-block;
+            margin: 0 5px;
+            padding: 5px;
+            border: 1px solid #000;
+            cursor: pointer;
+        }
+
+        .rating-button {
+            margin: 10px;
+            padding: 10px 20px;
+            cursor: pointer;
+        }
+
+        .wrong-letter {
+            background-color: red;
+        }
+
+        .inactive {
+            pointer-events: none;
+            background-color: lightgrey;
+        }
+
+        .correct-word {
+            background-color: lightgreen;
+            color: green;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+<h1>Flashcard Study</h1>
+<div id="card-container">
+    <div id="card-front" class="card-side"></div>
+</div>
+
+{% if buttons_to_show.show_back %}
+    <button id="show-back-btn">Show Back</button>
+{% endif %}
+{% if buttons_to_show.show_hint %}
+    <button id="show-hint-btn">Show Hint</button>
+{% endif %}
+{% if buttons_to_show.show_similar %}
+    <button id="show-similar-btn">Show Similar Words</button>
+{% endif %}
+{% if buttons_to_show.show_first_letters %}
+    <button id="show-first-letters-btn">Show First Letters</button>
+{% endif %}
+{% if buttons_to_show.scramble_letters %}
+    <button id="scramble-letters-btn">Scramble Letters</button>
+{% endif %}
+{% if buttons_to_show.speech %}
+    <button id="play-sound-btn">Play Sound</button>
+{% endif %}
+
+
+<div id="card-back" class="card-side hidden"></div>
+<div id="hint-container" class="hidden"></div>
+<div id="similar-words-container" class="hidden"></div>
+<div id="letters-container" class="hidden"></div>
+<div id="result-container"></div>
+
+<div>
+    <button class="rating-button" id="again-btn" data-rating="1">Again</button>
+    <button class="rating-button" id="hard-btn" data-rating="2">Hard</button>
+    <button class="rating-button" id="good-btn" data-rating="3">Good</button>
+    <button class="rating-button" id="easy-btn" data-rating="4">Easy</button>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const slug = '{{ slug }}';
+        const studyMode = '{{ study_mode }}';
+        const csrfToken = '{{ csrf_token }}';
+        const cardFront = document.getElementById('card-front');
+        const cardBack = document.getElementById('card-back');
+        const hintContainer = document.getElementById('hint-container');
+        const similarWordsContainer = document.getElementById('similar-words-container');
+        const lettersContainer = document.getElementById('letters-container');
+        const resultContainer = document.getElementById('result-container');
+        const actionButtons = document.querySelectorAll('#show-back-btn, #show-hint-btn, #show-similar-btn, #show-first-letters-btn, #scramble-letters-btn');
+        let cardData = null;
+        let soundUrlCache = null; // Кэш для URL звукового файла
+        let audio = null;
+
+        const loadCard = (data = null) => {
+            if (data) {
+                cardData = data;
+                cardFront.innerText = data.front_side;
+                cardBack.classList.add('hidden');
+                cardBack.innerText = '';
+                hintContainer.classList.add('hidden');
+                similarWordsContainer.classList.add('hidden');
+                lettersContainer.classList.add('hidden');
+                resultContainer.innerText = '';
+                resultContainer.classList.remove('correct-word');
+                actionButtons.forEach(button => button.disabled = false);
+                soundUrlCache = null;
+                audio = null;
+            } else {
+                const baseUrl = `{% url 'get_card' slug %}`;
+                const url = `${baseUrl}?study_mode=${studyMode}`;
+                fetch(url).then(response => response.json()).then(data => {
+                    cardData = data;
+                    loadCard(data);
+                });
+            }
+
+        };
+
+        loadCard();
+
+        const showBackButton = document.getElementById('show-back-btn');
+        if (showBackButton) {
+            showBackButton.addEventListener('click', function () {
+                cardBack.innerText = cardData.back_side;
+                cardBack.classList.remove('hidden');
+                makeButtonsInactive();
+            });
+        }
+
+        const showHintButton = document.getElementById('show-hint-btn');
+        if (showHintButton) {
+            showHintButton.addEventListener('click', function () {
+                const hintUrl = `{% url 'get_hint' 'dummy_mappings_id' %}`.replace('dummy_mappings_id', cardData.mappings_id);
+                fetch(hintUrl).then(response => response.json()).then(data => {
+                    hintContainer.innerText = data.hint;
+                    hintContainer.classList.remove('hidden');
+                });
+            });
+        }
+
+        const showSimilarButton = document.getElementById('show-similar-btn');
+        if (showSimilarButton) {
+            showSimilarButton.addEventListener('click', function () {
+                disableOtherActionButtons(this.id);
+                const similarWordsUrl = `{% url 'get_similar_words' 'dummy_mappings_id' %}`.replace('dummy_mappings_id', cardData.mappings_id);
+                fetch(similarWordsUrl).then(response => response.json()).then(data => {
+                    similarWordsContainer.innerHTML = '';
+                    data.similar_words.forEach(word => {
+                        const button = document.createElement('button');
+                        button.innerText = word;
+                        button.addEventListener('click', function () {
+                            if (word === data.back_side) {
+                                resultContainer.innerText = 'Correct!';
+                                resultContainer.classList.add('correct-word');
+                            } else {
+                                resultContainer.innerText = `Wrong! The correct word is ${data.back_side}`;
+                            }
+                            makeButtonsInactive();
+                            disableSimilarWordButtons();
+                        });
+                        similarWordsContainer.appendChild(button);
+                    });
+                    similarWordsContainer.classList.remove('hidden');
+                });
+            });
+        }
+
+        function disableSimilarWordButtons() {
+            const buttons = similarWordsContainer.querySelectorAll('button');
+            buttons.forEach(button => {
+                button.disabled = true;
+            });
+        }
+
+        let revealIndex = 0;
+
+        const showFirstLettersButton = document.getElementById('show-first-letters-btn');
+        if (showFirstLettersButton) {
+            showFirstLettersButton.addEventListener('click', function () {
+                disableOtherActionButtons(this.id);
+                const sentence = cardData.back_side;
+                const words = sentence.split(' ');
+
+                if (words.length < 3) {
+                    // Слово состоит из одной части
+                    revealIndex += 2;
+                    if (revealIndex > sentence.length) revealIndex = sentence.length;
+                    const revealed = sentence.slice(0, revealIndex);
+                    cardBack.innerText = revealed + '*'.repeat(sentence.length - revealIndex);
+                    if (revealIndex >= sentence.length) {
+                        makeButtonsInactive();
+                        revealIndex = 0;
+                    }
+
+                } else {
+                    // Слово состоит из нескольких частей
+                    revealIndex += 1;
+                    if (revealIndex > words.length) revealIndex = words.length;
+                    const revealed = words.slice(0, revealIndex).join(' ');
+                    const remainingWords = words.slice(revealIndex).join(' ');
+                    cardBack.innerText = revealed + ' ' + '*'.repeat(remainingWords.length);
+                    if (revealIndex >= sentence.length) {
+                        makeButtonsInactive();
+                        revealIndex = 0;
+                    }
+                }
+
+                cardBack.classList.remove('hidden');
+            });
+        }
+
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        const scrambleLettersButton = document.getElementById('scramble-letters-btn');
+        if (scrambleLettersButton) {
+            scrambleLettersButton.addEventListener('click', function () {
+                disableOtherActionButtons(this.id);
+                lettersContainer.innerHTML = '';
+                const input = cardData.back_side.trim();
+                const words = input.split(' ');
+                const isSentence = words.length > 2; // проверка, является ли это предложение (более 2 слов)
+                let elements;
+
+                if (isSentence) {
+                    elements = words.slice(); // используем копию массива слов
+                } else {
+                    elements = input.split(''); // используем буквы
+                }
+
+                shuffleArray(elements);
+                let userInput = isSentence ? [] : ''; // массив для предложений, строка для слов
+
+                elements.forEach(element => {
+                    const span = document.createElement('span');
+                    span.className = 'letter';
+                    span.innerText = element;
+                    span.addEventListener('click', () => {
+                        const currentIndex = userInput.length;
+                        const originalElement = isSentence ? words[currentIndex] : input[currentIndex];
+
+                        if (element === originalElement) {
+                            if (isSentence) {
+                                userInput.push(element);
+                                resultContainer.innerText = userInput.join(' ') + ' ';
+                            } else {
+                                userInput += element;
+                                resultContainer.innerText = userInput;
+                            }
+                            span.classList.add('inactive');
+
+                            // Проверка полного соответствия ввода
+                            if ((isSentence && userInput.join(' ') === input) || (!isSentence && userInput === input)) {
+                                resultContainer.innerText = `${isSentence ? userInput.join(' ') : userInput} - Correct!`;
+                                resultContainer.classList.add('correct-word');
+                                lettersContainer.classList.add('hidden');
+                                makeButtonsInactive();
+                            }
+                        } else {
+                            span.classList.add('wrong-letter');
+                            setTimeout(() => {
+                                span.classList.remove('wrong-letter');
+                            }, 1000);
+                        }
+                    });
+                    lettersContainer.appendChild(span);
+                });
+                lettersContainer.classList.remove('hidden');
+            });
+        }
+
+        function disableOtherActionButtons(activeButtonId) {
+            actionButtons.forEach(button => {
+                if (button.id !== activeButtonId) {
+                    button.disabled = true;
+                }
+            });
+        }
+
+        function makeButtonsInactive() {
+            actionButtons.forEach(button => button.disabled = true);
+        }
+
+        document.querySelectorAll('.rating-button').forEach(button => {
+            button.addEventListener('click', function () {
+                const rating = parseInt(this.getAttribute('data-rating'));
+                const baseUrl = `{% url 'get_card' slug %}`;
+                fetch(baseUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrfToken
+                    },
+                    body: JSON.stringify({rating: rating, mappings_id: cardData.mappings_id})
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        loadCard(data);
+                    });
+            });
+        });
+
+        const playSoundButton = document.getElementById('play-sound-btn');
+        playSoundButton.addEventListener('click', function () {
+            if (!soundUrlCache) {
+                const soundUrl = `{% url 'get_sound' 'dummy_mappings_id' %}`.replace('dummy_mappings_id', cardData.mappings_id);
+                fetch(soundUrl)
+                    .then(response => response.blob())
+                    .then(blob => {
+                        soundUrlCache = URL.createObjectURL(blob);
+                        audio = new Audio(soundUrlCache);
+                        audio.play();
+                    });
+            } else {
+                audio.play();
+            }
+        });
+    });
+</script>
+
+</body>
+</html>

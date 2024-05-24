@@ -1,10 +1,10 @@
-{% extends 'cards/base.html' %}
+{% extends 'deckhub/base.html' %}
 {% load cards_tags %}
 {% load humanize %}
 
 {% block content %}
     <h2>Box</h2>
-    <h6>{% include 'cards/create_new_card.html' %}</h6>
+    <h6>{% include 'deckhub/create_new_card.html' %}</h6>
 
     <mark>{{ ratings_count | sum_values  }}</mark> Card{{ object_list | pluralize }} in process.
     <hr>

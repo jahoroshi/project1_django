@@ -1,4 +1,4 @@
-{% extends 'cards/base.html' %}
+{% extends 'deckhub/base.html' %}
 {% block content %}
     <form method="post">{% csrf_token %}
         <p>Are you sure you want to delete "{{ object }}{{ deck_name }}"?</p>
