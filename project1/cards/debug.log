@@ -1,0 +1,1 @@
+(0.003) UPDATE "cards_cards" SET "audio" = NULL; args=(); alias=default
