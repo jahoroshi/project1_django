@@ -1,20 +1,78 @@
 {% extends 'deckhub/base.html' %}
 
 {% block content %}
-    {% if object %}
-        <h2>Edit card</h2>
-    {% else %}
-        <h2> Create New Card</h2>
-    {% endif %}
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <input type="submit" value="Save Card">
-    </form>
-    {% if request.path %}
-        <a href="{{ request.path }}">Cansel</a>
-    {% else %}
-        <a href="{% url 'decks_list' %}">Cansel</a>
-    {% endif %}
+
+    <div class="row">
+        <div class="col-12">
+            <div class="content pt-2 px-4 mb-4">
+                <div class="content-block shadow-sm p-3 my-4 bg-body-tertiary rounded-5 text-center">
+                    <div class="row">
+                        <div class="col-2">
+                                <a href="{% url 'deck_content' slug %}" class="link-button-close " role="button"
+                                       data-bs-toggle="tooltip"
+                                       data-bs-placement="top" title="Close">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30"
+                                             fill="currentColor"
+                                             class="bi bi-x-lg" viewBox="0 0 16 16">
+                                            <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z"/>
+                                        </svg>
+                                    </a>
+                        </div>
+
+                        <div class="col-8">
+                            {% if object %}
+                        <h2>Edit card</h2>
+                    {% else %}
+                        <h2> Create New Card</h2>
+                    {% endif %}
+                        </div>
+                    <div class="col-2">
+
+                    </div>
+                    </div>
+
+                    <form method="post" class="d-flex flex-column align-items-center">
+                        {% csrf_token %}
+                        <div class="w-75 mt-4">
+                            <div class="input-group mb-3 ">
+                                <span class="input-group-text">Side 1</span>
+                                {{ form.side1 }}
+                            </div>
+
+                            <div class="input-group mb-3">
+                                <span class="input-group-text">Side 2</span>
+                                {{ form.side2 }}
+                            </div>
+
+                            {% if is_update %}
+                                <div class="input-group mb-3 has-validation">
+                                    <span class="input-group-text">{{ form.category.label_tag }}</span>
+                                    {{ form.category }}
+                                    <div class="invalid-feedback">
+                                        {{ form.category.errors }}
+                                    </div>
+                                </div>
+                            {% endif %}
+
+
+                            <div class="form-check form-switch mb-3">
+                                {{ form.is_two_sides }}
+                                <label class="form-check-label"
+                                       for="flexSwitchCheckDefault">{{ form.is_two_sides.label }}</label>
+                            </div>
+
+                            <button type="submit" class="btn btn-outline-info mt-3 create-card-add"><svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="currentColor" class="bi bi-check-circle-fill" viewBox="0 0 16 16">
+  <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0m-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
+</svg></button>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+
+        </div>
+
+
+    </div></div>
 {% endblock %}
 

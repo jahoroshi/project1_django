@@ -1,6 +1,6 @@
-import json
 import random
-
+import json
+from django.urls import reverse
 from django.http import HttpResponse
 from django.http import JsonResponse
 from django.shortcuts import render, get_object_or_404
@@ -10,7 +10,6 @@ from cards.services.query_builder import build_card_view_queryset
 from speech.views import synthesize_speech
 
 
-# logger = logging.getLogger('cards.views')
 def get_card(request, *args, **kwargs):
     if request.method == 'POST':
         body_unicode = request.body.decode('utf-8')
@@ -20,13 +19,14 @@ def get_card(request, *args, **kwargs):
         mappings = get_object_or_404(Mappings, pk=mappings_id)
         mappings.move(rating)
     slug = kwargs['slug']
-    study_mode = request.GET.get('study_mode')
+    study_mode = request.GET.get('mode')
     card, ratings_count = build_card_view_queryset(slug=slug, study_mode=study_mode)
 
     data = {
         'front_side': card.get('front_side'),
         'back_side': card.get('back_side'),
-        'mappings_id': card.get('id')
+        'mappings_id': card.get('id'),
+        'ratings_count': ratings_count,
     }
 
     return JsonResponse(data)
@@ -47,8 +47,10 @@ def submit_answer(request, card_id):
         return JsonResponse({'new_card_id': new_card.id, 'front_side': new_card.front_side})
 
 
+
+
 def study_view(request, *args, **kwargs):
-    study_mode = request.GET.get('study_mode')
+    study_mode = request.GET.get('mode')
     slug = kwargs.get('slug')
     buttons_to_show = {
         'show_back': True,
@@ -58,13 +60,23 @@ def study_view(request, *args, **kwargs):
         'scramble_letters': True,
         'speech': True
     }
-    context = {
+    context_data = {
         'csrf_token': request.COOKIES.get('csrftoken'),
         'slug': slug,
         'study_mode': study_mode,
-        'buttons_to_show': buttons_to_show,
+        'urls': {
+            'get_card': reverse('get_card', kwargs={'slug': slug}),
+            'get_hint': reverse('get_hint', kwargs={'mappings_id': 'dummy_mappings_id'}),
+            'get_similar_words': reverse('get_similar_words', kwargs={'mappings_id': 'dummy_mappings_id'}),
+            'get_sound': reverse('get_sound', kwargs={'mappings_id': 'dummy_mappings_id'})
+        }
+    }
+    context = {
+        'context_json': json.dumps(context_data),
+        'buttons_to_show': buttons_to_show
     }
     return render(request, 'cardmode/studying_mode.html', context)
+
 
 
 def get_sound(request, mappings_id):

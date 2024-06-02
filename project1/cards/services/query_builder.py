@@ -43,7 +43,7 @@ def my_debug(subquery, map_id):
 
 def cards_counter(queryset):
     query_rating_count = Mappings.objects.filter(id__in=(Subquery(queryset))).values('mem_rating').annotate(count=Count('mem_rating')).order_by('mem_rating')
-    dic = {}.fromkeys(range(1, 6), 0)
+    dic = {}.fromkeys(range(1, 5), 0)
     dic.update({el['mem_rating']: el['count'] for el in query_rating_count})
     return dic
 
@@ -79,12 +79,14 @@ def build_card_view_queryset(*args, **kwargs):
             output_field=CharField(),
         ),
     ).values(
-        'repetition', 'front_side', 'back_side', 'card__id', 'id', 'category__name', 'easiness'
+        'upd_date', 'front_side', 'back_side', 'card__id', 'id', 'category__name', 'easiness'
     ).first()
-
     ####
     my_debug(subquery1, card.get('id'))
     ####
+    if card.get('upd_date') is None and study_mode == 'new':
+        ratings_count_dict[5] = 1
+    ratings_count_dict.pop(0, None)
     return card, ratings_count_dict
 
 # def build_card_view_queryset(*args, **kwargs):

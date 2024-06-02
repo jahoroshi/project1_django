@@ -5,7 +5,8 @@ document.addEventListener('DOMContentLoaded', function () {
     const studyMode = config.study_mode;
     const urls = config.urls;
 
-    const cardFront = document.getElementById('card-front');
+    const knownButton = document.getElementById('known-btn');
+    const cardFront = document.getElementById('card-text');
     const cardBack = document.getElementById('card-back');
     const hintContainer = document.getElementById('hint-container');
     const similarWordsContainer = document.getElementById('similar-words-container');
@@ -15,6 +16,7 @@ document.addEventListener('DOMContentLoaded', function () {
     let cardData = null;
     let soundUrlCache = null; // Кэш для URL звукового файла
     let audio = null;
+    let count = 0;
 
     const loadCard = (data = null) => {
         if (data) {
@@ -32,16 +34,44 @@ document.addEventListener('DOMContentLoaded', function () {
             audio = null;
             similarWordsContainer.innerHTML = '';
             lettersContainer.innerHTML = '';
+            showKnownButton();
+            updateCounters(cardData.ratings_count);
         } else {
-            const url = `${urls.get_card}?study_mode=${studyMode}`;
+            const url = `${urls.get_card}?mode=${studyMode}`;
             fetch(url).then(response => response.json()).then(data => {
                 cardData = data;
+                updateCounters(cardData.ratings_count);
+
                 loadCard(data);
             });
         }
     };
+    const showKnownButton = () => {
+        if (cardData) {
+            if (cardData.ratings_count[5]) {
+                knownButton.classList.remove('hidden')
+            }
+        }
+    };
+
+    const updateCounters = (ratings) => {
+        document.getElementById('again-count').innerText = ratings[1] || 0;
+        document.getElementById('hard-count').innerText = ratings[2] || 0;
+        document.getElementById('good-count').innerText = ratings[3] || 0;
+        // document.getElementById('easy-count').innerText = ratings[4] || 0;
+    };
+
+    document.getElementById('easy-btn').addEventListener('click', function () {
+        count++;
+        document.getElementById('easy-count').innerText = count;
+    });
 
     loadCard();
+
+
+    //     if (cardData.rating_count[5]) {
+    //         knownButton.classList.add('known-btn-active');
+    // }
 
     const showBackButton = document.getElementById('show-back-btn');
     if (showBackButton) {
@@ -72,13 +102,18 @@ document.addEventListener('DOMContentLoaded', function () {
                 similarWordsContainer.innerHTML = '';
                 data.similar_words.forEach(word => {
                     const button = document.createElement('button');
+                    button.className = 'list-group-item list-group-item-action similar-words';
+                    button.setAttribute('type', 'button');
                     button.innerText = word;
                     button.addEventListener('click', function () {
                         if (word === data.back_side) {
-                            resultContainer.innerText = 'Correct!';
-                            resultContainer.classList.add('correct-word');
+                            button.classList.add('correct-choice'); // Добавление стиля для правильного ответа
                         } else {
-                            resultContainer.innerText = `Wrong! The correct word is ${data.back_side}`;
+                            button.classList.add('wrong-choice'); // Добавление стиля для ошибочного ответа
+                            const correctButton = Array.from(similarWordsContainer.querySelectorAll('button')).find(btn => btn.innerText === data.back_side);
+                            if (correctButton) {
+                                correctButton.classList.add('correct-choice'); // Добавление стиля для правильного ответа
+                            }
                         }
                         makeButtonsInactive();
                         disableSimilarWordButtons();
@@ -96,6 +131,7 @@ document.addEventListener('DOMContentLoaded', function () {
             button.disabled = true;
         });
     }
+
 
     let revealIndex = 0;
 
@@ -123,7 +159,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (revealIndex > words.length) revealIndex = words.length;
                 const revealed = words.slice(0, revealIndex).join(' ');
                 const remainingWords = words.slice(revealIndex).join(' ');
-                cardBack.innerText = revealed + ' ' + '*'.repeat(remainingWords.length);
+                cardBack.innerText = revealed + ' ' + '* '.repeat(remainingWords.length);
                 if (revealIndex >= sentence.length) {
                     makeButtonsInactive();
                     revealIndex = 0;
@@ -140,6 +176,7 @@ document.addEventListener('DOMContentLoaded', function () {
             [array[i], array[j]] = [array[j], array[i]];
         }
     }
+
 
     const scrambleLettersButton = document.getElementById('scramble-letters-btn');
     if (scrambleLettersButton) {
@@ -180,7 +217,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
                         // Проверка полного соответствия ввода
                         if ((isSentence && userInput.join(' ') === input) || (!isSentence && userInput === input)) {
-                            resultContainer.innerText = `${isSentence ? userInput.join(' ') : userInput} - Correct!`;
+                            resultContainer.innerHTML = `${isSentence ? userInput.join(' ') : userInput} <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-check2-all" viewBox="0 0 16 16">
+      <path d="M12.354 4.354a.5.5 0 0 0-.708-.708L5 10.293 1.854 7.146a.5.5 0 1 0-.708.708l3.5 3.5a.5.5 0 0 0 .708 0l7-7zm-4.208 7-.896-.897.707-.707.543.543 6.646-6.647a.5.5 0 0 1 .708.708l-7 7a.5.5 0 0 1-.708 0z"/>
+      <path d="m5.354 7.146.896.897-.707.707-.897-.896a.5.5 0 1 1 .708-.708"/>
+    </svg>`;
+
+
                             resultContainer.classList.add('correct-word');
                             lettersContainer.classList.add('hidden');
                             makeButtonsInactive();
@@ -228,7 +270,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
-    const playSoundButton = document.getElementById('play-sound-btn');
+    const playSoundButton = document.getElementById('card-front');
     playSoundButton.addEventListener('click', function () {
         if (!soundUrlCache) {
             const soundUrl = urls.get_sound.replace('dummy_mappings_id', cardData.mappings_id);

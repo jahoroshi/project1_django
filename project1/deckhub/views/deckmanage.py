@@ -1,6 +1,9 @@
 from django.db.models import Count, Case, When, F, IntegerField
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy, reverse
+from django.utils.decorators import method_decorator
+from django.views import View
 from django.views.generic import (
     ListView,
     CreateView,
@@ -8,9 +11,10 @@ from django.views.generic import (
 )
 
 from cards.services.check_post_request import CheckReuqest, is_post_unique
-from cards.models import Cards, Categories
+from cards.models import Cards, Categories, Card
 from django.utils.timezone import now
-
+from django.views.decorators.csrf import csrf_exempt
+import json
 
 class DecksListView(ListView):
     model = Categories

@@ -14,6 +14,10 @@
   </component>
   <component name="NewModuleRootManager">
     <content url="file://$MODULE_DIR$">
+      <sourceFolder url="file://$MODULE_DIR$/cardmode" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/cards" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/deckhub" isTestSource="false" />
+      <excludeFolder url="file://$MODULE_DIR$/.idea/dataSources" />
       <excludeFolder url="file://$MODULE_DIR$/.venv" />
     </content>
     <orderEntry type="jdk" jdkName="Python 3.11 (Courses)" jdkType="Python SDK" />
@@ -25,5 +29,11 @@
   </component>
   <component name="TemplatesService">
     <option name="TEMPLATE_CONFIGURATION" value="Django" />
+    <option name="TEMPLATE_FOLDERS">
+      <list>
+        <option value="$MODULE_DIR$/cards/templates" />
+        <option value="$MODULE_DIR$/deckhub/templates" />
+      </list>
+    </option>
   </component>
 </module>

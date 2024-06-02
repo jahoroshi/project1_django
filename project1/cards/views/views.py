@@ -1,6 +1,5 @@
-from django.core.cache import cache
 from django.http import HttpResponseRedirect
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404
 from django.urls import reverse_lazy, reverse
 from django.views.generic import (
     ListView,
@@ -9,10 +8,10 @@ from django.views.generic import (
     DeleteView,
 )
 
+from cards.forms import CardCheckForm, CardForm
+from cards.models import Cards, Mappings
 from cards.services.check_post_request import CheckReuqest, is_post_unique
 from cards.services.query_builder import build_card_view_queryset
-from cards.forms import CardCheckForm, CardForm, ImportCardsForm
-from cards.models import Cards, Mappings, Categories
 
 
 class CardCreateView(CreateView):
@@ -26,6 +25,7 @@ class CardCreateView(CreateView):
             self.object = form.save(commit=False)
             self.object.save()
             category = form.cleaned_data['category']
+
             Mappings.objects.create(card=self.object, category=category)
             if form.cleaned_data['is_two_sides']:
                 Mappings.objects.create(card=self.object, category=category, is_back_side=True)
@@ -36,35 +36,17 @@ class CardCreateView(CreateView):
         kwargs['slug'] = self.kwargs.get('slug')
         return kwargs
 
+    def get_context_data(self, **kwargs):
+        slug = self.kwargs.get('slug')
+        context = super(CardCreateView, self).get_context_data(**kwargs)
+        context['slug'] = slug
+        return context
 
-def import_cards(request, *args, **kwargs):
-    if request.method == 'POST':
-        form = ImportCardsForm(request.POST)
-        if form.is_valid():
-            slug = kwargs['slug']
-            category = Categories.objects.get(slug=slug)
-            text = form.cleaned_data['text']
-            words_separator = form.cleaned_data['words_separator']
-            cards_separator = form.cleaned_data['cards_separator']
-            words_separator_custom = form.cleaned_data['words_separator_custom']
-            cards_separator_custom = form.cleaned_data['cards_separator_custom']
-            separators = {'tab': '  ', 'comma': ',', 'words_custom': words_separator_custom, 'new_line': '\r\n',
-                          'semicolon': ';', 'cards_custom': cards_separator_custom}
+    def post(self, request, *args, **kwargs):
+        self.object = None
+        return super().post(request, *args, **kwargs)
 
-            words_sep = separators[words_separator]
-            cards_sep = separators[cards_separator]
-            cards = text.split(cards_sep)
-            for card in cards:
-                try:
-                    front_side, back_side = card.split(words_sep)
-                    object_card = Cards.objects.create(side1=front_side.strip(), side2=back_side.strip())
-                    Mappings.objects.create(card=object_card, category=category)
-                except ValueError:
-                    continue
-            return HttpResponseRedirect(reverse('deck_content', args=[slug]))
-    else:
-        form = ImportCardsForm()
-    return render(request, 'cards/cards_import.html', {'form': form})
+
 
 
 
@@ -78,7 +60,12 @@ class CardUpdateView(CardCreateView, UpdateView):
             card = Mappings.objects.get(card=self.object)
             card.category = form.cleaned_data['category']
             card.save()
-        return HttpResponseRedirect(reverse('decks_list'))
+        return HttpResponseRedirect(reverse('deck_content', kwargs={'slug': slug}))
+
+    def get_context_data(self, **kwargs):
+        context = super(CardUpdateView, self).get_context_data(**kwargs)
+        context['is_update'] = True
+        return context
 
 
 class CardDeleteView(CheckReuqest, DeleteView):
@@ -88,6 +75,11 @@ class CardDeleteView(CheckReuqest, DeleteView):
     def get_success_url(self):
         slug = self.kwargs['slug']
         return reverse_lazy('deck_content', args=[slug])
+
+    def get_context_data(self, **kwargs):
+        context = super(CardDeleteView, self).get_context_data(**kwargs)
+        context['slug'] = self.kwargs['slug']
+        return context
 
 
 class BoxView(ListView):

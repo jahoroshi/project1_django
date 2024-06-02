@@ -1,27 +1,220 @@
 {% extends 'deckhub/base.html' %}
+{% load static %}
+
+
 
 {% block content %}
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_table }}
-        <input type="submit" value="Create">
-    </form>
+    <div class="row">
+        <div class="col-12">
+            <div class="content pt-2 px-4 mb-4">
+                <div class="content-block shadow-sm p-3 my-4 bg-body-tertiary rounded-5 text-center">
+                    <div class="row mb-4">
+                        <div class="col-2">
+                            <a href="{% url 'deck_content' slug %}" class="link-button-close " role="button"
+                               data-bs-toggle="tooltip"
+                               data-bs-placement="top" title="Close">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30"
+                                     fill="currentColor"
+                                     class="bi bi-x-lg" viewBox="0 0 16 16">
+                                    <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z"/>
+                                </svg>
+                            </a>
+                        </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            var customOptionInput1 = document.getElementById('id_words_separator_custom');
-            var customOptionInput2 = document.getElementById('id_cards_separator_custom');
-            var customRadio1 = document.getElementById('id_words_separator_2');
-            var customRadio2 = document.getElementById('id_cards_separator_2');
+                        <div class="col-8">
+                            <h2> Import cards</h2>
+                        </div>
+                        <div class="col-2">
 
-            customOptionInput1.addEventListener('focus', function () {
-                customRadio1.checked = true;
-            });
+                        </div>
+                    </div>
 
-            customOptionInput2.addEventListener('focus', function () {
-                customRadio2.checked = true;
-            });
-        });
-    </script>
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="row mb-4">
+                            <div class="col">
+                                {{ form.text.label }}
+                                {{ form.text }}
+                            </div>
+                        </div>
 
+                        <div class="row mb-4">
+                            <div class="col">
+                                <div class="row mb-2">
+                                    <div class="col">
+                                        <label>{{ form.words_separator.label }}</label>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col">
+                                        <div class="form-group">
+
+                                            {% for radio in form.words_separator %}
+                                                <div class="form-check form-check-inline">
+                                                    {{ radio.tag }}
+                                                    <label class="form-check-label"
+                                                           for="{{ radio.id_for_label }}">{{ radio.choice_label }}</label>
+                                                </div>
+                                            {% endfor %}
+
+                                            {{ form.words_separator_custom }}
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                            </div>
+                        </div>
+
+                        <div class="row mb-5">
+                            <div class="col">
+
+                                <div class="row mb-2">
+                                    <div class="col">
+                                        <label>{{ form.words_separator.label }}</label>
+
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col">
+                                        <div class="form-group">
+                                            {% for radio in form.cards_separator %}
+                                                <div class="form-check form-check-inline">
+                                                    {{ radio.tag }}
+                                                    <label class="form-check-label"
+                                                           for="{{ radio.id_for_label }}">{{ radio.choice_label }}</label>
+                                                </div>
+                                            {% endfor %}
+                                            {{ form.cards_separator_custom }}
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-outline-light btn-lg">Import</button>
+                    </form>
+
+                    <h3 id="card-count" class="mt-5">Cards for import: 0</h3>
+
+                    <div id="preview-container" class='content-block shadow-sm p-3 my-4 bg-body-tertiary rounded-5' style="display: none;">
+                        <div id="preview"></div>
+                    </div>
+
+                    {#    <script>#}
+                    {#        document.addEventListener('DOMContentLoaded', function () {#}
+                    {#            var customOptionInput1 = document.getElementById('id_words_separator_custom');#}
+                    {#            var customOptionInput2 = document.getElementById('id_cards_separator_custom');#}
+                    {#            var customRadio1 = document.getElementById('id_words_separator_2');#}
+                    {#            var customRadio2 = document.getElementById('id_cards_separator_2');#}
+                    {#            var textInput = document.getElementById('id_text');#}
+                    {#            var previewContainer = document.getElementById('preview');#}
+                    {#            var previewContainerWrapper = document.getElementById('preview-container');#}
+                    {#            var cardCountElement = document.getElementById('card-count');#}
+                    {##}
+                    {#            // Вставка табуляции в текстовое поле#}
+                    {#            textInput.addEventListener('keydown', function (e) {#}
+                    {#                if (e.key === 'Tab') {#}
+                    {#                    e.preventDefault();#}
+                    {#                    var start = this.selectionStart;#}
+                    {#                    var end = this.selectionEnd;#}
+                    {#                    this.value = this.value.substring(0, start) + '\t' + this.value.substring(end);#}
+                    {#                    this.selectionStart = this.selectionEnd = start + 1;#}
+                    {#                    updatePreview();#}
+                    {#                }#}
+                    {#            });#}
+                    {##}
+                    {#            function escapeHTML(str) {#}
+                    {#                return str.replace(/[&<>"']/g, function (match) {#}
+                    {#                    switch (match) {#}
+                    {#                        case '&':#}
+                    {#                            return '&amp;';#}
+                    {#                        case '<':#}
+                    {#                            return '&lt;';#}
+                    {#                        case '>':#}
+                    {#                            return '&gt;';#}
+                    {#                        case '"':#}
+                    {#                            return '&quot;';#}
+                    {#                        case "'":#}
+                    {#                            return '&#39;';#}
+                    {#                    }#}
+                    {#                });#}
+                    {#            }#}
+                    {##}
+                    {#            function updatePreview() {#}
+                    {#                var text = textInput.value;#}
+                    {#                var wordsSeparator = document.querySelector('input[name="words_separator"]:checked').value;#}
+                    {#                var cardsSeparator = document.querySelector('input[name="cards_separator"]:checked').value;#}
+                    {#                var wordsSeparatorCustom = customOptionInput1.value;#}
+                    {#                var cardsSeparatorCustom = customOptionInput2.value;#}
+                    {##}
+                    {#                // Показываем или скрываем контейнер превью в зависимости от наличия текста#}
+                    {#                if (!text.trim()) {#}
+                    {#                    previewContainerWrapper.style.display = 'none';#}
+                    {#                    cardCountElement.textContent = 'Cards: 0';#}
+                    {#                    return;#}
+                    {#                } else {#}
+                    {#                    previewContainerWrapper.style.display = 'block';#}
+                    {#                }#}
+                    {##}
+                    {#                // Определяем разделители#}
+                    {#                var wordsSeparatorValue = (wordsSeparator === 'words_custom' && wordsSeparatorCustom) ? wordsSeparatorCustom : (wordsSeparator === 'tab' ? '\t' : (wordsSeparator === 'comma' ? ',' : null));#}
+                    {#                var cardsSeparatorValue = (cardsSeparator === 'cards_custom' && cardsSeparatorCustom) ? cardsSeparatorCustom : (cardsSeparator === 'new_line' ? '\n' : (cardsSeparator === 'semicolon' ? ';' : null));#}
+                    {##}
+                    {#                // Проверка пользовательских разделителей#}
+                    {#                if ((wordsSeparator === 'words_custom' && !wordsSeparatorCustom) || (cardsSeparator === 'cards_custom' && !cardsSeparatorCustom)) {#}
+                    {#                    previewContainer.textContent = "Please enter custom separators.";#}
+                    {#                    return;#}
+                    {#                }#}
+                    {##}
+                    {#                // Разделяем текст на карточки и слова#}
+                    {#                var cards = text.split(cardsSeparatorValue).filter(card => card.trim() !== '');#}
+                    {#                previewContainer.innerHTML = ''; // Очищаем контейнер перед добавлением новых карточек#}
+                    {##}
+                    {#                cards.forEach(card => {#}
+                    {#                    var cardElement = document.createElement('div');#}
+                    {#                    cardElement.className = 'card';#}
+                    {##}
+                    {#                    var words = card.split(wordsSeparatorValue);#}
+                    {#                    var formattedText = words.map(word => escapeHTML(word.trim())).join('<br>');#}
+                    {##}
+                    {#                    cardElement.innerHTML = formattedText;#}
+                    {#                    previewContainer.appendChild(cardElement);#}
+                    {#                });#}
+                    {##}
+                    {#                // Обновляем счетчик карточек#}
+                    {#                cardCountElement.textContent = 'Cards: ' + cards.length;#}
+                    {#            }#}
+                    {##}
+                    {#            customOptionInput1.addEventListener('focus', function () {#}
+                    {#                customRadio1.checked = true;#}
+                    {#            });#}
+                    {##}
+                    {#            customOptionInput2.addEventListener('focus', function () {#}
+                    {#                customRadio2.checked = true;#}
+                    {#            });#}
+                    {##}
+                    {#            textInput.addEventListener('input', updatePreview);#}
+                    {#            document.querySelectorAll('input[name="words_separator"]').forEach(function (radio) {#}
+                    {#                radio.addEventListener('change', updatePreview);#}
+                    {#            });#}
+                    {#            document.querySelectorAll('input[name="cards_separator"]').forEach(function (radio) {#}
+                    {#                radio.addEventListener('change', updatePreview);#}
+                    {#            });#}
+                    {#            customOptionInput1.addEventListener('input', updatePreview);#}
+                    {#            customOptionInput2.addEventListener('input', updatePreview);#}
+                    {##}
+                    {#            // Инициализируем предварительный просмотр при загрузке страницы#}
+                    {#            updatePreview();#}
+                    {#        });#}
+                    {#    </script>#}
+
+
+                    <script type="module" src="{% static 'js/cards/import.js' %}"></script>
+                </div>
+            </div>
+        </div>
+    </div>
 {% endblock %}

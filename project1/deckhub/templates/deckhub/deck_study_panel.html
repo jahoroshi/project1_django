@@ -1,71 +1,143 @@
-<h7>New cards for studying: {{ stats_box.0.new_cards_count }}</h7>
-<h7>Cards for review: {{ stats_box.0.cards_review_count }}</h7>
-{% if  stats_box.0.next_review_date %}
-    <div class="countdown-title">Cards will be available in:</div>
-    <div id="countdown" class="countdown-container">
-        <div class="countdown-item">
-            <div id="days" class="countdown-number"></div>
-            <div class="countdown-label">days</div>
+{#<p class="d-inline-flex gap-1">#}
+{#    <button type="button" class="btn" data-bs-toggle="button">Кнопка-переключатель</button>#}
+{#    <button type="button" class="btn active" data-bs-toggle="button" aria-pressed="true">Активная кнопка-переключатель#}
+{#    </button>#}
+{#    <button type="button" class="btn" disabled data-bs-toggle="button">Отключенная кнопка-переключатель</button>#}
+{#</p>#}
+
+
+<div class="row mb-1">
+    <div class="col-6 text-center">
+        {% if stats_box.0.new_cards_count > 0 %}
+            <p>New cards for studying: {{ stats_box.0.new_cards_count }}</p>
+        {% else %}
+            <p class="text-black-50">No cards for studying</p>
+        {% endif %}
+
+    </div>
+    <div class="col-6 text-center">
+        {% if stats_box.0.new_cards_count > 0 %}
+            <p>Cards for review: {{ stats_box.0.cards_review_count }}</p>
+        {% else %}
+            <p class="text-black-50">No cards for review</p>
+        {% endif %}
+
+    </div>
+</div>
+{% if stats_box.0.next_review_date %}
+
+    <div class="row">
+        <div class="col-6">
+            <div class="alert alert-light" role="alert">
+                <div class="row">
+                    <h5 class="countdown-title alert-heading">Cards will be available in:</h5>
+                </div>
+                <div class="row justify-content-center align-items-center" id="countdown">
+                    <div class="col-3">
+                        <div class="countdown-item text-center">
+                            <div id="days" class="countdown-number text-bg-light"></div>
+                            <div class="countdown-label">days</div>
+                        </div>
+                    </div>
+                    <div class="col-3">
+                        <div class="countdown-item text-center">
+                            <div id="hours" class="countdown-number text-bg-light"></div>
+                            <div class="countdown-label">hours</div>
+                        </div>
+                    </div>
+                    <div class="col-3">
+                        <div class="countdown-item text-center">
+                            <div id="minutes" class="countdown-number text-bg-light"></div>
+                            <div class="countdown-label">minutes</div>
+                        </div>
+                    </div>
+                    <div class="col-3">
+                        <div class="countdown-item text-center">
+                            <div id="seconds" class="countdown-number text-bg-primary"></div>
+                            <div class="countdown-label">seconds</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="countdown-item">
-            <div id="hours" class="countdown-number"></div>
-            <div class="countdown-label">hours</div>
-        </div>
-        <div class="countdown-item">
-            <div id="minutes" class="countdown-number"></div>
-            <div class="countdown-label">minutes</div>
-        </div>
-        <div class="countdown-item">
-            <div id="seconds" class="countdown-number"></div>
-            <div class="countdown-label">seconds</div>
+        <div class="col-6">
+            <div class="row">
+                <div class="col">
+                    <div class="spinner-border" style="width: 3rem; height: 3rem;" role="status"></div>
+                    <div class="spinner-grow" style="width: 3rem; height: 3rem;" role="status"></div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <div class="spinner-grow" style="width: 3rem; height: 3rem;" role="status"></div>
+                    <div class="spinner-border" style="width: 3rem; height: 3rem;" role="status"></div>
+                </div>
+            </div>
         </div>
     </div>
 {% endif %}
 
-<a href="{% url 'import_cards' stats_box.0.slug %}">Import cards</a>
-{% include 'deckhub/create_new_card.html' %}
-<br>
-{% if stats_box.0.new_cards_count > 0 %}
-    <a href="{% url 'learn_cards' stats_box.0.slug %}?study_mode=new">Study new cards</a>
-{% else %}
-    <a>Study new cards</a>
-{% endif %}
+<div class="row">
+    <div class="col-8">
+        {% if stats_box.0.new_cards_count > 0 %}
+                <strong><a href="{% url 'cardmode' stats_box.0.slug %}?mode=new" role="button" class="buttons-study-panel">Study new cards</a></strong>
+        {% else %}
+            <a href="#" class="btn btn-secondary buttons-study-panel disabled text-dark" tabindex="-1" role="button"
+               aria-disabled="true" style="background-color: transparent;">Study new cards </a>
+        {% endif %}
+    </div>
+    <div class="col-4">
+        {% if stats_box.0.cards_review_count > 0 %}
+                <strong><a href="{% url 'cardmode' stats_box.0.slug %}?mode=review" class="buttons-study-panel">Review cards</a></strong>
+        {% else %}
+            <a href="#" class="btn btn-secondary buttons-study-panel disabled text-dark" tabindex="-1" role="button"
+               aria-disabled="true" style="background-color: transparent;">Review cards</a>
+        {% endif %}
+    </div>
 
-{% if stats_box.0.cards_review_count > 0 %}
-    <a href="{% url 'learn_cards' stats_box.0.slug %}?study_mode=review">Review cards</a>
-{% else %}
-    <a>Review cards</a>
-{% endif %}
+</div>
+<div class="row">
+    <div class="col">
+            <a href="{% url 'import_cards' stats_box.0.slug %}"class="buttons-study-panel">Import cards</a>
+    </div>
+    <div class="col">
+{#        <div class="buttons-study-panel">#}
+            <a href="{% url 'card_create' stats_box.0.slug %}" class="buttons-study-panel">Add new card</a>
+{#        </div>#}
+
+    </div>
+</div>
+
 
 <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            // Получить конечное время и текущее время из тега данных
-            var endTime = new Date('{{ stats_box.0.next_review_date|date:"Y-m-d H:i:s" }}').getTime();
-            var serverStartTime = new Date('{{ stats_box.0.current_time|date:"Y-m-d H:i:s" }}').getTime();
-            var clientStartTime = new Date().getTime();
+    document.addEventListener('DOMContentLoaded', function () {
+        // Получить конечное время и текущее время из тега данных
+        var endTime = new Date('{{ stats_box.0.next_review_date|date:"Y-m-d H:i:s" }}').getTime();
+        var serverStartTime = new Date('{{ stats_box.0.current_time|date:"Y-m-d H:i:s" }}').getTime();
+        var clientStartTime = new Date().getTime();
 
-            // Функция обновления таймера
-            function updateCountdown() {
-                var now = serverStartTime + (new Date().getTime() - clientStartTime);
-                var timeRemaining = endTime - now;
+        // Функция обновления таймера
+        function updateCountdown() {
+            var now = serverStartTime + (new Date().getTime() - clientStartTime);
+            var timeRemaining = endTime - now;
 
-                if (timeRemaining > 0) {
-                    var days = Math.floor(timeRemaining / (1000 * 60 * 60 * 24));
-                    var hours = Math.floor((timeRemaining % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                    var minutes = Math.floor((timeRemaining % (1000 * 60 * 60)) / (1000 * 60));
-                    var seconds = Math.floor((timeRemaining % (1000 * 60)) / 1000);
+            if (timeRemaining > 0) {
+                var days = Math.floor(timeRemaining / (1000 * 60 * 60 * 24));
+                var hours = Math.floor((timeRemaining % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                var minutes = Math.floor((timeRemaining % (1000 * 60 * 60)) / (1000 * 60));
+                var seconds = Math.floor((timeRemaining % (1000 * 60)) / 1000);
 
-                    document.getElementById('days').innerHTML = days;
-                    document.getElementById('hours').innerHTML = hours;
-                    document.getElementById('minutes').innerHTML = minutes;
-                    document.getElementById('seconds').innerHTML = seconds;
-                } else {
-                    document.getElementById('countdown').innerHTML = "EXPIRED";
-                }
+                document.getElementById('days').innerHTML = days;
+                document.getElementById('hours').innerHTML = hours;
+                document.getElementById('minutes').innerHTML = minutes;
+                document.getElementById('seconds').innerHTML = seconds;
+            } else {
+                document.getElementById('countdown').innerHTML = "EXPIRED";
             }
+        }
 
-            // Обновление таймера каждую секунду
-            setInterval(updateCountdown, 1000);
-            updateCountdown(); // Начальная установка
-        });
-    </script>
+        // Обновление таймера каждую секунду
+        setInterval(updateCountdown, 1000);
+        updateCountdown(); // Начальная установка
+    });
+</script>

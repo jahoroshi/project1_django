@@ -1,328 +1,444 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Flashcard Study</title>
-    <style>
-        .hidden {
-            display: none;
-        }
+{#{% extends 'deckhub/base.html' %}#}
+{#{% load static %}#}
+{#{% block content %}#}
+{##}
+{#<h1>#}
+{#<div id="card-container">#}
+{#    <div id="card-front" class="card-side"></div>#}
+{#</div>#}
+{#</h1>#}
+{##}
+{#{% if buttons_to_show.show_back %}#}
+{#    <button id="show-back-btn">Show Back</button>#}
+{#{% endif %}#}
+{#{% if buttons_to_show.show_hint %}#}
+{#    <button id="show-hint-btn">Show Hint</button>#}
+{#{% endif %}#}
+{#{% if buttons_to_show.show_similar %}#}
+{#    <button id="show-similar-btn">Show Similar Words</button>#}
+{#{% endif %}#}
+{#{% if buttons_to_show.show_first_letters %}#}
+{#    <button id="show-first-letters-btn">Show First Letters</button>#}
+{#{% endif %}#}
+{#{% if buttons_to_show.scramble_letters %}#}
+{#    <button id="scramble-letters-btn">Scramble Letters</button>#}
+{#{% endif %}#}
+{#{% if buttons_to_show.speech %}#}
+{#    <button id="play-sound-btn">Play Sound</button>#}
+{#{% endif %}#}
+{##}
+{##}
+{#<div id="card-back" class="card-side hidden"></div>#}
+{#<div id="hint-container" class="hidden"></div>#}
+{#<div id="similar-words-container" class="hidden"></div>#}
+{#<div id="letters-container" class="hidden"></div>#}
+{#<div id="result-container"></div>#}
+{##}
+{#<div>#}
+{#    <button class="rating-button" id="again-btn" data-rating="1">Again</button>#}
+{#    <button class="rating-button" id="hard-btn" data-rating="2">Hard</button>#}
+{#    <button class="rating-button" id="good-btn" data-rating="3">Good</button>#}
+{#    <button class="rating-button" id="easy-btn" data-rating="4">Easy</button>#}
+{#</div>#}
+{##}
+{#<script>#}
+{#    document.addEventListener('DOMContentLoaded', function () {#}
+{#        const slug = '{{ slug }}';#}
+{#        const studyMode = '{{ study_mode }}';#}
+{#        const csrfToken = '{{ csrf_token }}';#}
+{#        const cardFront = document.getElementById('card-front');#}
+{#        const cardBack = document.getElementById('card-back');#}
+{#        const hintContainer = document.getElementById('hint-container');#}
+{#        const similarWordsContainer = document.getElementById('similar-words-container');#}
+{#        const lettersContainer = document.getElementById('letters-container');#}
+{#        const resultContainer = document.getElementById('result-container');#}
+{#        const actionButtons = document.querySelectorAll('#show-back-btn, #show-hint-btn, #show-similar-btn, #show-first-letters-btn, #scramble-letters-btn');#}
+{#        let cardData = null;#}
+{#        let soundUrlCache = null; // Кэш для URL звукового файла#}
+{#        let audio = null;#}
+{##}
+{#        const loadCard = (data = null) => {#}
+{#            if (data) {#}
+{#                cardData = data;#}
+{#                cardFront.innerText = data.front_side;#}
+{#                cardBack.classList.add('hidden');#}
+{#                cardBack.innerText = '';#}
+{#                hintContainer.classList.add('hidden');#}
+{#                similarWordsContainer.classList.add('hidden');#}
+{#                lettersContainer.classList.add('hidden');#}
+{#                resultContainer.innerText = '';#}
+{#                resultContainer.classList.remove('correct-word');#}
+{#                actionButtons.forEach(button => button.disabled = false);#}
+{#                soundUrlCache = null;#}
+{#                audio = null;#}
+{#                similarWordsContainer.innerHTML = '';#}
+{#                lettersContainer.innerHTML = '';#}
+{#            } else {#}
+{#                const baseUrl = `{% url 'get_card' slug %}`;#}
+{#                const url = `${baseUrl}?study_mode=${studyMode}`;#}
+{#                fetch(url).then(response => response.json()).then(data => {#}
+{#                    cardData = data;#}
+{#                    loadCard(data);#}
+{#                });#}
+{#            }#}
+{##}
+{#        };#}
+{##}
+{#        loadCard();#}
+{##}
+{#        const showBackButton = document.getElementById('show-back-btn');#}
+{#        if (showBackButton) {#}
+{#            showBackButton.addEventListener('click', function () {#}
+{#                cardBack.innerText = cardData.back_side;#}
+{#                cardBack.classList.remove('hidden');#}
+{#                makeButtonsInactive();#}
+{#            });#}
+{#        }#}
+{##}
+{#        const showHintButton = document.getElementById('show-hint-btn');#}
+{#        if (showHintButton) {#}
+{#            showHintButton.addEventListener('click', function () {#}
+{#                const hintUrl = `{% url 'get_hint' 'dummy_mappings_id' %}`.replace('dummy_mappings_id', cardData.mappings_id);#}
+{#                fetch(hintUrl).then(response => response.json()).then(data => {#}
+{#                    hintContainer.innerText = data.hint;#}
+{#                    hintContainer.classList.remove('hidden');#}
+{#                });#}
+{#            });#}
+{#        }#}
+{##}
+{#        const showSimilarButton = document.getElementById('show-similar-btn');#}
+{#        if (showSimilarButton) {#}
+{#            showSimilarButton.addEventListener('click', function () {#}
+{#                disableOtherActionButtons(this.id);#}
+{#                const similarWordsUrl = `{% url 'get_similar_words' 'dummy_mappings_id' %}`.replace('dummy_mappings_id', cardData.mappings_id);#}
+{#                fetch(similarWordsUrl).then(response => response.json()).then(data => {#}
+{#                    similarWordsContainer.innerHTML = '';#}
+{#                    data.similar_words.forEach(word => {#}
+{#                        const button = document.createElement('button');#}
+{#                        button.innerText = word;#}
+{#                        button.addEventListener('click', function () {#}
+{#                            if (word === data.back_side) {#}
+{#                                resultContainer.innerText = 'Correct!';#}
+{#                                resultContainer.classList.add('correct-word');#}
+{#                            } else {#}
+{#                                resultContainer.innerText = `Wrong! The correct word is ${data.back_side}`;#}
+{#                            }#}
+{#                            makeButtonsInactive();#}
+{#                            disableSimilarWordButtons();#}
+{#                        });#}
+{#                        similarWordsContainer.appendChild(button);#}
+{#                    });#}
+{#                    similarWordsContainer.classList.remove('hidden');#}
+{#                });#}
+{#            });#}
+{#        }#}
+{##}
+{#        function disableSimilarWordButtons() {#}
+{#            const buttons = similarWordsContainer.querySelectorAll('button');#}
+{#            buttons.forEach(button => {#}
+{#                button.disabled = true;#}
+{#            });#}
+{#        }#}
+{##}
+{#        let revealIndex = 0;#}
+{##}
+{#        const showFirstLettersButton = document.getElementById('show-first-letters-btn');#}
+{#        if (showFirstLettersButton) {#}
+{#            showFirstLettersButton.addEventListener('click', function () {#}
+{#                disableOtherActionButtons(this.id);#}
+{#                const sentence = cardData.back_side;#}
+{#                const words = sentence.split(' ');#}
+{##}
+{#                if (words.length < 3) {#}
+{#                    // Слово состоит из одной части#}
+{#                    revealIndex += 2;#}
+{#                    if (revealIndex > sentence.length) revealIndex = sentence.length;#}
+{#                    const revealed = sentence.slice(0, revealIndex);#}
+{#                    cardBack.innerText = revealed + '*'.repeat(sentence.length - revealIndex);#}
+{#                    if (revealIndex >= sentence.length) {#}
+{#                        makeButtonsInactive();#}
+{#                        revealIndex = 0;#}
+{#                    }#}
+{##}
+{#                } else {#}
+{#                    // Слово состоит из нескольких частей#}
+{#                    revealIndex += 1;#}
+{#                    if (revealIndex > words.length) revealIndex = words.length;#}
+{#                    const revealed = words.slice(0, revealIndex).join(' ');#}
+{#                    const remainingWords = words.slice(revealIndex).join(' ');#}
+{#                    cardBack.innerText = revealed + ' ' + '*'.repeat(remainingWords.length);#}
+{#                    if (revealIndex >= sentence.length) {#}
+{#                        makeButtonsInactive();#}
+{#                        revealIndex = 0;#}
+{#                    }#}
+{#                }#}
+{##}
+{#                cardBack.classList.remove('hidden');#}
+{#            });#}
+{#        }#}
+{##}
+{#        function shuffleArray(array) {#}
+{#            for (let i = array.length - 1; i > 0; i--) {#}
+{#                const j = Math.floor(Math.random() * (i + 1));#}
+{#                [array[i], array[j]] = [array[j], array[i]];#}
+{#            }#}
+{#        }#}
+{##}
+{#        const scrambleLettersButton = document.getElementById('scramble-letters-btn');#}
+{#        if (scrambleLettersButton) {#}
+{#            scrambleLettersButton.addEventListener('click', function () {#}
+{#                disableOtherActionButtons(this.id);#}
+{#                lettersContainer.innerHTML = '';#}
+{#                const input = cardData.back_side.trim();#}
+{#                const words = input.split(' ');#}
+{#                const isSentence = words.length > 2; // проверка, является ли это предложение (более 2 слов)#}
+{#                let elements;#}
+{##}
+{#                if (isSentence) {#}
+{#                    elements = words.slice(); // используем копию массива слов#}
+{#                } else {#}
+{#                    elements = input.split(''); // используем буквы#}
+{#                }#}
+{##}
+{#                shuffleArray(elements);#}
+{#                let userInput = isSentence ? [] : ''; // массив для предложений, строка для слов#}
+{##}
+{#                elements.forEach(element => {#}
+{#                    const span = document.createElement('span');#}
+{#                    span.className = 'letter';#}
+{#                    span.innerText = element;#}
+{#                    span.addEventListener('click', () => {#}
+{#                        const currentIndex = userInput.length;#}
+{#                        const originalElement = isSentence ? words[currentIndex] : input[currentIndex];#}
+{##}
+{#                        if (element === originalElement) {#}
+{#                            if (isSentence) {#}
+{#                                userInput.push(element);#}
+{#                                resultContainer.innerText = userInput.join(' ') + ' ';#}
+{#                            } else {#}
+{#                                userInput += element;#}
+{#                                resultContainer.innerText = userInput;#}
+{#                            }#}
+{#                            span.classList.add('inactive');#}
+{##}
+{#                            // Проверка полного соответствия ввода#}
+{#                            if ((isSentence && userInput.join(' ') === input) || (!isSentence && userInput === input)) {#}
+{#                                resultContainer.innerText = `${isSentence ? userInput.join(' ') : userInput} - Correct!`;#}
+{#                                resultContainer.classList.add('correct-word');#}
+{#                                lettersContainer.classList.add('hidden');#}
+{#                                makeButtonsInactive();#}
+{#                            }#}
+{#                        } else {#}
+{#                            span.classList.add('wrong-letter');#}
+{#                            setTimeout(() => {#}
+{#                                span.classList.remove('wrong-letter');#}
+{#                            }, 1000);#}
+{#                        }#}
+{#                    });#}
+{#                    lettersContainer.appendChild(span);#}
+{#                });#}
+{#                lettersContainer.classList.remove('hidden');#}
+{#            });#}
+{#        }#}
+{##}
+{#        function disableOtherActionButtons(activeButtonId) {#}
+{#            actionButtons.forEach(button => {#}
+{#                if (button.id !== activeButtonId) {#}
+{#                    button.disabled = true;#}
+{#                }#}
+{#            });#}
+{#        }#}
+{##}
+{#        function makeButtonsInactive() {#}
+{#            actionButtons.forEach(button => button.disabled = true);#}
+{#        }#}
+{##}
+{#        document.querySelectorAll('.rating-button').forEach(button => {#}
+{#            button.addEventListener('click', function () {#}
+{#                const rating = parseInt(this.getAttribute('data-rating'));#}
+{#                const baseUrl = `{% url 'get_card' slug %}`;#}
+{#                fetch(baseUrl, {#}
+{#                    method: 'POST',#}
+{#                    headers: {#}
+{#                        'Content-Type': 'application/json',#}
+{#                        'X-CSRFToken': csrfToken#}
+{#                    },#}
+{#                    body: JSON.stringify({rating: rating, mappings_id: cardData.mappings_id})#}
+{#                })#}
+{#                    .then(response => response.json())#}
+{#                    .then(data => {#}
+{#                        loadCard(data);#}
+{#                    });#}
+{#            });#}
+{#        });#}
+{##}
+{#        const playSoundButton = document.getElementById('play-sound-btn');#}
+{#        playSoundButton.addEventListener('click', function () {#}
+{#            if (!soundUrlCache) {#}
+{#                const soundUrl = `{% url 'get_sound' 'dummy_mappings_id' %}`.replace('dummy_mappings_id', cardData.mappings_id);#}
+{#                fetch(soundUrl)#}
+{#                    .then(response => response.blob())#}
+{#                    .then(blob => {#}
+{#                        soundUrlCache = URL.createObjectURL(blob);#}
+{#                        audio = new Audio(soundUrlCache);#}
+{#                        audio.play();#}
+{#                    });#}
+{#            } else {#}
+{#                audio.play();#}
+{#            }#}
+{#        });#}
+{#    });#}
+{#</script>#}
+{##}
+{#{% endblock %}#}
 
-        .letter {
-            display: inline-block;
-            margin: 0 5px;
-            padding: 5px;
-            border: 1px solid #000;
-            cursor: pointer;
-        }
 
-        .rating-button {
-            margin: 10px;
-            padding: 10px 20px;
-            cursor: pointer;
-        }
-
-        .wrong-letter {
-            background-color: red;
-        }
-
-        .inactive {
-            pointer-events: none;
-            background-color: lightgrey;
-        }
-
-        .correct-word {
-            background-color: lightgreen;
-            color: green;
-            font-weight: bold;
-        }
-    </style>
-</head>
-<body>
-<h1>Flashcard Study</h1>
-<div id="card-container">
-    <div id="card-front" class="card-side"></div>
-</div>
-
-{% if buttons_to_show.show_back %}
-    <button id="show-back-btn">Show Back</button>
-{% endif %}
-{% if buttons_to_show.show_hint %}
-    <button id="show-hint-btn">Show Hint</button>
-{% endif %}
-{% if buttons_to_show.show_similar %}
-    <button id="show-similar-btn">Show Similar Words</button>
-{% endif %}
-{% if buttons_to_show.show_first_letters %}
-    <button id="show-first-letters-btn">Show First Letters</button>
-{% endif %}
-{% if buttons_to_show.scramble_letters %}
-    <button id="scramble-letters-btn">Scramble Letters</button>
-{% endif %}
-{% if buttons_to_show.speech %}
-    <button id="play-sound-btn">Play Sound</button>
-{% endif %}
+{% extends 'deckhub/base.html' %}
+{% load static %}
+{% block content %}
+    <div class="row">
+        <div class="col-12">
+            <div class="content pt-2 px-4 mb-4">
+                <div class="content-block shadow-sm p-3 my-4 bg-body-tertiary rounded-5 " style="min-height: 350px; ">
+                    <div class="row mb-5 shadow  overflow-y-auto" style="min-height: 80px; max-height: 300px;">
+                        <div class="col">
+                            <div id="card-container" class="text-center">
+                                <button id="card-front">
+                                    <span id="card-text"></span>
+                                    <span id="play"><svg xmlns="http://www.w3.org/2000/svg" width="40" height="40"
+                                                         fill="currentColor" class="bi bi-play-fill"
+                                                         viewBox="0 0 16 16">
+                                                          <path d="m11.596 8.697-6.363 3.692c-.54.313-1.233-.066-1.233-.697V4.308c0-.63.692-1.01 1.233-.696l6.363 3.692a.802.802 0 0 1 0 1.393z"/>
+                                                        </svg></span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row h-auto flex-grow-1  overflow-y-auto" style="min-height: 220px; max-height: 370px;">
+                        <div class="col">
+                            <h2 id="card-back" class="card-side hidden text-center"></h2>
+                            <h2 id="hint-container" class="hidden"></h2>
+                            <div id="similar-words-container" class="hidden list-group w-75 mx-auto text-center"></div>
+                            <h2 id="result-container"></h2>
+                        </div>
+                    </div>
+                    <div class="row align-items-end ">
+                        <div class="col d-flex justify-content-center ">
+                            <div id="letters-container" class="d-flex flex-row mb-3"></div>
+                        </div>
+                    </div>
+                </div>
 
 
-<div id="card-back" class="card-side hidden"></div>
-<div id="hint-container" class="hidden"></div>
-<div id="similar-words-container" class="hidden"></div>
-<div id="letters-container" class="hidden"></div>
-<div id="result-container"></div>
+                <div class="row">
+                    <div class="col-5 my-auto">
+                        <div class="row">
+                            <div class="col d-flex justify-content-end">
+                                {% if buttons_to_show.show_hint %}
+                                    <button id="show-hint-btn" class="btn-hint">Ask ChatGPT for a Hint
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+                                             fill="currentColor" class="bi bi-question-square ms-3" viewBox="0 0 16 16">
+                                            <path d="M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2z"/>
+                                            <path d="M5.255 5.786a.237.237 0 0 0 .241.247h.825c.138 0 .248-.113.266-.25.09-.656.54-1.134 1.342-1.134.686 0 1.314.343 1.314 1.168 0 .635-.374.927-.965 1.371-.673.489-1.206 1.06-1.168 1.987l.003.217a.25.25 0 0 0 .25.246h.811a.25.25 0 0 0 .25-.25v-.105c0-.718.273-.927 1.01-1.486.609-.463 1.244-.977 1.244-2.056 0-1.511-1.276-2.241-2.673-2.241-1.267 0-2.655.59-2.75 2.286zm1.557 5.763c0 .533.425.927 1.01.927.609 0 1.028-.394 1.028-.927 0-.552-.42-.94-1.029-.94-.584 0-1.009.388-1.009.94"/>
+                                        </svg>
+                                    </button>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col d-flex justify-content-end">
+                                {% if buttons_to_show.show_first_letters %}
+                                    <button id="show-first-letters-btn" class="btn-hint">Show First Letters
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+                                             fill="currentColor" class="bi bi-door-open ms-3" viewBox="0 0 16 16">
+                                            <path d="M8.5 10c-.276 0-.5-.448-.5-1s.224-1 .5-1 .5.448.5 1-.224 1-.5 1"/>
+                                            <path d="M10.828.122A.5.5 0 0 1 11 .5V1h.5A1.5 1.5 0 0 1 13 2.5V15h1.5a.5.5 0 0 1 0 1h-13a.5.5 0 0 1 0-1H3V1.5a.5.5 0 0 1 .43-.495l7-1a.5.5 0 0 1 .398.117zM11.5 2H11v13h1V2.5a.5.5 0 0 0-.5-.5M4 1.934V15h6V1.077z"/>
+                                        </svg>
+                                    </button>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-2 my-auto mx-auto">
+                        {% if buttons_to_show.show_back %}
+                            <button id="show-back-btn" class="show-answer">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="currentColor"
+                                     class="bi bi-hand-index-thumb-fill" viewBox="0 0 16 16">
+                                    <path d="M8.5 1.75v2.716l.047-.002c.312-.012.742-.016 1.051.046.28.056.543.18.738.288.273.152.456.385.56.642l.132-.012c.312-.024.794-.038 1.158.108.37.148.689.487.88.716.075.09.141.175.195.248h.582a2 2 0 0 1 1.99 2.199l-.272 2.715a3.5 3.5 0 0 1-.444 1.389l-1.395 2.441A1.5 1.5 0 0 1 12.42 16H6.118a1.5 1.5 0 0 1-1.342-.83l-1.215-2.43L1.07 8.589a1.517 1.517 0 0 1 2.373-1.852L5 8.293V1.75a1.75 1.75 0 0 1 3.5 0"/>
+                                </svg>
+                            </button>
+                        {% endif %}
+                    </div>
+                    <div class="col-5 my-auto">
+                        <div class="row">
+                            <div class="col d-flex justify-content-start">
+                                {% if buttons_to_show.show_similar %}
+                                    <button id="show-similar-btn" class="btn-hint">Show Similar Words
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+                                             fill="currentColor" class="bi bi-intersect ms-3" viewBox="0 0 16 16">
+                                            <path d="M0 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v2h2a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-2H2a2 2 0 0 1-2-2zm5 10v2a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V6a1 1 0 0 0-1-1h-2v5a2 2 0 0 1-2 2zm6-8V2a1 1 0 0 0-1-1H2a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h2V6a2 2 0 0 1 2-2z"/>
+                                        </svg>
+                                    </button>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12 d-flex justify-content-start">
+                                {% if buttons_to_show.scramble_letters %}
+                                    <button id="scramble-letters-btn" class="btn-hint">Scramble Letters
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+                                             fill="currentColor" class="bi bi-body-text ms-3" viewBox="0 0 16 16">
+                                            <path fill-rule="evenodd"
+                                                  d="M0 .5A.5.5 0 0 1 .5 0h4a.5.5 0 0 1 0 1h-4A.5.5 0 0 1 0 .5m0 2A.5.5 0 0 1 .5 2h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5m9 0a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5m-9 2A.5.5 0 0 1 .5 4h3a.5.5 0 0 1 0 1h-3a.5.5 0 0 1-.5-.5m5 0a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5m7 0a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 0 1h-3a.5.5 0 0 1-.5-.5m-12 2A.5.5 0 0 1 .5 6h6a.5.5 0 0 1 0 1h-6a.5.5 0 0 1-.5-.5m8 0a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5m-8 2A.5.5 0 0 1 .5 8h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5m7 0a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5m-7 2a.5.5 0 0 1 .5-.5h8a.5.5 0 0 1 0 1h-8a.5.5 0 0 1-.5-.5m0 2a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 0 1h-4a.5.5 0 0 1-.5-.5m0 2a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 0 1h-2a.5.5 0 0 1-.5-.5"/>
+                                        </svg>
+                                    </button>
+                                {% endif %}
 
-<div>
-    <button class="rating-button" id="again-btn" data-rating="1">Again</button>
-    <button class="rating-button" id="hard-btn" data-rating="2">Hard</button>
-    <button class="rating-button" id="good-btn" data-rating="3">Good</button>
-    <button class="rating-button" id="easy-btn" data-rating="4">Easy</button>
-</div>
+{#                                {% if buttons_to_show.speech %}#}
+{#                                    <button id="play-sound-btn" class="btn-hint">Play#}
+{#                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"#}
+{#                                             fill="currentColor" class="bi bi-play-fill" viewBox="0 0 16 16">#}
+{#                                            <path d="m11.596 8.697-6.363 3.692c-.54.313-1.233-.066-1.233-.697V4.308c0-.63.692-1.01 1.233-.696l6.363 3.692a.802.802 0 0 1 0 1.393z"/>#}
+{#                                        </svg>#}
+{#                                    </button>#}
+{##}
+{#                                {% endif %}#}
+                            </div>
+                        </div>
 
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const slug = '{{ slug }}';
-        const studyMode = '{{ study_mode }}';
-        const csrfToken = '{{ csrf_token }}';
-        const cardFront = document.getElementById('card-front');
-        const cardBack = document.getElementById('card-back');
-        const hintContainer = document.getElementById('hint-container');
-        const similarWordsContainer = document.getElementById('similar-words-container');
-        const lettersContainer = document.getElementById('letters-container');
-        const resultContainer = document.getElementById('result-container');
-        const actionButtons = document.querySelectorAll('#show-back-btn, #show-hint-btn, #show-similar-btn, #show-first-letters-btn, #scramble-letters-btn');
-        let cardData = null;
-        let soundUrlCache = null; // Кэш для URL звукового файла
-        let audio = null;
+                    </div>
 
-        const loadCard = (data = null) => {
-            if (data) {
-                cardData = data;
-                cardFront.innerText = data.front_side;
-                cardBack.classList.add('hidden');
-                cardBack.innerText = '';
-                hintContainer.classList.add('hidden');
-                similarWordsContainer.classList.add('hidden');
-                lettersContainer.classList.add('hidden');
-                resultContainer.innerText = '';
-                resultContainer.classList.remove('correct-word');
-                actionButtons.forEach(button => button.disabled = false);
-                soundUrlCache = null;
-                audio = null;
-            } else {
-                const baseUrl = `{% url 'get_card' slug %}`;
-                const url = `${baseUrl}?study_mode=${studyMode}`;
-                fetch(url).then(response => response.json()).then(data => {
-                    cardData = data;
-                    loadCard(data);
-                });
-            }
+                </div>
 
-        };
+            </div>
 
-        loadCard();
+            <div class="row mb-4">
+                <div class="col d-flex justify-content-center align-items-center">
 
-        const showBackButton = document.getElementById('show-back-btn');
-        if (showBackButton) {
-            showBackButton.addEventListener('click', function () {
-                cardBack.innerText = cardData.back_side;
-                cardBack.classList.remove('hidden');
-                makeButtonsInactive();
-            });
-        }
+                    <button class="rating-button btn btn-outline-danger btn-lg btn-mark" id="again-btn" data-rating="1">
+                        <span class="count" id="again-count">0</span>
+                        <span class="text">Again</span>
+                    </button>
+                    <button class="rating-button btn btn-outline-warning btn-lg btn-mark" id="hard-btn" data-rating="2">
+                        <span class="count" id="hard-count">0</span>
+                        <span class="text">Hard</span>
+                    </button>
+                    <button class="rating-button btn btn-outline-primary btn-lg btn-mark" id="good-btn" data-rating="3">
+                        <span class="count" id="good-count">0</span>
+                        <span class="text">Good</span>
+                    </button>
+                    <button class="rating-button btn btn-outline-success btn-lg btn-mark" id="easy-btn" data-rating="4">
+                        <span class="count" id="easy-count">0</span>
+                        <span class="text">Easy</span>
+                    </button>
 
-        const showHintButton = document.getElementById('show-hint-btn');
-        if (showHintButton) {
-            showHintButton.addEventListener('click', function () {
-                const hintUrl = `{% url 'get_hint' 'dummy_mappings_id' %}`.replace('dummy_mappings_id', cardData.mappings_id);
-                fetch(hintUrl).then(response => response.json()).then(data => {
-                    hintContainer.innerText = data.hint;
-                    hintContainer.classList.remove('hidden');
-                });
-            });
-        }
+                </div>
+            </div>
+        </div>
+    </div>
 
-        const showSimilarButton = document.getElementById('show-similar-btn');
-        if (showSimilarButton) {
-            showSimilarButton.addEventListener('click', function () {
-                disableOtherActionButtons(this.id);
-                const similarWordsUrl = `{% url 'get_similar_words' 'dummy_mappings_id' %}`.replace('dummy_mappings_id', cardData.mappings_id);
-                fetch(similarWordsUrl).then(response => response.json()).then(data => {
-                    similarWordsContainer.innerHTML = '';
-                    data.similar_words.forEach(word => {
-                        const button = document.createElement('button');
-                        button.innerText = word;
-                        button.addEventListener('click', function () {
-                            if (word === data.back_side) {
-                                resultContainer.innerText = 'Correct!';
-                                resultContainer.classList.add('correct-word');
-                            } else {
-                                resultContainer.innerText = `Wrong! The correct word is ${data.back_side}`;
-                            }
-                            makeButtonsInactive();
-                            disableSimilarWordButtons();
-                        });
-                        similarWordsContainer.appendChild(button);
-                    });
-                    similarWordsContainer.classList.remove('hidden');
-                });
-            });
-        }
 
-        function disableSimilarWordButtons() {
-            const buttons = similarWordsContainer.querySelectorAll('button');
-            buttons.forEach(button => {
-                button.disabled = true;
-            });
-        }
+    <script type="application/json" id="context-json">{{ context_json|safe }}</script>
+    <script type="module" src="{% static 'js/cardmode/studying_mode.js' %}"></script>
 
-        let revealIndex = 0;
-
-        const showFirstLettersButton = document.getElementById('show-first-letters-btn');
-        if (showFirstLettersButton) {
-            showFirstLettersButton.addEventListener('click', function () {
-                disableOtherActionButtons(this.id);
-                const sentence = cardData.back_side;
-                const words = sentence.split(' ');
-
-                if (words.length < 3) {
-                    // Слово состоит из одной части
-                    revealIndex += 2;
-                    if (revealIndex > sentence.length) revealIndex = sentence.length;
-                    const revealed = sentence.slice(0, revealIndex);
-                    cardBack.innerText = revealed + '*'.repeat(sentence.length - revealIndex);
-                    if (revealIndex >= sentence.length) {
-                        makeButtonsInactive();
-                        revealIndex = 0;
-                    }
-
-                } else {
-                    // Слово состоит из нескольких частей
-                    revealIndex += 1;
-                    if (revealIndex > words.length) revealIndex = words.length;
-                    const revealed = words.slice(0, revealIndex).join(' ');
-                    const remainingWords = words.slice(revealIndex).join(' ');
-                    cardBack.innerText = revealed + ' ' + '*'.repeat(remainingWords.length);
-                    if (revealIndex >= sentence.length) {
-                        makeButtonsInactive();
-                        revealIndex = 0;
-                    }
-                }
-
-                cardBack.classList.remove('hidden');
-            });
-        }
-
-        function shuffleArray(array) {
-            for (let i = array.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [array[i], array[j]] = [array[j], array[i]];
-            }
-        }
-
-        const scrambleLettersButton = document.getElementById('scramble-letters-btn');
-        if (scrambleLettersButton) {
-            scrambleLettersButton.addEventListener('click', function () {
-                disableOtherActionButtons(this.id);
-                lettersContainer.innerHTML = '';
-                const input = cardData.back_side.trim();
-                const words = input.split(' ');
-                const isSentence = words.length > 2; // проверка, является ли это предложение (более 2 слов)
-                let elements;
-
-                if (isSentence) {
-                    elements = words.slice(); // используем копию массива слов
-                } else {
-                    elements = input.split(''); // используем буквы
-                }
-
-                shuffleArray(elements);
-                let userInput = isSentence ? [] : ''; // массив для предложений, строка для слов
-
-                elements.forEach(element => {
-                    const span = document.createElement('span');
-                    span.className = 'letter';
-                    span.innerText = element;
-                    span.addEventListener('click', () => {
-                        const currentIndex = userInput.length;
-                        const originalElement = isSentence ? words[currentIndex] : input[currentIndex];
-
-                        if (element === originalElement) {
-                            if (isSentence) {
-                                userInput.push(element);
-                                resultContainer.innerText = userInput.join(' ') + ' ';
-                            } else {
-                                userInput += element;
-                                resultContainer.innerText = userInput;
-                            }
-                            span.classList.add('inactive');
-
-                            // Проверка полного соответствия ввода
-                            if ((isSentence && userInput.join(' ') === input) || (!isSentence && userInput === input)) {
-                                resultContainer.innerText = `${isSentence ? userInput.join(' ') : userInput} - Correct!`;
-                                resultContainer.classList.add('correct-word');
-                                lettersContainer.classList.add('hidden');
-                                makeButtonsInactive();
-                            }
-                        } else {
-                            span.classList.add('wrong-letter');
-                            setTimeout(() => {
-                                span.classList.remove('wrong-letter');
-                            }, 1000);
-                        }
-                    });
-                    lettersContainer.appendChild(span);
-                });
-                lettersContainer.classList.remove('hidden');
-            });
-        }
-
-        function disableOtherActionButtons(activeButtonId) {
-            actionButtons.forEach(button => {
-                if (button.id !== activeButtonId) {
-                    button.disabled = true;
-                }
-            });
-        }
-
-        function makeButtonsInactive() {
-            actionButtons.forEach(button => button.disabled = true);
-        }
-
-        document.querySelectorAll('.rating-button').forEach(button => {
-            button.addEventListener('click', function () {
-                const rating = parseInt(this.getAttribute('data-rating'));
-                const baseUrl = `{% url 'get_card' slug %}`;
-                fetch(baseUrl, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRFToken': csrfToken
-                    },
-                    body: JSON.stringify({rating: rating, mappings_id: cardData.mappings_id})
-                })
-                    .then(response => response.json())
-                    .then(data => {
-                        loadCard(data);
-                    });
-            });
-        });
-
-        const playSoundButton = document.getElementById('play-sound-btn');
-        playSoundButton.addEventListener('click', function () {
-            if (!soundUrlCache) {
-                const soundUrl = `{% url 'get_sound' 'dummy_mappings_id' %}`.replace('dummy_mappings_id', cardData.mappings_id);
-                fetch(soundUrl)
-                    .then(response => response.blob())
-                    .then(blob => {
-                        soundUrlCache = URL.createObjectURL(blob);
-                        audio = new Audio(soundUrlCache);
-                        audio.play();
-                    });
-            } else {
-                audio.play();
-            }
-        });
-    });
-</script>
-
-</body>
-</html>
+{% endblock %}

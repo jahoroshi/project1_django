@@ -1,0 +1,12 @@
+button:enabled:hover,
+.button:not([aria-disabled=true]):hover,
+input[type=submit]:enabled:hover,
+input[type=reset]:enabled:hover,
+input[type=button]:enabled:hover,
+label[type=button]:hover {
+    background-color: transparent; /* Убирает цвет фона */
+    border-color: transparent; /* Убирает цвет границы */
+    color: inherit; /* Наследует цвет текста */
+    box-shadow: none; /* Убирает тень, если она есть */
+    text-decoration: none; /* Убирает подчеркивание, если есть */
+}

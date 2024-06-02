@@ -1,10 +1,44 @@
 {% extends 'deckhub/base.html' %}
 {% block content %}
-    <form method="post">{% csrf_token %}
-        <p>Are you sure you want to delete "{{ object }}{{ deck_name }}"?</p>
-        {{ form }}
-        <input type="submit" value="Confirm">
-    </form>
-    <a href="{% url 'decks_list' %}">Cansel</a>
+    <div class="row">
+        <div class="col-12">
 
+            <div class="content pt-2 px-4 mb-4">
+                <div class="content-block shadow-sm p-3 my-4 bg-body-tertiary rounded-5 text-center">
+                    <div class="row mb-4">
+                        <div class="col-2 d-flex align-items-center justify-content-left">
+                            <a href="{% url 'deck_content' slug %}" class="link-button-close " role="button"
+                               data-bs-toggle="tooltip"
+                               data-bs-placement="top" title="Close">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30"
+                                     fill="currentColor"
+                                     class="bi bi-x-lg" viewBox="0 0 16 16">
+                                    <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z"/>
+                                </svg>
+                            </a>
+                        </div>
+
+                        <div class="col-8 d-flex align-items-center justify-content-center">
+                            <h2 class="my-auto">Delete</h2>
+                        </div>
+                        <div class="col-2">
+
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            
+                    <form method="post">{% csrf_token %}
+                        <p>Are you sure you want to delete "{{ object }}{{ deck_name }}"?</p>
+                        {{ form }}
+                        <button type="submit" class="btn btn-outline-info bt-5">Confirm</button>
+                    </form>
+                            
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
 {% endblock %}

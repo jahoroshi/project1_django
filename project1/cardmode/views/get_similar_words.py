@@ -47,7 +47,7 @@ def get_similar_words(request, mappings_id, segment_length=3):
                                    text_length__lte=round(len_text * 1.4)).values_list('lower_side_field',
                                                                                        flat=True).distinct()[:4])
 
-    if len(content) < 4 and segment_length > 0:
+    if len(content) < 4 and segment_length >= 0:
         return get_similar_words(request, mappings_id, segment_length - 1)
 
     content.append(text)

@@ -22,7 +22,7 @@ def time_left(review_date):
         elif hours <= 4:
             return 'Soon'
 
-    return
+    return 'Ready for Review'
 
 
 @register.filter

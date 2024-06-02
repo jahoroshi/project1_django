@@ -9,40 +9,40 @@ class CardCheckForm(forms.Form):
     rating = forms.IntegerField(required=False)
 
 
-class AddCardForm(forms.Form):
-    side1 = forms.CharField()
-    side2 = forms.CharField()
-    # category = forms.IntegerField()
-    # status = forms.IntegerField()
-    # repetition = forms.IntegerField()
-
-
-class MappingsForm(forms.ModelForm):
-    # side1 = forms.CharField()
-    # side2 = forms.CharField()
-    #
-    # class Meta:
-    #     model = Mappings
-    #     fields = ['repetition', 'side1', 'side2', 'status']
-    #
-    # def save(self, commit=True):
-    #     instance = super(MappingsForm, self).save(commit=False)
-    #     card = Cards(side1=self.cleaned_data['side1'], side2=self.cleaned_data['side2'])
-    #     card.save()
-    #     instance.card = card
-    #     if commit:
-    #         instance.save()
-    #     return instance
-    ...
-
-
 class CardForm(forms.ModelForm):
-    category = forms.ModelChoiceField(queryset=Categories.objects.all().order_by('pk'))
-    is_two_sides = forms.BooleanField(required=False, label='Two sides')
+    category = forms.ModelChoiceField(
+        queryset=Categories.objects.all().order_by('pk'),
+        widget=forms.Select(attrs={
+            'class': 'form-select',
+            'aria-label': 'Category choose',
+    }),
+        required=False
+    )
+    is_two_sides = forms.BooleanField(
+        required=False, label='Two sides',
+        widget=forms.CheckboxInput(attrs={
+            'class': "form-check-input",
+            'type': "checkbox",
+            'role': "switch",
+            'id': "flexSwitchCheckDefault"
+        }))
 
     class Meta:
         model = Cards
         fields = ['side1', 'side2', 'category', 'is_two_sides']
+        widgets = {
+            'side1': forms.Textarea(attrs={
+                'class': 'form-control w-75',
+                'aria-labal': 'Side 1',
+                'rows': 3,
+
+            }),
+            'side2': forms.Textarea(attrs={
+                'class': 'form-control w-75',
+                'aria-labal': 'Side 2',
+                'rows': 3
+            }),
+        }
 
     def __init__(self, *args, **kwargs):
         self.slug = kwargs.pop('slug', None)
@@ -55,10 +55,22 @@ class CardForm(forms.ModelForm):
             category = get_object_or_404(Categories, mappings__card=kwargs.get('instance'))
             self.fields['category'].initial = category.pk
 
+    def clean(self):
+        cleaned_data = super().clean()
+        category = cleaned_data.get('category')
+
+        # Устанавливаем категорию по умолчанию, если она не пришла от клиента
+        if not category:
+            slug = self.slug
+            category = Categories.objects.get(slug=slug)
+            cleaned_data['category'] = category
+
+        return cleaned_data
+
 
 class ImportCardsForm(forms.Form):
     text = forms.CharField(
-        widget=forms.Textarea,
+        widget=forms.Textarea(attrs={'class': "form-control w-100", 'rows': 10}),
         label='Import your data. Copy and paste your data here from Quizlet, Google doc, spreadsheet, etc.'
     )
 
@@ -75,27 +87,29 @@ class ImportCardsForm(forms.Form):
     ]
     words_separator = forms.ChoiceField(
         choices=WORDS_CHOICES,
-        widget=forms.RadioSelect(attrs={'class': 'inline-radio'}),
+        widget=forms.RadioSelect(attrs={'class': 'form-check-input'}),
         initial='tab',
         label='Between Front and Back sides'
     )
     words_separator_custom = forms.CharField(
         max_length=255,
         required=False,
-        widget=forms.TextInput(attrs={'placeholder': 'Custom: e.g. -', 'class': 'inline-text'}),
+        widget=forms.TextInput(attrs={'placeholder': 'Custom: e.g. -', 'class': 'form-control w-25'}),
         label=False,
+        strip=False,
 
     )
     cards_separator = forms.ChoiceField(
         choices=CARDS_CHOICES,
-        widget=forms.RadioSelect(attrs={'class': 'inline-radio'}),
+        widget=forms.RadioSelect(attrs={'class': 'form-check-input'}),
         initial='new_line',
         label='Between cards'
     )
     cards_separator_custom = forms.CharField(
         max_length=255,
         required=False,
-        widget=forms.TextInput(attrs={'placeholder': 'Custom: e.g. -', 'class': 'inline-text'}),
+        widget=forms.TextInput(attrs={'placeholder': 'Custom: e.g. -', 'class': 'form-control w-25'}),
         label=False,
+        strip=False
 
     )

@@ -5,21 +5,28 @@
 {% load humanize %}
 
 {% block content %}
-    <h2>
-        {{ deck_name }}
-    </h2>
-    {% deck_study_panel_stats slug %}
+    <div class="row">
+        <div class="col">
+            <h2 class="pb-2  mb-2 border-bottom display-3 text-center text-dark">
+                {{ deck_name }}
+            </h2>
+        </div>
+    </div>
+    <div class="study-panel text-dark px-5 pt-1">
 
-{#    <a href="{% url 'import_cards' slug %}">Import cards</a>#}
-{#    {% include 'cards/create_new_card.html' %}#}
-{#    <br>#}
-{#    <a href="{% url 'learn_cards' slug %}?study_mode=new">Study new cards</a>#}
-{#    <a href="{% url 'learn_cards' slug %}?study_mode=review">Review cards</a>#}
+        <div class="row">
+            <div class="col">
+            {% deck_study_panel_stats slug %}
+            </div>
+        </div>
+    </div>
 
 
-    {% for card in object_list %}
-        {% ifchanged %}
-        {% endifchanged %}
-        {% include "cards/card.html" %}
-    {% endfor %}
+    <div class="content">
+        {% for card in object_list %}
+            <div class="content-block ">
+                {% include "cards/card.html" %}
+            </div>
+        {% endfor %}
+    </div>
 {% endblock content %}

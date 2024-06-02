@@ -1,103 +1,652 @@
-:root {
-    --accent: #6e48ad;
-    --accent-bg: white;
-    --bg: #fff;
-    --text: #212121;
-    --text-light: #585858;
-    --border: #d8dae1;
-    --code: #d81b60;
-    --preformatted: #444;
+/*:root {*/
+/*    --accent: #6e48ad;*/
+/*    --accent-bg: white;*/
+/*    --bg: #fff;*/
+/*    --text: #212121;*/
+/*    --text-light: #585858;*/
+/*    --border: #d8dae1;*/
+/*    --code: #d81b60;*/
+/*    --preformatted: #444;*/
+/*}*/
+
+/*article {*/
+/*    background-color: var(--marked);*/
+/*    border: 1px solid var(--border);*/
+/*    border-radius: 5px;*/
+/*    padding: 1em;*/
+/*    margin: 1em 0;*/
+/*}*/
+
+/*h2 {*/
+/*    text-align: center;*/
+/*}*/
+
+/*h6 {*/
+/*    text-align: center;*/
+/*}*/
+
+/*h2, h4 {*/
+/*    margin-top: 0;*/
+/*}*/
+
+/*hr {*/
+/*    background: var(--accent);*/
+/*    border-color: var(--accent);*/
+/*}*/
+
+
+/*select, textarea {*/
+/*    width: 100%;*/
+/*}*/
+
+/*input {*/
+/*    width: 100%;*/
+/*}*/
+
+/*.button-container input {*/
+/*    display: inline-block;*/
+/*    width: 150px;*/
+/*    height: 40px;*/
+/*    font-size: 16px;*/
+/*    margin-right: 10px; !* Добавляет небольшое расстояние между кнопками *!*/
+/*}*/
+
+
+/*.button-container {*/
+/*    display: flex;*/
+/*    justify-content: space-between; !* Распределить кнопки равномерно по контейнеру *!*/
+/*}*/
+
+/*.inline-radio {*/
+/*    display: inline-block;*/
+/*    margin-right: 10px;*/
+/*}*/
+
+/*.inline-text {*/
+/*    display: inline-block;*/
+/*    width: 200px; !* Вы можете изменить ширину по мере необходимости *!*/
+/*    margin-left: 10px;*/
+/*    margin-top: 0px;*/
+/*}*/
+
+/*label[for='id_text'] {*/
+/*    font-size: 0.7em;*/
+/*}*/
+
+/*h7 {*/
+/*    display: block;*/
+/*}*/
+
+/*.countdown-container {*/
+/*    display: flex;*/
+/*    justify-content: center;*/
+/*    gap: 20px;*/
+/*    font-family: Arial, sans-serif;*/
+/*}*/
+
+/*.countdown-item {*/
+/*    text-align: center;*/
+/*}*/
+
+/*.countdown-number {*/
+/*    font-size: 2em;*/
+/*    font-weight: bold;*/
+/*}*/
+
+/*.countdown-label {*/
+/*    font-size: 1em;*/
+/*}*/
+
+/*.countdown-title {*/
+/*    text-align: center;*/
+/*    font-size: 0.8em;*/
+/*}*/
+
+.hidden {
+    display: none;
+}
+
+
+/*.rating-button {*/
+/*    margin: 10px;*/
+/*    padding: 10px 20px;*/
+/*    cursor: pointer;*/
+/*}*/
+
+/*.wrong-letter {*/
+/*    background-color: red;*/
+/*}*/
+
+
+/*.correct-word {*/
+/*    background-color: lightgreen;*/
+/*    color: green;*/
+/*    font-weight: bold;*/
+/*}*/
+
+header, footer, section {
+    padding: 70px 0;
+}
+
+body {
+    background-color: #dee2e6;
+}
+
+.container {
+    max-width: 800px;
+}
+
+.content {
+    border-radius: 66px;
+    background-color: rgb(33, 37, 41);
+    padding: 20px;
+    padding-top: .5rem !important;
+    padding-right: 1.5rem !important;
+    padding-left: 1.5rem !important;
+    margin-bottom: 1.5rem !important;
+}
+
+.study-panel {
+    /*border-radius: 66px;*/
+    /*background-color: rgb(33, 37, 41);*/
+    padding: 20px;
+    /*border: 3px solid rgb(33, 37, 41);*/
+    margin-bottom: 30px;
+    /*box-shadow: 0px 20px 20px 4px rgba(0, 0, 0, 0.2);*/
 }
 
 article {
-    background-color: var(--marked);
-    border: 1px solid var(--border);
-    border-radius: 5px;
-    padding: 1em;
-    margin: 1em 0;
+    border-radius: 21px;
 }
 
-h2 {
-    text-align: center;
+.topbar {
+    color: rgb(33, 37, 41);
+
 }
 
-h6 {
-    text-align: center;
+.btn-outline-secondary:hover {
+    background-color: #f3f3f3;
 }
 
-h2, h4 {
-    margin-top: 0;
-}
-
-hr {
-    background: var(--accent);
-    border-color: var(--accent);
-}
-
-
-select, textarea {
-    width: 100%;
-}
-
-input {
-    width: 100%;
-}
-
-.button-container input {
-    display: inline-block;
-    width: 150px;
-    height: 40px;
-    font-size: 16px;
-    margin-right: 10px; /* Добавляет небольшое расстояние между кнопками */
-}
-
-
-.button-container {
+.circle {
+    width: 110px;
+    height: 110px;
+    border-radius: 50%;
+    background-color: rgb(33, 37, 41);
     display: flex;
-    justify-content: space-between; /* Распределить кнопки равномерно по контейнеру */
-}
-
-.inline-radio {
-    display: inline-block;
-    margin-right: 10px;
-}
-
-.inline-text {
-    display: inline-block;
-    width: 200px; /* Вы можете изменить ширину по мере необходимости */
-    margin-left: 10px;
-    margin-top: 0px;
-}
-
-label[for='id_text'] {
-    font-size: 0.7em;
-}
-
-h7 {
-    display: block;
-}
-
-.countdown-container {
-    display: flex;
+    align-items: center;
     justify-content: center;
-    gap: 20px;
-    font-family: Arial, sans-serif;
+    color: #dee2e6;
+    font-size: 16px; /* Размер текста */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5); /* Внешняя тень */
+    position: relative;
+    transition: background-color 0.3s, color 0.3s, box-shadow 0.3s; /* Плавный переход */
+    text-align: center; /* Центрирование текста */
 }
 
-.countdown-item {
-    text-align: center;
+
+.circle a {
+    color: inherit; /* Унаследовать цвет */
+    text-decoration: none; /* Убрать подчеркивание */
+    z-index: 1; /* Обеспечить, что ссылка будет над псевдоэлементом */
 }
 
-.countdown-number {
-    font-size: 2em;
+.circle:hover {
+    background-color: #dee2e6;
+    color: black; /* Цвет текста при наведении */
+    box-shadow: none; /* Убрать внешнюю тень при наведении */
+}
+
+
+.circle:hover a {
+    color: black; /* Цвет текста при наведении */
+}
+
+
+/*a:hover, a:focus, a:active {*/
+/*    color: inherit; !* Наследовать цвет текста от родителя *!*/
+/*    text-decoration: none; !* Убрать подчеркивание *!*/
+/*}*/
+
+/*a {*/
+/*    color: inherit; !* Наследовать цвет текста от родителя *!*/
+/*    text-decoration: none; !* Убрать подчеркивание *!*/
+/*}*/
+
+
+/*.content a:hover, a:focus, a:active, a:visited, a {*/
+/*    color: inherit; !* Наследовать цвет текста от родителя *!*/
+/*    text-decoration: none; !* Убрать подчеркивание *!*/
+/*}*/
+
+
+.link-button-hover {
+    text-decoration: none;
+    width: 30px;
+    height: 30px;
+    position: relative;
+    transition: background-color 0.1s, color 0.3s; /* Плавный переход */
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /*color: inherit;*/
+
+}
+
+.link-button-hover[title="Rename"] {
+    /*color: var(--bs-purple);*/
+    color: #fff;
+
+}
+
+.link-button-hover[title="Delete"] {
+    /*color: var(--bs-red);*/
+    color: #fff;
+}
+
+/* Стили для состояния hover */
+.link-button-hover:hover {
+    background-color: rgb(33, 37, 41); /* Цвет фона при наведении */
+    color: #fff; /* Цвет текста при наведении */
+}
+
+
+.link-button-close {
+    text-decoration: none;
+    width: 44px;
+    height: 44px;
+    position: relative;
+    transition: background-color 0.1s, color 0.3s; /* Плавный переход */
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /*color: inherit;*/
+
+}
+
+.link-button-close[title="Close"] {
+    /*color: var(--bs-purple);*/
+    color: #fff;
+
+}
+
+
+/* Стили для состояния hover */
+.link-button-close:hover {
+    background-color: rgb(33, 37, 41); /* Цвет фона при наведении */
+    color: #fff; /* Цвет текста при наведении */
+}
+
+.create-card-add {
+    border-radius: 50%;
+    width: 80px;
+    height: 80px;
+    border: 3px solid;
+}
+
+.create-card-add:hover {
+    border-color: transparent;
+}
+
+.form-control:focus[name='side2'],
+.form-control:focus[name='side1'],
+.form-select:focus[name='category'] {
+    border-color: #00f3ff;
+}
+
+/*.form-check-input:focus[name="is_two_sides"] {*/
+/*    border-color: #00f3ff;*/
+/*    outline: 0;*/
+/*    box-shadow: 0 0 0 .25rem rgb(4, 226, 255);*/
+
+.add-card-decks {
+    height: 100%; /* Высота кнопки 100% от высоты родителя */
+    width: 100px;
+    display: flex; /* Flexbox для центрирования содержимого */
+    align-items: center; /* Вертикальное центрирование */
+    justify-content: center; /* Горизонтальное центрирование */
+    border-radius: 1px;
+}
+
+.add-card-decks:hover {
+    background-color: rgb(0 0 0 / 13%);
+
+}
+
+.buttons-study-panel {
+    height: 60px;
+    width: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 5px;
+    padding: 0 40px;
+    border: 1px solid #2b2f32;
+    transition: background-color 0.3s ease, transform 0.3s ease, border-color 0.3s ease;
+    margin-bottom: 20px;
+    position: relative; /* Положение для абсолютного позиционирования */
+    text-decoration: none; /* Убрать подчеркивание */
+    color: inherit; /* Наследовать цвет */
+}
+
+.buttons-study-panel:hover {
+    background-color: #bfbfbf42;
+    border: 1px solid rgba(0, 0, 0, 0);
+    transform: none; /* Убираем любые трансформации при наведении */
+    border-radius: 0;
+}
+
+.buttons-study-panel a {
+    color: inherit; /* Наследуем цвет от родительского элемента */
+    text-decoration: none; /* Убираем декорирование ссылки */
+}
+
+.button-study-panel-disable a {
+    height: 60px;
+    width: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 5px;
+    padding: 0 40px;
+    border: 1px solid #2b2f32;
+    margin-bottom: 20px;
+    background-color: transparent;
+}
+
+
+/*.deck-name a:*/
+.deck-name {
+    color: var(--bs-yellow);
+    text-decoration: none;
+    width: 100%;
+    height: 70px;
+    position: relative;
+    transition: background-color 0.1s, color 0.3s; /* Плавный переход */
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+
+}
+
+.deck-name:hover {
+    background-color: rgb(0 0 0 / 13%);
+
+    color: #fff; /* Цвет текста при наведении */
+    padding: 3px;
+    border-radius: 1px;
+}
+
+.deck-for-review {
+    background-color: var(--bs-red);
+}
+
+
+button.similar-words:hover {
+    background-color: var(--bs-secondary-text-emphasis);
+    color: #212529; /* Цвет текста при наведении */
+    border: 1px solid #212529; /* Граница при наведении */
+
+}
+
+button.correct-choice {
+    background-color: #28a745 !important; /* Зеленый фон для правильного ответа */
+    color: white !important; /* Белый текст */
+    border-color: #28a745; /* Зеленая граница */
     font-weight: bold;
 }
 
-.countdown-label {
-    font-size: 1em;
+button.wrong-choice {
+    background-color: #dc3545 !important; /* Красный фон для ошибочного ответа */
+    color: white; /* Белый текст */
+    border-color: #dc3545; /* Красная граница */
 }
 
-.countdown-title {
-    text-align: center;
+
+.letter {
+    margin: 2px 5px;
+    padding: 15px;
+    border: 1px solid #080707;
+    cursor: pointer;
+    background-color: #6c757d;
+    width: max-content;
+    height: 40px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* border-radius: 5px; */
+    /* color: #ffffff; */
+    font-weight: bold;
+    /* box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); */
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+.letter:hover {
+    background-color: #495057;
+    color: #ffffff; /* Цвет текста при наведении */
+    transform: translateY(-3px); /* Подъем при наведении */
+    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15); /* Тень при наведении */
+}
+
+.letter:active {
+    background-color: #343a40;
+    transform: translateY(-1px); /* Снижение при клике */
+    box-shadow: 0 3px 5px rgba(0, 0, 0, 0.2); /* Тень при клике */
+}
+
+
+.inactive {
+    pointer-events: none;
+    background-color: var(--bs-success);
+}
+
+.wrong-letter {
+    background-color: var(--bs-red);
+}
+
+.correct-word {
+    background-color: lightgreen;
+    color: green;
+    font-weight: bold;
+}
+
+#show-back-btn {
+    /* margin: 0 5px 15px 5px; */
+    padding: 15px;
+    border: 1px solid #333333;
+    cursor: pointer;
+    background-color: var(--bs-light);
+    color: #000000;
+    height: 100px;
+    width: 100%;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    font-weight: bold;
+    box-shadow: inset 20px 5px 20px 7px rgba(0, 0, 0, 0.2);
+    transition: background-color 0.3s, transform 0.2s, box-shadow 0.3s;
+}
+
+#show-back-btn:hover {
+    background-color: rgba(255, 255, 255, 0.62); /* Более светлый фон при наведении */
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4); /* Увеличение тени при наведении */
+    transform: translateY(-3px); /* Легкий подъем при наведении */
+}
+
+#show-back-btn:active {
+    background-color: #222222; /* Более темный фон при клике */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Уменьшение тени при клике */
+    transform: translateY(0); /* Возврат к исходному положению при клике */
+}
+
+#show-back-btn[disabled] {
+    cursor: not-allowed;
+    background-color: #343a40;
+    border-color: #343a40;
+    color: #f8f9fa1c;
+    box-shadow: none;
+    transform: none;
+}
+
+
+.btn-hint {
+    /* margin: 2px 0; */
+    padding: 10px 5px 10px 10px;
+    border: 3px solid #090909eb;
+    cursor: pointer;
+    background-color: rgb(255, 255, 255);
+    color: #0f2b46;
+    height: 48px;
+    /* width: 200px; */
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 5px;
+    /* font-weight: bold; */
+    box-shadow: inset 0px -2px 19px 6px rgba(0, 0, 0, 0.2);
+    transition: background-color 0.3s, transform 0.2s, box-shadow 0.3s;
+}
+
+button.btn-hint:hover {
+    background-color: #ffffff; /* Более светлый фон при наведении */
+    border: 3px solid #090909eb;
+    box-shadow: inset 0px -2px 9px 0px rgba(0, 0, 0, 0.2);
+
+}
+
+button.btn-hint[disabled]:hover {
+    cursor: not-allowed;
+    background-color: #343a40;
+    border-color: #343a40;
+    color: rgba(248, 249, 250, 0.18);
+    box-shadow: none;
+    transform: none;
+    margin: 3px
+
+}
+
+
+.btn-hint[disabled] {
+    cursor: not-allowed;
+    background-color: #343a40;
+    border-color: #343a40;
+    color: rgba(248, 249, 250, 0.18);
+    box-shadow: none;
+    transform: none;
+    margin: 3px
+}
+
+.content-block {
+    display: flex;
+    flex-direction: column;
+    border-radius: var(--bs-border-radius-xxl) !important;
+    --bs-bg-opacity: 1;
+    background-color: rgba(var(--bs-tertiary-bg-rgb), var(--bs-bg-opacity)) !important;
+    padding: 1rem !important;
+    margin-top: 1.5rem !important;
+    margin-bottom: 1.5rem !important;
+    box-shadow: var(--bs-box-shadow-sm) !important;
+}
+
+
+.content-block .flex-grow-1 {
+    flex-grow: 1;
+}
+
+
+.btn-known {
+    height: 6.4em;
+    width: 6.4em;
+    margin-inline: 8px;
+    border-radius: 50%;
+    border: 3px solid transparent;
+    font-weight: bold;
+    /* padding-inline: 0; */
+    margin-left: 2em;
+}
+
+
+.btn-mark {
+    position: relative; /* Устанавливаем относительное позиционирование для кнопки */
+    height: 8.4rem;
+    width: 8.4rem;
+    margin-inline: 8px;
+    border-radius: 50%;
+    border: 3px solid;
+    font-weight: bold;
+    display: flex;
+    align-items: center; /* Выравниваем элементы по горизонтали по центру */
+    justify-content: center; /* Выравниваем элементы по вертикали по центру */
+    text-align: center; /* Центрируем текст внутри кнопки */
+}
+
+.count {
+    position: absolute;
+    top: 0.2em;
     font-size: 0.8em;
+    color: #00000024;
+    width: 100%;
+    text-align: center;
+}
+
+
+#easy-count {
+    color: var(--bs-danger)
+}
+
+.btn-mark:hover #easy-count,
+.btn-mark:hover .count {
+    color: transparent
+}
+
+.text {
+    display: block; /* Отображаем текст "Again" */
+}
+
+#card-front {
+    background-color: transparent;
+    border: none;
+    font-size: 2.7em;
+
+}
+
+.max-width {
+    max-width: 45em;
+}
+
+#letters-container {
+    max-width: 100%; /* Устанавливаем максимальную ширину контейнера */
+    overflow: hidden; /* Скрываем переполнение */
+    flex-wrap: wrap; /* Разрешаем перенос элементов на следующую строку */
+}
+
+.form-check .form-check-input {
+    float: none;
+    margin-right: 0.4em;
+}
+
+#id_words_separator_custom, #id_cards_separator_custom {
+    display: inline;
+}
+
+#preview-container {
+    max-height: 400px; /* Задайте подходящую высоту */
+    overflow-y: auto; /* Включает вертикальную прокрутку при переполнении */
+    padding: 10px;
+    margin-top: 20px;
+}
+
+.card {
+    padding: 10px;
+    margin-bottom: 10px;
+    white-space: pre-wrap; /* Сохраняет пробелы и разрывы строк */
+    border-radius: 5px;
 }

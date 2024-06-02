@@ -28,8 +28,8 @@ urlpatterns = [
     ),
 
     # path("deckhub/delete/<int:pk>/", views.DeckDeleteView.as_view(), name="deck_delete")
-    path("learn/<slug:slug>/", views.BoxView.as_view(), name="learn_cards"),
-    path("learn/<slug:slug>/<int:rep>/", views.BoxView.as_view(), name="learn_cards_rep"),
+    # path("learn/<slug:slug>/", views.BoxView.as_view(), name="learn_cards"),
+    # path("learn/<slug:slug>/<int:rep>/", views.BoxView.as_view(), name="learn_cards_rep"),
     path("<slug:slug>/import/", views.import_cards, name="import_cards"),
     path("<slug:slug>/delete/<int:pk>/", views.CardDeleteView.as_view(), name="card_delete"),
     # path('study/<slug:slug>/<int:rep>/', views.study_view, name='study'),
