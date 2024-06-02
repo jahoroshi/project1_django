@@ -1,13 +1,11 @@
-{% extends 'deckhub/base.html' %}
-{% block content %}
-    <div class="row">
-        <div class="col-12">
-
-            <div class="content pt-2 px-4 mb-4">
+<div class="modal-delete fade" id="delete-object" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+       <div class="content pt-2 px-4 mb-4">
                 <div class="content-block shadow-sm p-3 my-4 bg-body-tertiary rounded-5 text-center">
                     <div class="row mb-4">
                         <div class="col-2 d-flex align-items-center justify-content-left">
-                            <a href="{% if object %} {% url 'deck_content' slug %} {% else %} {% url "decks_list" %}{% endif %}" class="link-button-close " role="button"
+                            <div class="link-button-close btn-close" data-bs-dismiss="modal"  role="button"
                                data-bs-toggle="tooltip"
                                data-bs-placement="top" title="Close">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30"
@@ -15,7 +13,7 @@
                                      class="bi bi-x-lg" viewBox="0 0 16 16">
                                     <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z"/>
                                 </svg>
-                            </a>
+                            </div>
                         </div>
 
                         <div class="col-8 d-flex align-items-center justify-content-center">
@@ -27,8 +25,10 @@
                     </div>
                     <div class="row">
                         <div class="col">
-                            
-                    <form method="post">{% csrf_token %}
+                            {{ slug }}
+                            {{ pk }}
+                    <form method="post" action="{% url 'card_delete' slug=slug pk=pk %}">
+                        {% csrf_token %}
                         <p>Are you sure you want to delete "{{ object }}{{ deck_name }}"?</p>
                         {{ form }}
                         <button type="submit" class="btn btn-outline-info bt-5">Confirm</button>
@@ -39,6 +39,6 @@
 
                 </div>
             </div>
-        </div>
     </div>
-{% endblock %}
+  </div>
+</div>

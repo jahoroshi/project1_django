@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'speech.apps.SpeechConfig',
     'deckhub.apps.DeckhubConfig',
     'cardmode.apps.CardmodeConfig',
+    'users',
 ]
 
 MIDDLEWARE = [
@@ -144,6 +145,10 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+
+#Users
+
+AUTH_USER_MODEL = 'users.User'
 
 # LOGGING = {
 #     'version': 1,

@@ -82,6 +82,8 @@ class CardDeleteView(CheckReuqest, DeleteView):
         return context
 
 
+
+
 class BoxView(ListView):
     model = Cards
     template_name = 'cards/box.html'

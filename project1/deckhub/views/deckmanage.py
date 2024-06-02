@@ -52,7 +52,8 @@ def deck_delete(request, pk):
         deck.delete()
         cards.delete()
         return redirect(reverse('decks_list'))
-    return render(request, 'cards/delete_object.html', {'deck_name': deck.name})
+    slug = Categories.objects.get(pk=pk).slug
+    return render(request, 'cards/delete_object.html', {'deck_name': deck.name, 'slug': slug})
 
 
 class DeckContentView(ListView):
