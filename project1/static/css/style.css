@@ -103,7 +103,7 @@
 /*}*/
 
 .hidden {
-    display: none;
+    display: none!important;
 }
 
 
@@ -180,7 +180,8 @@ article {
     font-size: 16px; /* Размер текста */
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.5); /* Внешняя тень */
     position: relative;
-    transition: background-color 0.3s, color 0.3s, box-shadow 0.3s; /* Плавный переход */
+    transition: background-color 0.3s, color 0.3s,
+    box-shadow 0.3s; /* Плавный переход */
     text-align: center; /* Центрирование текста */
 }
 
@@ -362,23 +363,22 @@ article {
     color: var(--bs-yellow);
     text-decoration: none;
     width: 100%;
-    height: 70px;
+    /*height: 70px;*/
     position: relative;
     transition: background-color 0.1s, color 0.3s; /* Плавный переход */
     border-radius: 10px;
     display: flex;
     align-items: center;
-    justify-content: center;
+    /*justify-content: center;*/
 
 
 }
 
 .deck-name:hover {
     background-color: rgb(0 0 0 / 13%);
-
     color: #fff; /* Цвет текста при наведении */
-    padding: 3px;
-    border-radius: 1px;
+    padding-left: 3px;
+    border-radius: 3px;
 }
 
 .deck-for-review {
@@ -563,29 +563,29 @@ button.btn-hint[disabled]:hover {
 
 
 .btn-known {
-    height: 6.4em;
-    width: 6.4em;
+    height: 5.4em;
+    width: 5.4em;
     margin-inline: 8px;
     border-radius: 50%;
     border: 3px solid transparent;
     font-weight: bold;
-    /* padding-inline: 0; */
+    padding-inline: 0;
     margin-left: 2em;
 }
 
 
 .btn-mark {
-    position: relative; /* Устанавливаем относительное позиционирование для кнопки */
-    height: 8.4rem;
-    width: 8.4rem;
+    position: relative;
+    height: 7.4rem;
+    width: 7.4rem;
     margin-inline: 8px;
     border-radius: 50%;
-    border: 3px solid;
+    border: 8px solid;
     font-weight: bold;
     display: flex;
-    align-items: center; /* Выравниваем элементы по горизонтали по центру */
-    justify-content: center; /* Выравниваем элементы по вертикали по центру */
-    text-align: center; /* Центрируем текст внутри кнопки */
+    align-items: center;
+    justify-content: center;
+    text-align: center;
 }
 
 .count {
@@ -669,3 +669,115 @@ button.btn-hint[disabled]:hover {
 }
 
 
+.bd-callout-warning {
+    --bd-callout-color: var(--bs-warning-text-emphasis);
+    --bd-callout-bg: var(--bs-warning-bg-subtle);
+    --bd-callout-border: var(--bs-warning-border-subtle);
+}
+
+.bd-callout-success {
+    --bd-callout-color: var(--bs-success-text-emphasis);
+    --bd-callout-bg: var(--bs-success-bg-subtle);
+    --bd-callout-border: var(--bs-success-border-subtle);
+}
+
+.bd-callout {
+    --bs-link-color-rgb: var(--bd-callout-link);
+    --bs-code-color: #ea88b8;
+    padding: 1.25rem;
+    margin-top: 1.25rem;
+    margin-bottom: 1.25rem;
+    color: var(--bd-callout-color, inherit);
+    background-color: var(--bd-callout-bg, var(--bs-gray-100));
+    border-left: 0.25rem solid var(--bd-callout-border, var(--bs-gray-300));
+}
+
+
+.dropdown-menu {
+    --bs-dropdown-zindex: 1000;
+    --bs-dropdown-min-width: 17rem;
+    --bs-dropdown-padding-x: 0;
+    --bs-dropdown-padding-y: 0.5rem;
+    --bs-dropdown-spacer: 0.925rem;
+    --bs-dropdown-font-size: 1rem;
+    --bs-dropdown-color: var(--bs-body-color);
+    --bs-dropdown-bg: var(--bs-body-bg);
+    --bs-dropdown-border-color: rgb(56 0 0);
+    --bs-dropdown-border-radius: var(--bs-border-radius);
+    --bs-dropdown-border-width: var(--bs-border-width);
+    --bs-dropdown-inner-border-radius: calc(var(--bs-border-radius) - var(--bs-border-width));
+    --bs-dropdown-divider-bg: var(--bs-border-color-translucent);
+    --bs-dropdown-divider-margin-y: 0.5rem;
+    --bs-dropdown-box-shadow: var(--bs-box-shadow);
+    --bs-dropdown-link-color: var(--bs-body-color);
+    --bs-dropdown-link-hover-color: var(--bs-body-color);
+    --bs-dropdown-link-hover-bg: #393f45;
+    --bs-dropdown-link-active-color: #fff;
+    --bs-dropdown-link-active-bg: #0d6efd;
+    --bs-dropdown-link-disabled-color: var(--bs-tertiary-color);
+    --bs-dropdown-item-padding-x: 1.2rem;
+    --bs-dropdown-item-padding-y: 0.65rem;
+    --bs-dropdown-header-color: #6c757d;
+    --bs-dropdown-header-padding-x: 1rem;
+    --bs-dropdown-header-padding-y: 0.5rem;
+    position: absolute;
+    z-index: var(--bs-dropdown-zindex);
+    display: none;
+    min-width: var(--bs-dropdown-min-width);
+    /* padding: var(--bs-dropdown-padding-y) var(--bs-dropdown-padding-x); */
+    margin: 0;
+    font-size: var(--bs-dropdown-font-size);
+    color: var(--bs-dropdown-color);
+    text-align: left;
+    list-style: none;
+    background-color: #2b3035;
+    background-clip: padding-box;
+    border: 2px solid #3b4147;
+    /* border-radius: var(--bs-dropdown-border-radius); */
+    border-radius: 20px;
+    padding: 15px;
+    box-shadow: inset 0px 0px 6px 1px rgba(0, 0, 0, 0.2);
+}
+
+.dropdown-menu a:hover {
+    background-color: var(--bs-dropdown-link-hover-bg);
+    color: var(--bs-dropdown-link-hover-color);
+    border-radius: 9px; /* или любое другое значение радиуса */
+}
+
+.btn-danger {
+    --bs-btn-color: #fff;
+    --bs-btn-bg: transparent;
+    --bs-btn-border-color: transparent;
+    --bs-btn-hover-color: #fff;
+    --bs-btn-hover-bg: #212529;
+    --bs-btn-hover-border-color: transparent;
+    --bs-btn-focus-shadow-rgb: 225, 83, 97;
+    --bs-btn-active-color: #fff;
+    --bs-btn-active-bg: transparent;
+    --bs-btn-active-border-color: transparent;
+    --bs-btn-active-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
+    --bs-btn-disabled-color: #fff;
+    --bs-btn-disabled-bg: transparent;
+    --bs-btn-disabled-border-color: transparent;
+}
+
+.profile-icon {
+        text-decoration: none;
+    width: 30px;
+    height: 30px;
+    position: relative;
+    transition: background-color 0.1s, color 0.3s; /* Плавный переход */
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+        color: #fff; /* Цвет текста при наведении */
+
+    /*color: inherit;*/
+}
+
+.profile-icon:hover {
+    /*background-color: rgb(33, 37, 41); !* Цвет фона при наведении *!*/
+    color: #fff; /* Цвет текста при наведении */
+}

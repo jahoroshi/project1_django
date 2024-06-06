@@ -1,16 +1,19 @@
+from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 
 from cards.forms import ImportCardsForm
 from cards.models import Cards, Mappings, Categories
+from cards.services.check_permission import check_permission_with_slug
 
-
+@login_required
+@check_permission_with_slug
 def import_cards(request, *args, **kwargs):
+    slug = kwargs.get('slug')
     if request.method == 'POST':
         form = ImportCardsForm(request.POST)
         if form.is_valid():
-            slug = kwargs['slug']
             category = Categories.objects.get(slug=slug)
             text = form.cleaned_data['text']
 
@@ -35,5 +38,4 @@ def import_cards(request, *args, **kwargs):
             return HttpResponseRedirect(reverse('deck_content', args=[slug]))
     else:
         form = ImportCardsForm()
-        slug = kwargs.get('slug')
     return render(request, 'cards/cards_import.html', {'form': form, 'slug': slug})

@@ -3,6 +3,7 @@ from django.db import models
 from django.utils.text import slugify
 from transliterate import translit, detect_language
 from cards.services.compute_study_metrics import compute_study_easiness, scale_easiness, NextReviewDate
+from users.models import User
 
 NUM_BOXES = 5
 BOXES = range(1, NUM_BOXES + 2)
@@ -38,7 +39,7 @@ class Users(models.Model):
 
 class Categories(models.Model):
     name = models.CharField(max_length=100, unique=True)
-    user = models.ForeignKey(Users, on_delete=models.CASCADE, blank=True, null=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
     slug = models.SlugField(unique=True, blank=True)
     # slug = AutoSlugField(populate_from='title', unique=True) установить!!!
 

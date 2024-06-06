@@ -8,9 +8,16 @@ from django.shortcuts import render, get_object_or_404
 from cards.models import Cards, Mappings
 from cards.services.query_builder import build_card_view_queryset
 from speech.views import synthesize_speech
+from cards.services.check_permission import check_permission_with_slug
+from django.contrib.auth.decorators import login_required
 
 
+
+@login_required
+@check_permission_with_slug
 def get_card(request, *args, **kwargs):
+    slug = kwargs['slug']
+
     if request.method == 'POST':
         body_unicode = request.body.decode('utf-8')
         body_data = json.loads(body_unicode)
@@ -18,9 +25,9 @@ def get_card(request, *args, **kwargs):
         mappings_id = body_data['mappings_id']
         mappings = get_object_or_404(Mappings, pk=mappings_id)
         mappings.move(rating)
-    slug = kwargs['slug']
     study_mode = request.GET.get('mode')
     card, ratings_count = build_card_view_queryset(slug=slug, study_mode=study_mode)
+    print(ratings_count)
 
     data = {
         'front_side': card.get('front_side'),
@@ -31,12 +38,12 @@ def get_card(request, *args, **kwargs):
 
     return JsonResponse(data)
 
-
+@login_required
 def get_hint(request, card_id):
     card = get_object_or_404(Cards, id=card_id)
     return JsonResponse({'hint': card.hint})
 
-
+@login_required
 def submit_answer(request, card_id):
     if request.method == 'POST':
         body_unicode = request.body.decode('utf-8')
@@ -48,10 +55,12 @@ def submit_answer(request, card_id):
 
 
 
-
+@login_required
+@check_permission_with_slug
 def study_view(request, *args, **kwargs):
     study_mode = request.GET.get('mode')
     slug = kwargs.get('slug')
+
     buttons_to_show = {
         'show_back': True,
         'show_hint': True,
@@ -79,6 +88,7 @@ def study_view(request, *args, **kwargs):
 
 
 
+@login_required
 def get_sound(request, mappings_id):
     mappings = Mappings.objects.filter(pk=mappings_id).values(
         'card__side1', 'card__audio', 'card_id'

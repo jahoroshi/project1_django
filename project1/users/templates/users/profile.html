@@ -1,0 +1,42 @@
+{% extends 'deckhub/base.html' %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-12">
+            <div class="content pt-2 px-4 mb-4">
+            {% include 'users/messages.html' with error_message=form.non_field_errors%}
+
+                <div class="row">
+                    <div class="col">
+                        <div class="content-block shadow-sm p-3 my-4 bg-body-tertiary rounded-5 text-center">
+                            <div class="d-flex flex-column  mx-auto w-50">
+                                <h2>Profile</h2>
+                                <form method="post">
+                                    {% csrf_token %}
+                                    <div class="form-floating mb-3 mt-2">
+                                        {{ form.username }}
+                                        <label for="{{ form.username.id_for_label }}">{{ form.username.label }}</label>
+                                    </div>
+
+                                    <div class="form-floating mb-3 mt-2">
+                                        {{ form.email }}
+                                        <label for="{{ form.email.id_for_label }}">{{ form.email.label }}</label>
+                                    </div>
+
+                                    {#                            <div class="form-floating mb-3">#}
+                                    {#                                {{ form.password }}#}
+                                    {#                                <label for="{{ form.password.id_for_label }}">{{ form.password.label }}</label>#}
+                                    {#                            </div>#}
+
+
+                                    <button type="submit" class="btn btn-warning">ok</button>
+                                </form>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

@@ -79,14 +79,16 @@ def build_card_view_queryset(*args, **kwargs):
             output_field=CharField(),
         ),
     ).values(
-        'upd_date', 'front_side', 'back_side', 'card__id', 'id', 'category__name', 'easiness'
-    ).first()
+        'review_date', 'front_side', 'back_side', 'card__id', 'id', 'category__name', 'easiness'
+    ).first() or {}
+
     ####
     my_debug(subquery1, card.get('id'))
     ####
-    if card.get('upd_date') is None and study_mode == 'new':
+    if card.get('review_date') is None and study_mode == 'new':
         ratings_count_dict[5] = 1
     ratings_count_dict.pop(0, None)
+
     return card, ratings_count_dict
 
 # def build_card_view_queryset(*args, **kwargs):

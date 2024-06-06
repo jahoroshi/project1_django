@@ -1,0 +1,18 @@
+{% if error_message or messages %}
+    <div class="row">
+        <div class="col">
+                {% if error_message %}
+                                <div class="bd-callout bd-callout-warning mx-4 mt-4 mb-0 rounded-5">
+
+                    {{ error_message }}
+                {% else %}
+                                <div class="bd-callout bd-callout-success mx-4 mt-4 mb-0 rounded-5">
+
+                    {% for message in messages %}
+                        {{ message }}
+                    {% endfor %}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% endif %}

@@ -4,6 +4,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const slug = config.slug;
     const studyMode = config.study_mode;
     const urls = config.urls;
+    const getUrl = `${urls.get_card}?mode=${studyMode}`
 
     const knownButton = document.getElementById('known-btn');
     const cardFront = document.getElementById('card-text');
@@ -13,6 +14,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const lettersContainer = document.getElementById('letters-container');
     const resultContainer = document.getElementById('result-container');
     const actionButtons = document.querySelectorAll('#show-back-btn, #show-hint-btn, #show-similar-btn, #show-first-letters-btn, #scramble-letters-btn');
+
     let cardData = null;
     let soundUrlCache = null; // Кэш для URL звукового файла
     let audio = null;
@@ -21,6 +23,21 @@ document.addEventListener('DOMContentLoaded', function () {
     const loadCard = (data = null) => {
         if (data) {
             cardData = data;
+            console.log(cardData)
+            if (!data.front_side) {
+                // cardFront is None, hide elements and show message
+                console.log(data.front_side)
+                document.getElementById('hidden-container').classList.add('hidden');
+                document.getElementById('show-container-message').classList.remove('hidden');
+                document.getElementById('show-container-trophy').classList.remove('hidden');
+                // hideElements();
+                // showMessage('No more cards to review. Redirecting...');
+                setTimeout(() => {
+                    window.location.href = "/";  // Замените на ваш URL для редиректа
+                }, 3000);  // Редирект через 3 секунды
+                return;
+            }
+
             cardFront.innerText = data.front_side;
             cardBack.classList.add('hidden');
             cardBack.innerText = '';
@@ -37,8 +54,7 @@ document.addEventListener('DOMContentLoaded', function () {
             showKnownButton();
             updateCounters(cardData.ratings_count);
         } else {
-            const url = `${urls.get_card}?mode=${studyMode}`;
-            fetch(url).then(response => response.json()).then(data => {
+            fetch(getUrl).then(response => response.json()).then(data => {
                 cardData = data;
                 updateCounters(cardData.ratings_count);
 
@@ -46,6 +62,16 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         }
     };
+
+    const hideElements = () => {
+        const hiddenContainer = document.getElementById('hidden-container').classList.add('hidden');
+        const showMessage = document.getElementById('show-container-message').classList.remove('hidden');
+        const showTrophy = document.getElementById('show-container-trophy').classList.remove('hidden');
+        hiddenContainer.classList.add('hidden');
+        showMessage.classList.remove('hidden');
+        showTrophy.classList.remove('hidden');
+    };
+
     const showKnownButton = () => {
         if (cardData) {
             if (cardData.ratings_count[5]) {
@@ -218,9 +244,9 @@ document.addEventListener('DOMContentLoaded', function () {
                         // Проверка полного соответствия ввода
                         if ((isSentence && userInput.join(' ') === input) || (!isSentence && userInput === input)) {
                             resultContainer.innerHTML = `${isSentence ? userInput.join(' ') : userInput} <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-check2-all" viewBox="0 0 16 16">
-      <path d="M12.354 4.354a.5.5 0 0 0-.708-.708L5 10.293 1.854 7.146a.5.5 0 1 0-.708.708l3.5 3.5a.5.5 0 0 0 .708 0l7-7zm-4.208 7-.896-.897.707-.707.543.543 6.646-6.647a.5.5 0 0 1 .708.708l-7 7a.5.5 0 0 1-.708 0z"/>
-      <path d="m5.354 7.146.896.897-.707.707-.897-.896a.5.5 0 1 1 .708-.708"/>
-    </svg>`;
+                              <path d="M12.354 4.354a.5.5 0 0 0-.708-.708L5 10.293 1.854 7.146a.5.5 0 1 0-.708.708l3.5 3.5a.5.5 0 0 0 .708 0l7-7zm-4.208 7-.896-.897.707-.707.543.543 6.646-6.647a.5.5 0 0 1 .708.708l-7 7a.5.5 0 0 1-.708 0z"/>
+                              <path d="m5.354 7.146.896.897-.707.707-.897-.896a.5.5 0 1 1 .708-.708"/>
+                            </svg>`;
 
 
                             resultContainer.classList.add('correct-word');
@@ -255,7 +281,7 @@ document.addEventListener('DOMContentLoaded', function () {
     document.querySelectorAll('.rating-button').forEach(button => {
         button.addEventListener('click', function () {
             const rating = parseInt(this.getAttribute('data-rating'));
-            fetch(urls.get_card, {
+            fetch(getUrl, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

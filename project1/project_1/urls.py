@@ -24,7 +24,9 @@ urlpatterns = [
     path('cards/', include("cards.urls")),
     path('speech/', include("speech.urls")),
     path('deck/', include("deckhub.urls")),
+    path('', include("deckhub.urls")),
     path('study/', include("cardmode.urls")),
+    path('users/', include("users.urls", namespace='users')),
 ]
 
 

@@ -1,8 +1,9 @@
+from django.contrib.auth.decorators import login_required
 from gtts import gTTS
 from django.conf import settings
 import os
 import datetime
-
+@login_required
 def synthesize_speech(*args, **kwargs):
     text = kwargs.get('text', 'Anki Chat')
     lang = kwargs.get('lang', 'en')

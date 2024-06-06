@@ -12,25 +12,32 @@ def deck_study_panel_stats(slug):
     now = timezone.now()
     counts = Mappings.objects.filter(category__slug=slug).aggregate(
         cards_review_count=Count(Case(
-            When(review_date__lt=now, review_date__isnull=False, then=1),
+            When(review_date__lt=now, study_mode='review', then=1),
             output_field=IntegerField()
         )),
         new_cards_count=Count(Case(
-            When(review_date__isnull=True, then=1),
+            When(study_mode='new', then=1),
             output_field=IntegerField()
         )),
 
     )
 
-    review_date = Categories.objects.filter(slug=slug).annotate(
-        nearest_review_date=Min(
-            'mappings__review_date',
-            filter=Q(mappings__review_date__gte=now)
-        )
-    ).filter(
-        ~Q(mappings__review_date__lt=now)
-    )
-    next_review_date = review_date.first().nearest_review_date if review_date.exists() else None
+    if sum(counts.values()) == 0:
+        review_date = Mappings.objects.filter(Q(category__slug=slug) & Q(review_date__gte=now)).order_by(
+            'review_date').values_list('review_date').first()
+        next_review_date = review_date[0] if review_date else None
+    else:
+        next_review_date = None
+
+    # review_date = Categories.objects.filter(slug=slug).annotate(
+    #     nearest_review_date=Min(
+    #         'mappings__review_date',
+    #         filter=Q(mappings__review_date__gte=now)
+    #     )
+    # ).filter(
+    #     ~Q(mappings__review_date__lt=now)
+    # )
+    # next_review_date = review_date.first().nearest_review_date if review_date.exists() else None
     stats_box.append({
         'cards_review_count': counts['cards_review_count'],
         'new_cards_count': counts['new_cards_count'],

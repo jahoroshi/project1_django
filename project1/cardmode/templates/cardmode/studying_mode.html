@@ -1,296 +1,3 @@
-{#{% extends 'deckhub/base.html' %}#}
-{#{% load static %}#}
-{#{% block content %}#}
-{##}
-{#<h1>#}
-{#<div id="card-container">#}
-{#    <div id="card-front" class="card-side"></div>#}
-{#</div>#}
-{#</h1>#}
-{##}
-{#{% if buttons_to_show.show_back %}#}
-{#    <button id="show-back-btn">Show Back</button>#}
-{#{% endif %}#}
-{#{% if buttons_to_show.show_hint %}#}
-{#    <button id="show-hint-btn">Show Hint</button>#}
-{#{% endif %}#}
-{#{% if buttons_to_show.show_similar %}#}
-{#    <button id="show-similar-btn">Show Similar Words</button>#}
-{#{% endif %}#}
-{#{% if buttons_to_show.show_first_letters %}#}
-{#    <button id="show-first-letters-btn">Show First Letters</button>#}
-{#{% endif %}#}
-{#{% if buttons_to_show.scramble_letters %}#}
-{#    <button id="scramble-letters-btn">Scramble Letters</button>#}
-{#{% endif %}#}
-{#{% if buttons_to_show.speech %}#}
-{#    <button id="play-sound-btn">Play Sound</button>#}
-{#{% endif %}#}
-{##}
-{##}
-{#<div id="card-back" class="card-side hidden"></div>#}
-{#<div id="hint-container" class="hidden"></div>#}
-{#<div id="similar-words-container" class="hidden"></div>#}
-{#<div id="letters-container" class="hidden"></div>#}
-{#<div id="result-container"></div>#}
-{##}
-{#<div>#}
-{#    <button class="rating-button" id="again-btn" data-rating="1">Again</button>#}
-{#    <button class="rating-button" id="hard-btn" data-rating="2">Hard</button>#}
-{#    <button class="rating-button" id="good-btn" data-rating="3">Good</button>#}
-{#    <button class="rating-button" id="easy-btn" data-rating="4">Easy</button>#}
-{#</div>#}
-{##}
-{#<script>#}
-{#    document.addEventListener('DOMContentLoaded', function () {#}
-{#        const slug = '{{ slug }}';#}
-{#        const studyMode = '{{ study_mode }}';#}
-{#        const csrfToken = '{{ csrf_token }}';#}
-{#        const cardFront = document.getElementById('card-front');#}
-{#        const cardBack = document.getElementById('card-back');#}
-{#        const hintContainer = document.getElementById('hint-container');#}
-{#        const similarWordsContainer = document.getElementById('similar-words-container');#}
-{#        const lettersContainer = document.getElementById('letters-container');#}
-{#        const resultContainer = document.getElementById('result-container');#}
-{#        const actionButtons = document.querySelectorAll('#show-back-btn, #show-hint-btn, #show-similar-btn, #show-first-letters-btn, #scramble-letters-btn');#}
-{#        let cardData = null;#}
-{#        let soundUrlCache = null; // Кэш для URL звукового файла#}
-{#        let audio = null;#}
-{##}
-{#        const loadCard = (data = null) => {#}
-{#            if (data) {#}
-{#                cardData = data;#}
-{#                cardFront.innerText = data.front_side;#}
-{#                cardBack.classList.add('hidden');#}
-{#                cardBack.innerText = '';#}
-{#                hintContainer.classList.add('hidden');#}
-{#                similarWordsContainer.classList.add('hidden');#}
-{#                lettersContainer.classList.add('hidden');#}
-{#                resultContainer.innerText = '';#}
-{#                resultContainer.classList.remove('correct-word');#}
-{#                actionButtons.forEach(button => button.disabled = false);#}
-{#                soundUrlCache = null;#}
-{#                audio = null;#}
-{#                similarWordsContainer.innerHTML = '';#}
-{#                lettersContainer.innerHTML = '';#}
-{#            } else {#}
-{#                const baseUrl = `{% url 'get_card' slug %}`;#}
-{#                const url = `${baseUrl}?study_mode=${studyMode}`;#}
-{#                fetch(url).then(response => response.json()).then(data => {#}
-{#                    cardData = data;#}
-{#                    loadCard(data);#}
-{#                });#}
-{#            }#}
-{##}
-{#        };#}
-{##}
-{#        loadCard();#}
-{##}
-{#        const showBackButton = document.getElementById('show-back-btn');#}
-{#        if (showBackButton) {#}
-{#            showBackButton.addEventListener('click', function () {#}
-{#                cardBack.innerText = cardData.back_side;#}
-{#                cardBack.classList.remove('hidden');#}
-{#                makeButtonsInactive();#}
-{#            });#}
-{#        }#}
-{##}
-{#        const showHintButton = document.getElementById('show-hint-btn');#}
-{#        if (showHintButton) {#}
-{#            showHintButton.addEventListener('click', function () {#}
-{#                const hintUrl = `{% url 'get_hint' 'dummy_mappings_id' %}`.replace('dummy_mappings_id', cardData.mappings_id);#}
-{#                fetch(hintUrl).then(response => response.json()).then(data => {#}
-{#                    hintContainer.innerText = data.hint;#}
-{#                    hintContainer.classList.remove('hidden');#}
-{#                });#}
-{#            });#}
-{#        }#}
-{##}
-{#        const showSimilarButton = document.getElementById('show-similar-btn');#}
-{#        if (showSimilarButton) {#}
-{#            showSimilarButton.addEventListener('click', function () {#}
-{#                disableOtherActionButtons(this.id);#}
-{#                const similarWordsUrl = `{% url 'get_similar_words' 'dummy_mappings_id' %}`.replace('dummy_mappings_id', cardData.mappings_id);#}
-{#                fetch(similarWordsUrl).then(response => response.json()).then(data => {#}
-{#                    similarWordsContainer.innerHTML = '';#}
-{#                    data.similar_words.forEach(word => {#}
-{#                        const button = document.createElement('button');#}
-{#                        button.innerText = word;#}
-{#                        button.addEventListener('click', function () {#}
-{#                            if (word === data.back_side) {#}
-{#                                resultContainer.innerText = 'Correct!';#}
-{#                                resultContainer.classList.add('correct-word');#}
-{#                            } else {#}
-{#                                resultContainer.innerText = `Wrong! The correct word is ${data.back_side}`;#}
-{#                            }#}
-{#                            makeButtonsInactive();#}
-{#                            disableSimilarWordButtons();#}
-{#                        });#}
-{#                        similarWordsContainer.appendChild(button);#}
-{#                    });#}
-{#                    similarWordsContainer.classList.remove('hidden');#}
-{#                });#}
-{#            });#}
-{#        }#}
-{##}
-{#        function disableSimilarWordButtons() {#}
-{#            const buttons = similarWordsContainer.querySelectorAll('button');#}
-{#            buttons.forEach(button => {#}
-{#                button.disabled = true;#}
-{#            });#}
-{#        }#}
-{##}
-{#        let revealIndex = 0;#}
-{##}
-{#        const showFirstLettersButton = document.getElementById('show-first-letters-btn');#}
-{#        if (showFirstLettersButton) {#}
-{#            showFirstLettersButton.addEventListener('click', function () {#}
-{#                disableOtherActionButtons(this.id);#}
-{#                const sentence = cardData.back_side;#}
-{#                const words = sentence.split(' ');#}
-{##}
-{#                if (words.length < 3) {#}
-{#                    // Слово состоит из одной части#}
-{#                    revealIndex += 2;#}
-{#                    if (revealIndex > sentence.length) revealIndex = sentence.length;#}
-{#                    const revealed = sentence.slice(0, revealIndex);#}
-{#                    cardBack.innerText = revealed + '*'.repeat(sentence.length - revealIndex);#}
-{#                    if (revealIndex >= sentence.length) {#}
-{#                        makeButtonsInactive();#}
-{#                        revealIndex = 0;#}
-{#                    }#}
-{##}
-{#                } else {#}
-{#                    // Слово состоит из нескольких частей#}
-{#                    revealIndex += 1;#}
-{#                    if (revealIndex > words.length) revealIndex = words.length;#}
-{#                    const revealed = words.slice(0, revealIndex).join(' ');#}
-{#                    const remainingWords = words.slice(revealIndex).join(' ');#}
-{#                    cardBack.innerText = revealed + ' ' + '*'.repeat(remainingWords.length);#}
-{#                    if (revealIndex >= sentence.length) {#}
-{#                        makeButtonsInactive();#}
-{#                        revealIndex = 0;#}
-{#                    }#}
-{#                }#}
-{##}
-{#                cardBack.classList.remove('hidden');#}
-{#            });#}
-{#        }#}
-{##}
-{#        function shuffleArray(array) {#}
-{#            for (let i = array.length - 1; i > 0; i--) {#}
-{#                const j = Math.floor(Math.random() * (i + 1));#}
-{#                [array[i], array[j]] = [array[j], array[i]];#}
-{#            }#}
-{#        }#}
-{##}
-{#        const scrambleLettersButton = document.getElementById('scramble-letters-btn');#}
-{#        if (scrambleLettersButton) {#}
-{#            scrambleLettersButton.addEventListener('click', function () {#}
-{#                disableOtherActionButtons(this.id);#}
-{#                lettersContainer.innerHTML = '';#}
-{#                const input = cardData.back_side.trim();#}
-{#                const words = input.split(' ');#}
-{#                const isSentence = words.length > 2; // проверка, является ли это предложение (более 2 слов)#}
-{#                let elements;#}
-{##}
-{#                if (isSentence) {#}
-{#                    elements = words.slice(); // используем копию массива слов#}
-{#                } else {#}
-{#                    elements = input.split(''); // используем буквы#}
-{#                }#}
-{##}
-{#                shuffleArray(elements);#}
-{#                let userInput = isSentence ? [] : ''; // массив для предложений, строка для слов#}
-{##}
-{#                elements.forEach(element => {#}
-{#                    const span = document.createElement('span');#}
-{#                    span.className = 'letter';#}
-{#                    span.innerText = element;#}
-{#                    span.addEventListener('click', () => {#}
-{#                        const currentIndex = userInput.length;#}
-{#                        const originalElement = isSentence ? words[currentIndex] : input[currentIndex];#}
-{##}
-{#                        if (element === originalElement) {#}
-{#                            if (isSentence) {#}
-{#                                userInput.push(element);#}
-{#                                resultContainer.innerText = userInput.join(' ') + ' ';#}
-{#                            } else {#}
-{#                                userInput += element;#}
-{#                                resultContainer.innerText = userInput;#}
-{#                            }#}
-{#                            span.classList.add('inactive');#}
-{##}
-{#                            // Проверка полного соответствия ввода#}
-{#                            if ((isSentence && userInput.join(' ') === input) || (!isSentence && userInput === input)) {#}
-{#                                resultContainer.innerText = `${isSentence ? userInput.join(' ') : userInput} - Correct!`;#}
-{#                                resultContainer.classList.add('correct-word');#}
-{#                                lettersContainer.classList.add('hidden');#}
-{#                                makeButtonsInactive();#}
-{#                            }#}
-{#                        } else {#}
-{#                            span.classList.add('wrong-letter');#}
-{#                            setTimeout(() => {#}
-{#                                span.classList.remove('wrong-letter');#}
-{#                            }, 1000);#}
-{#                        }#}
-{#                    });#}
-{#                    lettersContainer.appendChild(span);#}
-{#                });#}
-{#                lettersContainer.classList.remove('hidden');#}
-{#            });#}
-{#        }#}
-{##}
-{#        function disableOtherActionButtons(activeButtonId) {#}
-{#            actionButtons.forEach(button => {#}
-{#                if (button.id !== activeButtonId) {#}
-{#                    button.disabled = true;#}
-{#                }#}
-{#            });#}
-{#        }#}
-{##}
-{#        function makeButtonsInactive() {#}
-{#            actionButtons.forEach(button => button.disabled = true);#}
-{#        }#}
-{##}
-{#        document.querySelectorAll('.rating-button').forEach(button => {#}
-{#            button.addEventListener('click', function () {#}
-{#                const rating = parseInt(this.getAttribute('data-rating'));#}
-{#                const baseUrl = `{% url 'get_card' slug %}`;#}
-{#                fetch(baseUrl, {#}
-{#                    method: 'POST',#}
-{#                    headers: {#}
-{#                        'Content-Type': 'application/json',#}
-{#                        'X-CSRFToken': csrfToken#}
-{#                    },#}
-{#                    body: JSON.stringify({rating: rating, mappings_id: cardData.mappings_id})#}
-{#                })#}
-{#                    .then(response => response.json())#}
-{#                    .then(data => {#}
-{#                        loadCard(data);#}
-{#                    });#}
-{#            });#}
-{#        });#}
-{##}
-{#        const playSoundButton = document.getElementById('play-sound-btn');#}
-{#        playSoundButton.addEventListener('click', function () {#}
-{#            if (!soundUrlCache) {#}
-{#                const soundUrl = `{% url 'get_sound' 'dummy_mappings_id' %}`.replace('dummy_mappings_id', cardData.mappings_id);#}
-{#                fetch(soundUrl)#}
-{#                    .then(response => response.blob())#}
-{#                    .then(blob => {#}
-{#                        soundUrlCache = URL.createObjectURL(blob);#}
-{#                        audio = new Audio(soundUrlCache);#}
-{#                        audio.play();#}
-{#                    });#}
-{#            } else {#}
-{#                audio.play();#}
-{#            }#}
-{#        });#}
-{#    });#}
-{#</script>#}
-{##}
-{#{% endblock %}#}
 
 
 {% extends 'deckhub/base.html' %}
@@ -299,8 +6,18 @@
     <div class="row">
         <div class="col-12">
             <div class="content pt-2 px-4 mb-4">
-                <div class="content-block shadow-sm p-3 my-4 bg-body-tertiary rounded-5 " style="min-height: 350px; ">
-                    <div class="row mb-5 shadow  overflow-y-auto" style="min-height: 80px; max-height: 300px;">
+
+                <div class="content-block shadow-sm p-3 my-4 bg-body-tertiary rounded-5"
+                     style="min-height: 350px;">
+                    <div class="row hidden" id="show-container-message">
+                        <div class="col">
+                            <div class="alert alert-success mb-3 mt-2" role="alert">
+                                Congratulations! You have completed all the cards in this deck.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mb-5 shadow  overflow-y-auto" id="hidden-container"
+                         style="min-height: 80px; max-height: 300px;">
                         <div class="col">
                             <div id="card-container" class="text-center">
                                 <button id="card-front">
@@ -316,6 +33,13 @@
                     </div>
                     <div class="row h-auto flex-grow-1  overflow-y-auto" style="min-height: 220px; max-height: 370px;">
                         <div class="col">
+                            <div class="d-flex flex-column align-items-center justify-content-center mt-5 hidden"
+                                 id="show-container-trophy">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="120" height="120" fill="currentColor"
+                                     class="bi bi-trophy" viewBox="0 0 16 16">
+                                    <path d="M2.5.5A.5.5 0 0 1 3 0h10a.5.5 0 0 1 .5.5c0 .538-.012 1.05-.034 1.536a3 3 0 1 1-1.133 5.89c-.79 1.865-1.878 2.777-2.833 3.011v2.173l1.425.356c.194.048.377.135.537.255L13.3 15.1a.5.5 0 0 1-.3.9H3a.5.5 0 0 1-.3-.9l1.838-1.379c.16-.12.343-.207.537-.255L6.5 13.11v-2.173c-.955-.234-2.043-1.146-2.833-3.012a3 3 0 1 1-1.132-5.89A33.076 33.076 0 0 1 2.5.5m.099 2.54a2 2 0 0 0 .72 3.935c-.333-1.05-.588-2.346-.72-3.935zm10.083 3.935a2 2 0 0 0 .72-3.935c-.133 1.59-.388 2.885-.72 3.935M3.504 1c.007.517.026 1.006.056 1.469.13 2.028.457 3.546.87 4.667C5.294 9.48 6.484 10 7 10a.5.5 0 0 1 .5.5v2.61a1 1 0 0 1-.757.97l-1.426.356a.5.5 0 0 0-.179.085L4.5 15h7l-.638-.479a.501.501 0 0 0-.18-.085l-1.425-.356a1 1 0 0 1-.757-.97V10.5A.5.5 0 0 1 9 10c.516 0 1.706-.52 2.57-2.864.413-1.12.74-2.64.87-4.667.03-.463.049-.952.056-1.469H3.504z"/>
+                                </svg>
+                            </div>
                             <h2 id="card-back" class="card-side hidden text-center"></h2>
                             <h2 id="hint-container" class="hidden"></h2>
                             <div id="similar-words-container" class="hidden list-group w-75 mx-auto text-center"></div>
@@ -394,15 +118,15 @@
                                     </button>
                                 {% endif %}
 
-{#                                {% if buttons_to_show.speech %}#}
-{#                                    <button id="play-sound-btn" class="btn-hint">Play#}
-{#                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"#}
-{#                                             fill="currentColor" class="bi bi-play-fill" viewBox="0 0 16 16">#}
-{#                                            <path d="m11.596 8.697-6.363 3.692c-.54.313-1.233-.066-1.233-.697V4.308c0-.63.692-1.01 1.233-.696l6.363 3.692a.802.802 0 0 1 0 1.393z"/>#}
-{#                                        </svg>#}
-{#                                    </button>#}
-{##}
-{#                                {% endif %}#}
+                                {#                                {% if buttons_to_show.speech %}#}
+                                {#                                    <button id="play-sound-btn" class="btn-hint">Play#}
+                                {#                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"#}
+                                {#                                             fill="currentColor" class="bi bi-play-fill" viewBox="0 0 16 16">#}
+                                {#                                            <path d="m11.596 8.697-6.363 3.692c-.54.313-1.233-.066-1.233-.697V4.308c0-.63.692-1.01 1.233-.696l6.363 3.692a.802.802 0 0 1 0 1.393z"/>#}
+                                {#                                        </svg>#}
+                                {#                                    </button>#}
+                                {##}
+                                {#                                {% endif %}#}
                             </div>
                         </div>
 
@@ -431,12 +155,14 @@
                         <span class="count" id="easy-count">0</span>
                         <span class="text">Easy</span>
                     </button>
+                    <button class="rating-button btn btn-outline-dark btn-known hidden" id="known-btn" data-rating="5">
+                        <span class="text">Already known</span>
+                    </button>
 
                 </div>
             </div>
         </div>
     </div>
-
 
     <script type="application/json" id="context-json">{{ context_json|safe }}</script>
     <script type="module" src="{% static 'js/cardmode/studying_mode.js' %}"></script>

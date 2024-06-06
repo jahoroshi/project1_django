@@ -12,19 +12,29 @@ from cards.forms import CardCheckForm, CardForm
 from cards.models import Cards, Mappings
 from cards.services.check_post_request import CheckReuqest, is_post_unique
 from cards.services.query_builder import build_card_view_queryset
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.exceptions import PermissionDenied
+from cards.services.check_post_request import CheckReuqest, is_post_unique
+from cards.services.check_permission import check_permission_with_slug, CheckPermission
 
 
-class CardCreateView(CreateView):
+class CardCreateView(LoginRequiredMixin, CheckPermission, CreateView):
     model = Cards
     form_class = CardForm
     template_name = 'cards/card_form.html'
     success_url = reverse_lazy('card_create')
 
     def form_valid(self, form):
+
         if is_post_unique(self.request):
+            category = form.cleaned_data['category']
+            user = self.request.user
+            if category.user != user:
+                raise PermissionDenied
+
             self.object = form.save(commit=False)
             self.object.save()
-            category = form.cleaned_data['category']
 
             Mappings.objects.create(card=self.object, category=category)
             if form.cleaned_data['is_two_sides']:
@@ -52,13 +62,19 @@ class CardCreateView(CreateView):
 
 class CardUpdateView(CardCreateView, UpdateView):
 
+    # def get(self, request, *args, **kwargs):
+    #     check_permission_with_slug(user=self.request.user, slug=self.kwargs.get('slug'))
+    #     self.object = self.get_object()
+    #     return super().get(request, *args, **kwargs)
+
     def form_valid(self, form):
         slug = self.kwargs['slug']
+        category = form.cleaned_data['category']
         if is_post_unique(self.request):
             self.object = form.save(commit=False)
             self.object.save()
             card = Mappings.objects.get(card=self.object)
-            card.category = form.cleaned_data['category']
+            card.category = category
             card.save()
         return HttpResponseRedirect(reverse('deck_content', kwargs={'slug': slug}))
 
@@ -68,7 +84,7 @@ class CardUpdateView(CardCreateView, UpdateView):
         return context
 
 
-class CardDeleteView(CheckReuqest, DeleteView):
+class CardDeleteView(LoginRequiredMixin, CheckPermission, CheckReuqest, DeleteView):
     template_name = 'cards/delete_object.html'
     model = Cards
 
