@@ -1,11 +1,35 @@
-document.addEventListener('DOMContentLoaded', function () {
-    const config = JSON.parse(document.getElementById('context-json').textContent);
-    const csrfToken = config.csrf_token;
-    const slug = config.slug;
-    const studyMode = config.study_mode;
-    const urls = config.urls;
-    const getUrl = `${urls.get_card}?mode=${studyMode}`
+document.addEventListener('DOMContentLoaded', async function () {
+    async function initializeConfig() {
+        try {
+            const currentUrl = new URL(window.location.href);
 
+            const pathParts = currentUrl.pathname.split('/');
+            const slug = pathParts[2];
+
+            const studyMode = currentUrl.searchParams.get('mode');
+
+            console.log('Extracted Slug:', slug);
+            console.log('Extracted Study Mode:', studyMode);
+
+            const configUrl = `/study/api/v1/get_start_config/${slug}/${studyMode}/`;
+
+            const response = await fetch(configUrl);
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            const data = await response.json();
+            return data;
+        } catch (error) {
+            console.error('Ошибка при получении конфигурации:', error);
+            return null;
+        }
+    }
+
+
+    const config = await initializeConfig();
+    const csrfToken = config.csrf_token;
+    const urls = config.urls;
+    const getUrl = urls.get_card;
     const knownButton = document.getElementById('known-btn');
     const cardFront = document.getElementById('card-text');
     const cardBack = document.getElementById('card-back');
@@ -16,25 +40,46 @@ document.addEventListener('DOMContentLoaded', function () {
     const actionButtons = document.querySelectorAll('#show-back-btn, #show-hint-btn, #show-similar-btn, #show-first-letters-btn, #scramble-letters-btn');
 
     let cardData = null;
-    let soundUrlCache = null; // Кэш для URL звукового файла
+    let soundUrlCache = null;
     let audio = null;
     let count = 0;
+
+
+    function hideButtons() {
+        const buttonsToShow = config.buttons_to_show;
+
+        const buttonIds = {
+            show_back: 'show-back-btn',
+            show_hint: 'show-hint-btn',
+            show_similar: 'show-similar-btn',
+            show_first_letters: 'show-first-letters-btn',
+            scramble_letters: 'scramble-letters-btn',
+            speech: 'speech-btn'
+        };
+
+        for (const [key, value] of Object.entries(buttonIds)) {
+            const button = document.getElementById(value);
+            if (button && buttonsToShow[key]) {
+                button.classList.remove('hidden');
+            }
+        }
+    }
+
+    hideButtons();
 
     const loadCard = (data = null) => {
         if (data) {
             cardData = data;
             console.log(cardData)
             if (!data.front_side) {
-                // cardFront is None, hide elements and show message
                 console.log(data.front_side)
                 document.getElementById('hidden-container').classList.add('hidden');
                 document.getElementById('show-container-message').classList.remove('hidden');
                 document.getElementById('show-container-trophy').classList.remove('hidden');
-                // hideElements();
-                // showMessage('No more cards to review. Redirecting...');
+
                 setTimeout(() => {
-                    window.location.href = "/";  // Замените на ваш URL для редиректа
-                }, 3000);  // Редирект через 3 секунды
+                    window.location.href = "/";
+                }, 3000);
                 return;
             }
 
@@ -84,7 +129,6 @@ document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('again-count').innerText = ratings[1] || 0;
         document.getElementById('hard-count').innerText = ratings[2] || 0;
         document.getElementById('good-count').innerText = ratings[3] || 0;
-        // document.getElementById('easy-count').innerText = ratings[4] || 0;
     };
 
     document.getElementById('easy-btn').addEventListener('click', function () {
@@ -113,8 +157,10 @@ document.addEventListener('DOMContentLoaded', function () {
         showHintButton.addEventListener('click', function () {
             const hintUrl = urls.get_hint.replace('dummy_mappings_id', cardData.mappings_id);
             fetch(hintUrl).then(response => response.json()).then(data => {
-                hintContainer.innerText = data.hint;
+                hintContainer.innerText = data;
                 hintContainer.classList.remove('hidden');
+                makeButtonsInactive();
+
             });
         });
     }

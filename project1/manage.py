@@ -19,4 +19,5 @@ def main():
 
 
 if __name__ == '__main__':
+    print('ngrok http --domain=engaging-mastodon-accurate.ngrok-free.app 8080')
     main()

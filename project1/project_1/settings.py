@@ -23,11 +23,20 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-b(%xa53*12m&u-t8^4%(ci)+x7gev=c*9$ffemn%-4#z@pg+j9'
+API_KEY = 'your-unique-api-key-here'
+
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    'localhost',
+    '127.0.0.1',
+    'b114-46-53-254-108.ngrok-free.app',
+    'engaging-mastodon-accurate.ngrok-free.app'
+    # Добавьте этот домен
+    # Можно добавить и другие домены, если нужно
+]
 
 # Application definition
 
@@ -44,6 +53,7 @@ INSTALLED_APPS = [
     'deckhub.apps.DeckhubConfig',
     'cardmode.apps.CardmodeConfig',
     'users',
+    'rest_framework',
 ]
 
 MIDDLEWARE = [
@@ -151,37 +161,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = 'users.User'
 LOGIN_URL = 'users:login'
 
-# LOGGING = {
-#     'version': 1,
-#     'disable_existing_loggers': False,
-#     'formatters': {
-#         'standard': {
-#             'format': '[%(asctime)s] %(levelname)s [%(name)s:%(lineno)s] %(message)s',
-#             'datefmt': '%d/%b/%Y %H:%M:%S',
-#         },
-#     },
-#     'handlers': {
-#         'file': {
-#             'level': 'DEBUG',
-#             'class': 'logging.FileHandler',
-#             'filename': os.path.join(BASE_DIR, 'debug.log'),
-#             'formatter': 'standard',
-#         },
-#
-#     },
-#     'loggers': {
-#         'django': {
-#             'handlers': ['file'],
-#             'level': 'DEBUG',
-#             'propagate': True,
-#         },
-#         'cards': {
-#             'handlers': ['file'],
-#             'level': 'DEBUG',
-#             'propagate': False,
-#         },
-#     },
-# }
+
 
 LOGGING = {
     'version': 1,
@@ -201,3 +181,11 @@ LOGGING = {
         },
     },
 }
+
+
+
+# REST_FRAMEWORK = {
+#     'DEFAULT_AUTHENTICATION_CLASSES': [
+#         'project_1.authentication.APIKeyAuthentication',
+#     ],
+# }

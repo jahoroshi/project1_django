@@ -1,15 +1,11 @@
-import json
 import random
 
 from django.db.models import Q
 from django.db.models.functions import Length, Lower
 from django.http import JsonResponse
-from django.shortcuts import render, get_object_or_404
 
 from cards.models import Cards, Mappings
-from cards.services.query_builder import build_card_view_queryset
-from django.http import HttpResponse
-from gtts import gTTS
+
 
 def get_similar_words(request, mappings_id, segment_length=3):
     mappings = Mappings.objects.filter(id=mappings_id).values(

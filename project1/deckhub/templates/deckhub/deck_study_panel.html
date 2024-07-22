@@ -115,7 +115,6 @@
         var endTime = new Date('{{ stats_box.0.next_review_date|date:"Y-m-d H:i:s" }}').getTime();
         var serverStartTime = new Date('{{ stats_box.0.current_time|date:"Y-m-d H:i:s" }}').getTime();
         var clientStartTime = new Date().getTime();
-
         // Функция обновления таймера
         function updateCountdown() {
             var now = serverStartTime + (new Date().getTime() - clientStartTime);

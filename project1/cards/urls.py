@@ -1,8 +1,11 @@
-from django.urls import path
+from django.urls import path, include
 
 from cards import views
+from rest_framework import routers
 
-# from views import add_card
+router = routers.SimpleRouter()
+router.register(r'manage', views.CardViewSetApi, basename='cards')
+print(router.urls)
 
 urlpatterns = [
     path(
@@ -26,13 +29,10 @@ urlpatterns = [
         views.CardUpdateView.as_view(),
         name="card_edit",
     ),
-
-    # path("deckhub/delete/<int:pk>/", views.DeckDeleteView.as_view(), name="deck_delete")
-    # path("learn/<slug:slug>/", views.BoxView.as_view(), name="learn_cards"),
-    # path("learn/<slug:slug>/<int:rep>/", views.BoxView.as_view(), name="learn_cards_rep"),
     path("<slug:slug>/import/", views.import_cards, name="import_cards"),
     path("<slug:slug>/delete/<int:pk>/", views.CardDeleteView.as_view(), name="card_delete"),
-    # path('study/<slug:slug>/<int:rep>/', views.study_view, name='study'),
-    # path('study/<slug:slug>/', views.study_view, name='study'),
-    # path('study/', views.study_view, name='study'),
+    path('api/v1/import_cards/<slug:slug>/', views.ImportCardsAPIView.as_view(), name='import_cards_api'),
+    # path('api/v1/create/<slug:slug>/<int:pk>/', views.CardViewSetApi.as_view({'post': 'create'})),
+    path('api/v1/', include(router.urls)),
+
 ]

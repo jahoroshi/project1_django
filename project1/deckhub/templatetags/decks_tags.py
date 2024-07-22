@@ -29,15 +29,6 @@ def deck_study_panel_stats(slug):
     else:
         next_review_date = None
 
-    # review_date = Categories.objects.filter(slug=slug).annotate(
-    #     nearest_review_date=Min(
-    #         'mappings__review_date',
-    #         filter=Q(mappings__review_date__gte=now)
-    #     )
-    # ).filter(
-    #     ~Q(mappings__review_date__lt=now)
-    # )
-    # next_review_date = review_date.first().nearest_review_date if review_date.exists() else None
     stats_box.append({
         'cards_review_count': counts['cards_review_count'],
         'new_cards_count': counts['new_cards_count'],
