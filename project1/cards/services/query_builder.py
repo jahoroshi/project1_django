@@ -27,20 +27,6 @@ def my_debug(subquery, map_id):
             print('\033[13;26;1m %-15s %-15s %-20s %-20s %-35s %-35s \033[0m' % data)
 
 
-
-
-# def my_debug(queryset):
-#     for obj in queryset:
-#         for el in obj.mappings_set.all():
-#             data = (
-#                 f'Map.ID {el.id}',
-#                 f'Repetition {el.repetition}',
-#                 f'Easiness {el.easiness:.4f}',
-#                 f'Mem_rating {el.mem_rating}',
-#                 f'Upd date {el.upd_date}',
-#             )
-#             print('\033[33;40;1m %-15s %-20s %-20s %-35s %-35s \033[0m' % data, '\n')
-
 def cards_counter(queryset):
     query_rating_count = Mappings.objects.filter(id__in=(Subquery(queryset))).values('mem_rating').annotate(count=Count('mem_rating')).order_by('mem_rating')
     dic = {}.fromkeys(range(1, 5), 0)
@@ -48,9 +34,13 @@ def cards_counter(queryset):
     return dic
 
 
-def build_card_view_queryset(*args, **kwargs):
+def get_card_queryset(*args, **kwargs):
     study_mode = kwargs['study_mode']
-    conditions = Q(category__slug=kwargs['slug'])
+    if study_mode.endswith('all'):
+        study_mode, tg_id, _ = study_mode.split('-')
+        conditions = Q(category__user__telegram_id=tg_id)
+    else:
+        conditions = Q(category__slug=kwargs['slug'])
 
     if study_mode == 'new':
         conditions &= Q(study_mode='new')
@@ -85,43 +75,10 @@ def build_card_view_queryset(*args, **kwargs):
     ####
     my_debug(subquery1, card.get('id'))
     ####
-    if card.get('review_date') is None and study_mode == 'new':
+    if not card.get('easiness') and study_mode == 'new':
         ratings_count_dict[5] = 1
     ratings_count_dict.pop(0, None)
 
     return card, ratings_count_dict
 
-# def build_card_view_queryset(*args, **kwargs):
-#     study_mode = kwargs['study_mode']
-#     conditions = Q(mappings__category__slug=kwargs['slug'])
-#
-#     if study_mode == 'new':
-#         conditions &= Q(mappings__study_mode='new')
-#         subquery = Cards.objects.filter(conditions).order_by('-mappings__mem_rating').values('mappings__id')[:10]
-#         print(subquery)
-#         queryset = Cards.objects.filter(mappings__id__in=Subquery(subquery)).order_by('mappings__easiness', 'mappings__upd_date')
-#         my_debug(queryset)
-#     elif study_mode == 'review':
-#         conditions &= Q(mappings__study_mode='review') & (Q(mappings__review_date__lt=timezone.now()) | Q(mappings__mem_rating__gt=0))
-#
-#         subquery = Cards.objects.filter(conditions).order_by('-mappings__mem_rating', '-mappings__review_date').values('mappings__id')[:10]
-#         queryset = Cards.objects.filter(mappings__id__in=Subquery(subquery)).order_by('mappings__mem_rating', 'mappings__review_date')
-#         my_debug(queryset)
-#
-#     queryset = queryset.annotate(
-#             front_side=Case(
-#                 When(mappings__is_back_side=True, then=F('side2')),
-#                 default=F('side1'),
-#                 output_field=CharField(),
-#             ),
-#             back_side=Case(
-#                 When(mappings__is_back_side=True, then=F('side1')),
-#                 default=F('side2'),
-#                 output_field=CharField(),
-#             ),
-#         ).values(
-#             'mappings__repetition', 'front_side', 'back_side', 'id', 'mappings', 'mappings__category__name'
-#         )
-#     return queryset
-#
-#
+

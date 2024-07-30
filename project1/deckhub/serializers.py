@@ -30,7 +30,7 @@ class DeckSetSerializer(serializers.ModelSerializer):
 class DeckContentSerializer(serializers.Serializer):
     side1 = serializers.CharField()
     side2 = serializers.CharField()
-    id = serializers.IntegerField()
+    card_id = serializers.IntegerField()
     # class Meta:
     #     fields = ['side1', 'side2']
 

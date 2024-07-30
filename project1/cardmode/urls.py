@@ -11,6 +11,6 @@ urlpatterns = [
     path('api/v1/get_start_config/<str:telegram_id>/', views.GetStartConfigAPI.as_view(), name='get_start_config_tg'),
     path('api/v1/get_start_config/<slug:slug>/<str:mode>/',
          views.GetStartConfigAPI.as_view(), name='get_start_config'),
-    path('api/v1/get_start_config/<slug:slug>/<str:mode>/<str:telegram_id>/',
+    path('api/v1/get_start_config/<slug:slug>/<str:mode>/<str:st_format>/<str:telegram_id>/',
          views.GetStartConfigAPI.as_view(), name='get_start_config_tg_slug'),
 ]

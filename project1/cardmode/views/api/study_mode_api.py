@@ -18,7 +18,7 @@ from django.db import models
 
 
 
-from cards.services.query_builder import build_card_view_queryset
+from cards.services.query_builder import get_card_queryset
 from cardmode.permissions import IsOwner
 from speech.views import synthesize_speech
 
@@ -35,14 +35,13 @@ class GetCardAPIView(APIView):
 
     def get(self, request, slug, *args, **kwargs):
         study_mode = kwargs.get('mode')
-        card, ratings_count = build_card_view_queryset(slug=slug, study_mode=study_mode)
+        card, ratings_count = get_card_queryset(slug=slug, study_mode=study_mode)
         print(ratings_count)
 
 
 
         data = {
             'front_side': card.get('front_side'),
-            # 'front_side': 1,
             'back_side': card.get('back_side'),
             'mappings_id': card.get('id'),
             'ratings_count': ratings_count,
@@ -56,6 +55,7 @@ class GetStartConfigAPI(APIView):
 
     def get(self, request, *args, **kwargs):
         study_mode = kwargs.get('mode')
+        study_format = kwargs.get('st_format')
         slug = kwargs.get('slug')
         telegram_id = kwargs.get('telegram_id')
         if telegram_id is not None:
@@ -65,6 +65,7 @@ class GetStartConfigAPI(APIView):
                     session_config = {
                         'slug': slug,
                         'study_mode': study_mode,
+                        'study_format': study_format
                     }
                     # user = User.objects.get(telegram_id=telegram_id)
                     # user.session_config = session_config
@@ -79,6 +80,7 @@ class GetStartConfigAPI(APIView):
                     if config:
                         slug = config.get('slug')
                         study_mode = config.get('study_mode')
+                        study_format = config.get('study_format')
 
             else:
                 return Response({"detail": "telegram_id must be a digit"}, status=status.HTTP_400_BAD_REQUEST)
@@ -98,6 +100,7 @@ class GetStartConfigAPI(APIView):
             'csrf_token': request.COOKIES.get('csrftoken'),
             'slug': slug,
             'study_mode': study_mode,
+            'study_format': study_format,
             'urls': {
                 'get_card': reverse('get_card', kwargs={'slug': slug, 'mode': study_mode}),
                 'get_hint': reverse('get_hint', kwargs={'mappings_id': 'dummy_mappings_id'}),

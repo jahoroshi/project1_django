@@ -14,9 +14,10 @@ urlpatterns = [
     path("<slug:slug>/", views.DeckContentView.as_view(), name="deck_content"),
     path('', views.DecksListView.as_view(), name="decks_list"),
     path('api/v1/manage/<int:tg_user>/', views.DeckViewSetApi.as_view({'get': 'list'}), name='decks_list_tguser'),
+    path('api/v1/manage/reset/<int:tg_user>/<slug:slug>/', views.reset_deck_progress, name='decks_list_tguser'),
     path('api/v1/manage/<int:tg_user>/<slug:slug>/', views.DeckContentViewApi.as_view({'get': 'list'}),
          name='deck_content_tguser'),
-    path('api/v1/manage/first_filling/<int:telegram_id>/<str:language>', views.first_deck_fill, name='first_deck_fill'),
+    path('api/v1/manage/first_filling/<int:tg_user>/<str:language>', views.first_deck_fill, name='first_deck_fill'),
     path('api/v1/', include(router.urls)),
 
 ]

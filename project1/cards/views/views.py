@@ -11,7 +11,7 @@ from django.views.generic import (
 from cards.forms import CardCheckForm, CardForm
 from cards.models import Cards, Mappings
 from cards.services.check_post_request import CheckReuqest, is_post_unique
-from cards.services.query_builder import build_card_view_queryset
+from cards.services.query_builder import get_card_queryset
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import PermissionDenied
@@ -110,7 +110,7 @@ class BoxView(ListView):
         self.kwargs['study_mode'] = study_mode
         slug = self.kwargs['slug']
         try:
-            queryset, self.kwargs['ratings_count'] = build_card_view_queryset(slug=slug, study_mode=study_mode)
+            queryset, self.kwargs['ratings_count'] = get_card_queryset(slug=slug, study_mode=study_mode)
         except Cards.DoesNotExist:
             print('s')
 

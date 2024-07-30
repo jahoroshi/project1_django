@@ -6,7 +6,7 @@ from django.http import JsonResponse
 from django.shortcuts import render, get_object_or_404
 
 from cards.models import Cards, Mappings
-from cards.services.query_builder import build_card_view_queryset
+from cards.services.query_builder import get_card_queryset
 from speech.views import synthesize_speech
 from cards.services.check_permission import check_permission_with_slug
 from django.contrib.auth.decorators import login_required

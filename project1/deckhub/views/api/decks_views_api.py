@@ -1,7 +1,10 @@
 import csv
 from pathlib import Path
 
-from django.db.models import Count, Case, When, IntegerField, Q, Min
+from django.core.exceptions import ObjectDoesNotExist
+from django.db.models import IntegerField, Min
+from django.db.models import Q, Case, When, F, CharField, Count
+from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from rest_framework import viewsets, status
 from rest_framework.decorators import api_view
@@ -9,14 +12,32 @@ from rest_framework.response import Response
 
 from cards.models import Categories
 from cards.models import Mappings
-from deckhub.serializers import DeckSetSerializer, DeckContentSerializer
 from cards.services.handle_card_import import import_handler
+from deckhub.serializers import DeckSetSerializer, DeckContentSerializer
 from users.models import User
 
+@api_view(['GET'])
+def reset_deck_progress(request, *args, **kwargs):
+    tg_id = kwargs.get('tg_user')
+    slug = kwargs.get('slug')
+    mappings = Mappings.objects.filter(category__slug=slug, category__user__telegram_id=tg_id)
+
+    if not mappings.exists():
+        return Response({'detail': 'Category is empty'}, status=status.HTTP_204_NO_CONTENT)
+
+    mappings.update(
+        repetition=0,
+        mem_rating=0,
+        easiness=0.0,
+        study_mode='new',
+        review_params=None,
+        review_date=None
+    )
+    return Response(data={'detail': 'Category was reset'}, status=status.HTTP_200_OK)
 
 @api_view(['GET'])
 def first_deck_fill(request, *args, **kwargs):
-    tg_id = kwargs.get('telegram_id')
+    tg_id = kwargs.get('tg_user')
     language = kwargs.get('language')
     deck_name = 'First Deck for Test' if language == 'en' else 'Первая тестовая категория'
     user = User.objects.get(telegram_id=tg_id)
@@ -46,9 +67,6 @@ def first_deck_fill(request, *args, **kwargs):
         return Response(data={'detail': f'Cards have not been added.'}, status=status.HTTP_400_BAD_REQUEST)
 
 
-
-
-
 class DeckViewSetApi(viewsets.ModelViewSet):
     # permission_classes = [IsAuthenticated]
     serializer_class = DeckSetSerializer
@@ -59,18 +77,29 @@ class DeckViewSetApi(viewsets.ModelViewSet):
         if self.kwargs.get('tg_user') or self.kwargs.get('slug'):
             current_time = timezone.now()
 
-            queryset = Categories.objects.filter().annotate(cards_count=Count('mappings'),
-                                                            reviews_count=Count(
-                                                                Case(
-                                                                    When(mappings__review_date__lte=current_time,
-                                                                         then=1),
-                                                                    output_field=IntegerField(),
-                                                                )),
-                                                            new_cards_count=Count(Case(
-                                                                When(mappings__study_mode='new', then=1),
-                                                                output_field=IntegerField()
-                                                            )),
-                                                            min_review_date=Min('mappings__review_date'))
+            queryset = Categories.objects.filter().annotate(
+                cards_count=Count(
+                    Case(
+                        When(Q(mappings__study_mode='new') | Q(mappings__study_mode='review'), then=1),
+                        output_field=IntegerField()
+                    )
+                ),
+                reviews_count=Count(
+                    Case(
+                        When(mappings__review_date__lte=current_time, then=1),
+                        output_field=IntegerField(),
+                    )
+                ),
+                new_cards_count=Count(
+                    Case(
+                        When(mappings__study_mode='new', then=1),
+                        output_field=IntegerField(),
+                    )
+                ),
+                min_review_date=Min('mappings__review_date')
+            )
+
+            print(queryset)
             return queryset
         else:
             return Categories.objects.none()
@@ -102,6 +131,11 @@ class DeckViewSetApi(viewsets.ModelViewSet):
         response = super().update(request, *args, **kwargs)
         return Response({'name': response.data.get('name'), 'slug': response.data.get('slug')})
 
+    def retrieve(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = self.get_serializer(instance)
+        return Response(serializer.data)
+
 
 class DeckContentViewApi(viewsets.ModelViewSet):
     serializer_class = DeckContentSerializer
@@ -110,10 +144,26 @@ class DeckContentViewApi(viewsets.ModelViewSet):
         tg_user = self.kwargs.get('tg_user')
         slug = self.kwargs.get('slug')
 
-        mappings = Mappings.objects.filter(
+        cards = Mappings.objects.filter(
             category__user__telegram_id=tg_user,
-            category__slug=slug, is_back_side=False
-        ).select_related('card').only('card__side1', 'card__side2')
-        cards = [mapping.card for mapping in mappings]
+            category__slug=slug,
+        ).annotate(
+            side1=Case(
+                When(is_back_side=True, then=F('card__side2')),
+                default=F('card__side1'),
+                output_field=CharField(),
+            ),
+            side2=Case(
+                When(is_back_side=True, then=F('card__side1')),
+                default=F('card__side2'),
+                output_field=CharField(),
+            ),
+        ).values('side1', 'side2', 'card_id')
+
+        # mappings = Mappings.objects.filter(
+        #     category__user__telegram_id=tg_user,
+        #     category__slug=slug, is_back_side=False
+        # ).select_related('card').only('card__side1', 'card__side2')
+        # cards = [mapping.card for mapping in mappings]
 
         return cards

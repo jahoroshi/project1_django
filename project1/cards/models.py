@@ -1,13 +1,26 @@
+import re
+
+from autoslug import AutoSlugField
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.utils.text import slugify
-from transliterate import translit, detect_language
+from transliterate import detect_language, translit
+
 from cards.services.compute_study_metrics import compute_study_easiness, scale_easiness, NextReviewDate
 from users.models import User
-from time import time
 
 NUM_BOXES = 5
 BOXES = range(1, NUM_BOXES + 2)
+
+
+def custom_slugify(value):
+    value = value.replace('_', '-').lower().strip()
+    if not value[0].isalpha():
+        value = f'deck-{value}'
+    if detect_language(value):
+        value = translit(value, reversed=True)
+    value = re.sub(r'[^a-z0-9-]+', '', value)
+    return value
+
 
 class Card(models.Model):
     question = models.CharField(max_length=100)
@@ -31,37 +44,38 @@ class Card(models.Model):
         return self
 
 
-
 class Users(models.Model):
     name = models.CharField(max_length=100)
     login = models.CharField(max_length=100, unique=True)
     password = models.CharField(max_length=100)
     email = models.EmailField(unique=True)
 
+
 class Categories(models.Model):
     name = models.CharField(max_length=100)
     user = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
-    slug = models.SlugField(unique=True, blank=True)
-    # slug = AutoSlugField(populate_from='title', unique=True) установить!!!
+    # slug = models.SlugField(unique=True, blank=True)
+    slug = AutoSlugField(populate_from='name', unique=True, always_update=True, slugify=custom_slugify, max_length=50)
 
     def clean(self):
         if not any(c.isalnum() for c in self.name):
             raise ValidationError(('Имя категории должно содержать хотя бы одну букву и одну цифру.'))
-    def save(self, *args, **kwargs):
-        # if not self.slug:
-        name = self.name.replace('_', '-')
-        if not name[0].isalpha():
-            name = f'deck-{name}'
-        if detect_language(name):
-            name = translit(name, reversed=True)
-        slug = slugify(name)
-        for num in range(100):
-            if Categories.objects.filter(slug=slug).exists():
-                slug = f'{slug}-{self.user.id}' if not num else f'{slug}-{str(time()).split(".")[0]}'
-            else:
-                break
-        self.slug = slug
-        super().save(*args, **kwargs)
+
+    # def save(self, *args, **kwargs):
+    #     # if not self.slug:
+    #     name = self.name.replace('_', '-')
+    #     if not name[0].isalpha():
+    #         name = f'deck-{name}'
+    #     if detect_language(name):
+    #         name = translit(name, reversed=True)
+    #     slug = slugify(name)
+    #     for num in range(100):
+    #         if Categories.objects.filter(slug=slug).exists():
+    #             slug = f'{slug}-{self.user.id}' if not num else f'{slug}-{str(time()).split(".")[0]}'
+    #         else:
+    #             break
+    #     self.slug = slug
+    #     super().save(*args, **kwargs)
 
     def __str__(self):
         return self.name
@@ -73,9 +87,9 @@ class Cards(models.Model):
     transcription = models.CharField(max_length=255)
     audio_side1 = models.URLField(blank=True, null=True, max_length=255)
     audio_side2 = models.URLField(blank=True, null=True, max_length=255)
+
     def __str__(self):
         return self.side1
-
 
 
 class Mappings(models.Model):
@@ -89,12 +103,13 @@ class Mappings(models.Model):
     review_params = models.JSONField(blank=True, null=True)
     review_date = models.DateTimeField(blank=True, null=True)
     upd_date = models.DateTimeField(auto_now=True)
+
     def my_debug(self):
         data = (f'ID: {self.id}',
-              f'Repetition: {self.repetition}',
-              f'Easiness: {self.easiness}',
-              f'Mem_rating: {self.mem_rating}',
-              f'Study mode: {self.study_mode}')
+                f'Repetition: {self.repetition}',
+                f'Easiness: {self.easiness}',
+                f'Mem_rating: {self.mem_rating}',
+                f'Study mode: {self.study_mode}')
         print('\033[33;40;1m %-15s %-20s %-20s %-35s %-20s\033[0m' % data, '\n')
 
     def move(self, rating):
@@ -121,12 +136,14 @@ class Mappings(models.Model):
         return self
 
 
-class TestSides(models.Model): # for delete
+class TestSides(models.Model):  # for delete
     side = models.CharField(max_length=255)
     relation = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True)
 
-class ActiveStudy(models.Model): # for delete
+
+class ActiveStudy(models.Model):  # for delete
     mappings = models.OneToOneField(Mappings, on_delete=models.CASCADE)
     study_mode = models.CharField(max_length=3, default='new')
+
     class Meta:
         db_table = 'cards_active_study'
