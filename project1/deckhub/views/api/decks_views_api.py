@@ -99,7 +99,6 @@ class DeckViewSetApi(viewsets.ModelViewSet):
                 min_review_date=Min('mappings__review_date')
             )
 
-            print(queryset)
             return queryset
         else:
             return Categories.objects.none()

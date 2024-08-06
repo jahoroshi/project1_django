@@ -91,6 +91,11 @@ class Cards(models.Model):
     def __str__(self):
         return self.side1
 
+    def save(self, *args, **kwargs):
+        self.side1 = self.side1.replace("<", "‹").replace(">", "›")
+        self.side2 = self.side2.replace("<", "‹").replace(">", "›")
+        super().save(*args, **kwargs)
+
 
 class Mappings(models.Model):
     category = models.ForeignKey(Categories, on_delete=models.CASCADE)

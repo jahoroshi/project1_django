@@ -16,7 +16,6 @@ class CardViewSetApi(viewsets.ModelViewSet):
         return CardSetSerializer
 
     def get_queryset(self):
-        # if self.action ==
         serializers = self.get_serializer(data=self.request.data)
         serializers.is_valid(raise_exception=True)
         valid_data = serializers.validated_data
@@ -38,7 +37,7 @@ class CardViewSetApi(viewsets.ModelViewSet):
 
         Mappings.objects.create(card=card, category=category)
 
-        if valid_data['is_two_sides'] is True:
+        if valid_data.get('is_two_sides') is True:
             Mappings.objects.create(card=card, category=category, is_back_side=True)
 
         return Response(serializer.data, status=status.HTTP_201_CREATED)
