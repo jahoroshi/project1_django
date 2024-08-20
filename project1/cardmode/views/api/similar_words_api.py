@@ -16,16 +16,15 @@ class SimilarWordsAPI(APIView):
     # permission_classes = (IsAuthenticated,)
     def get(self, request, mappings_id, segment_length=3):
         mappings = Mappings.objects.filter(id=mappings_id).values(
-            'is_back_side', 'card__side1', 'card__side2', 'category_id'
+            'card__side2', 'category_id'
         )
         if not mappings:
             return Response({'error': 'Mappings not found'}, status=status.HTTP_404_NOT_FOUND)
 
         mappings = mappings[0]
-        is_back_side = mappings['is_back_side']
         category_id = mappings['category_id']
-        side_field = 'side1' if is_back_side else 'side2'
-        text = mappings['card__side1'] if is_back_side else mappings['card__side2']
+        side_field = 'side2'
+        text = mappings['card__side2']
         text = text.lower()
         len_text = len(text)
 

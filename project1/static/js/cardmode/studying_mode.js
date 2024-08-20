@@ -4,14 +4,12 @@ document.addEventListener('DOMContentLoaded', async function () {
             const currentUrl = new URL(window.location.href);
 
             const pathParts = currentUrl.pathname.split('/');
-            const slug = pathParts[2];
+            const slug = pathParts[4];
 
             const studyMode = currentUrl.searchParams.get('mode');
 
-            console.log('Extracted Slug:', slug);
-            console.log('Extracted Study Mode:', studyMode);
 
-            const configUrl = `/study/api/v1/get_start_config/${slug}/${studyMode}/`;
+            const configUrl = `/api/v1/study/get_start_config/${slug}/${studyMode}/`;
 
             const response = await fetch(configUrl);
             if (!response.ok) {
@@ -119,7 +117,8 @@ document.addEventListener('DOMContentLoaded', async function () {
 
     const showKnownButton = () => {
         if (cardData) {
-            if (cardData.ratings_count[5]) {
+            knownButton.classList.add('hidden');
+            if (cardData.ratings_count.hasOwnProperty(5)) {
                 knownButton.classList.remove('hidden')
             }
         }

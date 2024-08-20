@@ -36,7 +36,7 @@ def import_handler(data, slug):
     for card in cards:
         try:
             front_side, back_side = card.split(words_sep)
-            object_card = Cards.objects.create(side1=front_side.strip(), side2=back_side.strip())
+            object_card = Cards.objects.create(side1=front_side.strip()[:256], side2=back_side.strip()[:256])
             Mappings.objects.create(card=object_card, category=category)
             success_count += 1
         except ValueError:

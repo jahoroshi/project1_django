@@ -15,7 +15,7 @@ from rest_framework import viewsets, status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
-from cards.models import Categories
+from cards.models import Categories, Cards
 from cards.models import Mappings
 from cards.services.handle_card_import import import_handler
 from deckhub.serializers import DeckSetSerializer, DeckContentSerializer
@@ -38,19 +38,10 @@ current_time = timezone.now()
 
 
 
+card = Cards.objects.annotate(
+    front_side=F('side1')
+).values(
+    'front_side', 'audio', 'id'
+).get(mappings__id=2493)
 
-
-tg_id = 6980817380
-slug = 'pervajatestovajakategorija'
-
-mappings = Mappings.objects.filter(category__slug=slug, category__user__telegram_id=tg_id)
-if not mappings.exists():
-    ...
-mappings.update(
-    repetition=0,
-    mem_rating=0,
-    easiness=0.0,
-    study_mode='new',
-    review_params=None,
-    review_date=None
-)
+print(card)

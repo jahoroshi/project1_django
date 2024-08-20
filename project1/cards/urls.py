@@ -31,8 +31,8 @@ urlpatterns = [
     ),
     path("<slug:slug>/import/", views.import_cards, name="import_cards"),
     path("<slug:slug>/delete/<int:pk>/", views.CardDeleteView.as_view(), name="card_delete"),
-    path('api/v1/import_cards/<slug:slug>/', views.ImportCardsAPIView.as_view(), name='import_cards_api'),
+    path('import_cards/<slug:slug>/', views.ImportCardsAPIView.as_view(), name='import_cards_api'),
     # path('api/v1/create/<slug:slug>/<int:pk>/', views.CardViewSetApi.as_view({'post': 'create'})),
-    path('api/v1/', include(router.urls)),
+    path('', include(router.urls)),
 
 ]

@@ -67,8 +67,7 @@ class GetStartConfigAPI(APIView):
                         'study_mode': study_mode,
                         'study_format': study_format
                     }
-                    # user = User.objects.get(telegram_id=telegram_id)
-                    # user.session_config = session_config
+
                     user, created = User.objects.update_or_create(
                         telegram_id=telegram_id,
                         defaults={'session_config': session_config}
@@ -115,32 +114,18 @@ class GetStartConfigAPI(APIView):
 class GetSoundAPI(APIView):
     # permission_classes = [IsAuthenticated]
     def get(self, request, mappings_id, *args, **kwargs):
-        card = Mappings.objects.annotate(
-            front_side=Case(
-                When(is_back_side=True, then=F('card__side2')),
-                default=F('card__side1'),
-                output_field=CharField()
-            ),
-            audio=Case(
-                When(is_back_side=True, then=F('card__audio_side2')),
-                default=F('card__audio_side1'),
-                output_field=CharField()
-            )
-        ).values(
-            'front_side', 'audio', 'card_id', 'is_back_side'
-        ).get(pk=mappings_id)
+        card = Cards.objects.values(
+            'side1', 'audio', 'id'
+        ).get(mappings__id=mappings_id)
 
-        is_back_side = card.get('is_back_side')
         sound_file_path = card.get('audio')
 
         if sound_file_path is None:
-            text = card.get('front_side')
-            card_id = card.get('card_id')
-            sound_file_path = synthesize_speech(text=text, card_id=f"{card_id}_side_{(1,2)[is_back_side]}")
-            if not is_back_side:
-                Cards.objects.filter(id=card_id).update(audio_side1=sound_file_path)
-            else:
-                Cards.objects.filter(id=card_id).update(audio_side2=sound_file_path)
+            text = card.get('side1')
+            card_id = card.get('id')
+            sound_file_path = synthesize_speech(text=text, card_id=f"card_{card_id}")
+            Cards.objects.filter(id=card_id).update(audio=sound_file_path)
+
 
 
         try:

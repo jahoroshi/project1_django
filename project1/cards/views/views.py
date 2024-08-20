@@ -1,3 +1,5 @@
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.exceptions import PermissionDenied
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.urls import reverse_lazy, reverse
@@ -9,14 +11,11 @@ from django.views.generic import (
 )
 
 from cards.forms import CardCheckForm, CardForm
-from cards.models import Cards, Mappings
+from cards.models import Cards, Mappings, Categories
+from cards.services.check_permission import CheckPermission
 from cards.services.check_post_request import CheckReuqest, is_post_unique
 from cards.services.query_builder import get_card_queryset
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.core.exceptions import PermissionDenied
-from cards.services.check_post_request import CheckReuqest, is_post_unique
-from cards.services.check_permission import check_permission_with_slug, CheckPermission
+from cards.services.second_side_creator import create_second_side
 
 
 class CardCreateView(LoginRequiredMixin, CheckPermission, CreateView):
@@ -24,6 +23,7 @@ class CardCreateView(LoginRequiredMixin, CheckPermission, CreateView):
     form_class = CardForm
     template_name = 'cards/card_form.html'
     success_url = reverse_lazy('card_create')
+
 
     def form_valid(self, form):
 
@@ -36,14 +36,17 @@ class CardCreateView(LoginRequiredMixin, CheckPermission, CreateView):
             self.object = form.save(commit=False)
             self.object.save()
 
-            Mappings.objects.create(card=self.object, category=category)
+            mapping_object = Mappings.objects.create(card=self.object, category=category)
+
             if form.cleaned_data['is_two_sides']:
-                Mappings.objects.create(card=self.object, category=category, is_back_side=True)
+                create_second_side(category, mapping_object, side1=self.object.side1, side2=self.object.side2)
+
         return HttpResponseRedirect(self.request.path)
 
     def get_form_kwargs(self):
         kwargs = super(CardCreateView, self).get_form_kwargs()
         kwargs['slug'] = self.kwargs.get('slug')
+        kwargs['user'] = self.request.user
         return kwargs
 
     def get_context_data(self, **kwargs):
@@ -55,9 +58,6 @@ class CardCreateView(LoginRequiredMixin, CheckPermission, CreateView):
     def post(self, request, *args, **kwargs):
         self.object = None
         return super().post(request, *args, **kwargs)
-
-
-
 
 
 class CardUpdateView(CardCreateView, UpdateView):
@@ -73,9 +73,13 @@ class CardUpdateView(CardCreateView, UpdateView):
         if is_post_unique(self.request):
             self.object = form.save(commit=False)
             self.object.save()
-            card = Mappings.objects.get(card=self.object)
-            card.category = category
-            card.save()
+            mapping_object = Mappings.objects.get(card=self.object)
+            mapping_object.category = category
+            mapping_object.save()
+
+            if form.cleaned_data['is_two_sides'] is True and mapping_object.has_two_sides is False:
+                create_second_side(category, mapping_object, side1=self.object.side1, side2=self.object.side2)
+
         return HttpResponseRedirect(reverse('deck_content', kwargs={'slug': slug}))
 
     def get_context_data(self, **kwargs):
@@ -98,8 +102,6 @@ class CardDeleteView(LoginRequiredMixin, CheckPermission, CheckReuqest, DeleteVi
         return context
 
 
-
-
 class BoxView(ListView):
     model = Cards
     template_name = 'cards/box.html'
@@ -113,7 +115,6 @@ class BoxView(ListView):
             queryset, self.kwargs['ratings_count'] = get_card_queryset(slug=slug, study_mode=study_mode)
         except Cards.DoesNotExist:
             print('s')
-
 
         return queryset
 
@@ -137,6 +138,3 @@ class BoxView(ListView):
             mappings.move(form.cleaned_data['rating'])
         success_url = self.request.get_full_path()
         return HttpResponseRedirect(success_url)
-
-
-

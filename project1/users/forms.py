@@ -163,3 +163,12 @@ class UserProfileForm(UserChangeForm):
     class Meta:
         model = User
         fields = ('email', 'password')
+
+
+class TelegramUserForm(forms.Form):
+    id = forms.IntegerField()
+    first_name = forms.CharField()
+    last_name = forms.CharField()
+    username = forms.CharField()
+    auth_date = forms.IntegerField()
+    hash = forms.CharField()

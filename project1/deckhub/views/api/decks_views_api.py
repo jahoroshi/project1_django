@@ -146,18 +146,10 @@ class DeckContentViewApi(viewsets.ModelViewSet):
         cards = Mappings.objects.filter(
             category__user__telegram_id=tg_user,
             category__slug=slug,
-        ).annotate(
-            side1=Case(
-                When(is_back_side=True, then=F('card__side2')),
-                default=F('card__side1'),
-                output_field=CharField(),
-            ),
-            side2=Case(
-                When(is_back_side=True, then=F('card__side1')),
-                default=F('card__side2'),
-                output_field=CharField(),
-            ),
-        ).values('side1', 'side2', 'card_id')
+        ) .annotate(
+                side1=F('card__side1'),
+                side2=F('card__side2')
+            ).values('side1', 'side2', 'card_id')
 
         # mappings = Mappings.objects.filter(
         #     category__user__telegram_id=tg_user,

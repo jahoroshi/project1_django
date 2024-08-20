@@ -20,4 +20,6 @@ def main():
 
 if __name__ == '__main__':
     print('ngrok http --domain=engaging-mastodon-accurate.ngrok-free.app 8080')
+    print('http://localhost/users/telegram/callback/?id=7390715192&first_name=Platon&last_name=Cross&username=platon_cross&auth_date=1723746975&hash=e1a2cd49dd85aa71ce5edf003f3a358103fcecca0bb7e15dec78c7a7bc3e8fa4')
+    print('pagekite 8000 jahoroshi4y.pagekite.me')
     main()

@@ -4,7 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, HttpResponseRedirect
 from django.urls import reverse
 
-from users.forms import UserLoginForm, UserRegistrationForm, UserProfileForm
+from users.forms import UserLoginForm, UserRegistrationForm, UserProfileForm, TelegramUserForm
 
 
 def login(request):
@@ -58,3 +58,14 @@ def profile(request):
 def logout(request):
     auth.logout(request)
     return HttpResponseRedirect(reverse('decks_list'))
+
+
+def telegram_auth(request):
+    if request.method == 'GET':
+        form = TelegramUserForm(data=request.GET)
+        if form.is_valid():
+            id = form.cleaned_data['id']
+            username = form.cleaned_data['username']
+
+    return HttpResponseRedirect(request.path)
+

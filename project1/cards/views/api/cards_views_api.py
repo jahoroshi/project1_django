@@ -4,6 +4,7 @@ from rest_framework.response import Response
 
 from cards.models import Cards, Categories, Mappings
 from cards.serializers import CardSetSerializer, CardCreateSerializer
+from cards.services.second_side_creator import create_second_side
 
 
 class CardViewSetApi(viewsets.ModelViewSet):
@@ -23,29 +24,32 @@ class CardViewSetApi(viewsets.ModelViewSet):
         queryset = Cards.objects.filter(id__in=mappings.values('card_id'))
         return queryset
 
-
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         valid_data = serializer.validated_data
         slug = valid_data.get('slug')
         category = get_object_or_404(Categories, slug=slug)
+        side1 = valid_data['side1']
+        side2 = valid_data['side2']
         card = Cards.objects.create(
-            side1=valid_data['side1'],
-            side2=valid_data['side2']
+            side1=side1,
+            side2=side2,
         )
 
-        Mappings.objects.create(card=card, category=category)
+        mapping_object = Mappings.objects.create(card=card, category=category)
 
         if valid_data.get('is_two_sides') is True:
-            Mappings.objects.create(card=card, category=category, is_back_side=True)
+            create_second_side(category, mapping_object, side1=side1, side2=side2)
 
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def perform_update(self, serializer):
         serializer.save()
         if serializer.validated_data['is_two_sides'] is True:
-            count = Mappings.objects.filter(card=serializer.instance).count()
-            if count == 1:
+            mapping_object = get_object_or_404(Mappings, card=serializer.instance)
+            if mapping_object.has_two_sides is False:
                 category = get_object_or_404(Categories, slug=serializer.validated_data['slug'])
-                Mappings.objects.create(card=serializer.instance, category=category, is_back_side=True)
+                side1 = serializer.instance.side1
+                side2 = serializer.instance.side2
+                create_second_side(category, mapping_object, side1=side1, side2=side2)

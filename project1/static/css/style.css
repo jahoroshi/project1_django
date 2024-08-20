@@ -103,7 +103,7 @@
 /*}*/
 
 .hidden {
-    display: none!important;
+    display: none !important;
 }
 
 
@@ -130,6 +130,7 @@ header, footer, section {
 
 body {
     background-color: #dee2e6;
+    min-width: 375px;
 }
 
 .container {
@@ -137,12 +138,13 @@ body {
 }
 
 .content {
-    border-radius: 66px;
+    border-radius: 46px;
     background-color: rgb(33, 37, 41);
-    padding: 20px;
-    padding-top: .5rem !important;
-    padding-right: 1.5rem !important;
-    padding-left: 1.5rem !important;
+    /*padding: 20px;*/
+    /*padding-bottom: .5rem !important;*/
+    /*padding-top: .5rem !important;*/
+    /*padding-right: 1.5rem !important;*/
+    /*padding-left: 1.5rem !important;*/
     margin-bottom: 1.5rem !important;
 }
 
@@ -227,7 +229,7 @@ article {
     height: 30px;
     position: relative;
     transition: background-color 0.1s, color 0.3s; /* Плавный переход */
-    border-radius: 10px;
+    border-radius: 8px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -304,7 +306,7 @@ article {
 
 .add-card-decks {
     height: 100%; /* Высота кнопки 100% от высоты родителя */
-    width: 100px;
+    width: 100%;
     display: flex; /* Flexbox для центрирования содержимого */
     align-items: center; /* Вертикальное центрирование */
     justify-content: center; /* Горизонтальное центрирование */
@@ -550,11 +552,17 @@ button.btn-hint[disabled]:hover {
     border-radius: var(--bs-border-radius-xxl) !important;
     --bs-bg-opacity: 1;
     background-color: rgba(var(--bs-tertiary-bg-rgb), var(--bs-bg-opacity)) !important;
-    padding: 1rem !important;
-    margin-top: 1.5rem !important;
-    margin-bottom: 1.5rem !important;
+    padding: 1rem !important; /* Padding для больших экранов */
     box-shadow: var(--bs-box-shadow-sm) !important;
 }
+
+/* Адаптивный паддинг для экранов размером меньше 576px (sm) */
+@media (max-width: 575.98px) {
+    .content-block {
+        padding: 0.6rem !important; /* Padding для маленьких экранов */
+    }
+}
+
 
 
 .content-block .flex-grow-1 {
@@ -763,7 +771,7 @@ button.btn-hint[disabled]:hover {
 }
 
 .profile-icon {
-        text-decoration: none;
+    text-decoration: none;
     width: 30px;
     height: 30px;
     position: relative;
@@ -772,7 +780,7 @@ button.btn-hint[disabled]:hover {
     display: flex;
     align-items: center;
     justify-content: center;
-        color: #fff; /* Цвет текста при наведении */
+    color: #fff; /* Цвет текста при наведении */
 
     /*color: inherit;*/
 }
@@ -780,4 +788,102 @@ button.btn-hint[disabled]:hover {
 .profile-icon:hover {
     /*background-color: rgb(33, 37, 41); !* Цвет фона при наведении *!*/
     color: #fff; /* Цвет текста при наведении */
+}
+
+
+.telegram-button {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #0088cc;
+    color: white;
+    font-family: 'Roboto', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    border-radius: 5px;
+    text-align: center;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    border: none;
+}
+
+.telegram-button:hover {
+    background-color: #007bb5;
+}
+
+.telegram-button i {
+    display: inline-block;
+    vertical-align: middle;
+    margin-right: 8px;
+    width: 20px;
+    height: 20px;
+    background-image: url('https://telegram.org/img/t_logo.png'); /* Telegram logo */
+    background-size: contain;
+    background-repeat: no-repeat;
+}
+
+
+.divider {
+        display: flex;
+    flex-direction: row;
+    text-transform: uppercase;
+    border: none;
+    font-size: 12px;
+    font-weight: 400;
+    margin: 0;
+    align-items: center;
+    justify-content: center;
+    /*width: 320px;*/
+    vertical-align: baseline;
+}
+
+.divider::before,
+.divider::after {
+    content: '';
+    flex: 1;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.divider::before {
+    margin-right: .85em;
+}
+
+.divider::after {
+    margin-left: .85em;
+}
+
+.telegram-button-navbar {
+    display: inline-block;
+    padding: 0.35rem  1.1rem;
+    background-color: #0088cc;
+    color: white;
+    font-family: 'Roboto', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    border-radius: 5px;
+    text-align: center;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    border: none;
+}
+
+.telegram-button-navbar:hover {
+    background-color: #007bb5;
+}
+
+.telegram-button-navbar i {
+    display: inline-block;
+    vertical-align: middle;
+    margin-right: 8px;
+    width: 20px;
+    height: 20px;
+    background-image: url('https://telegram.org/img/t_logo.png'); /* Telegram logo */
+    background-size: contain;
+    background-repeat: no-repeat;
+}
+
+
+.content-block:last-child {
+    margin-bottom: 0 !important;
 }

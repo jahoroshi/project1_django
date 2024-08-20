@@ -18,6 +18,12 @@ class ImportCardsAPIView(APIView):
     def post(self, request, slug, *args, **kwargs):
         serializer = ImportCardsSerializer(data=request.data)
         if serializer.is_valid():
+            count = Mappings.objects.filter(category__slug=slug).count()
+            if count > 500 and len(serializer.validated_data['text']) > 600:
+                return Response(
+                    {'detail': 'Import not allowed: The category contains more than 500 cards.'},
+                    status=status.HTTP_405_METHOD_NOT_ALLOWED
+                )
             imports = import_handler(serializer.validated_data, slug)
             if imports:
                 return Response({'detail': f'{imports} cards imported successfully'},

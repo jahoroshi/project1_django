@@ -1,7 +1,8 @@
 from rest_framework import viewsets, status
 from rest_framework.response import Response
 
-from users.models import TelegramUser, User
+from users.forms import TelegramUserForm
+from users.models import User
 from users.serializers import UserSetSerializer
 
 
@@ -38,3 +39,5 @@ class UserViewSet(viewsets.ModelViewSet):
         self.check_object_permissions(self.request, obj)
 
         return obj
+
+

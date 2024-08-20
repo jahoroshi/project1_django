@@ -6,8 +6,8 @@
 {% block content %}
     <div class="row">
         <div class="col-12">
-            <div class="content pt-2 px-4 mb-4">
-                <div class="content-block shadow-sm p-3 my-4 bg-body-tertiary rounded-5 text-center">
+            <div class="content p-sm-4 p-3 mb-4">
+                <div class="content-block shadow-sm mb-4 bg-body-tertiary rounded-5 text-center">
                     <div class="row mb-4">
                         <div class="col-2">
                             <a href="{% url 'deck_content' slug %}" class="link-button-close " role="button"
@@ -46,9 +46,9 @@
                                     </div>
                                 </div>
 
-                                <div class="row">
+                                <div class="row ms-3 ms-sm-0">
                                     <div class="col">
-                                        <div class="form-group">
+                                        <div class="form-group d-flex flex-wrap flex-column flex-sm-row align-items-start align-items-sm-center justify-content-sm-center ">
 
                                             {% for radio in form.words_separator %}
                                                 <div class="form-check form-check-inline">
@@ -77,9 +77,9 @@
                                     </div>
                                 </div>
 
-                                <div class="row">
+                                <div class="row ms-3 ms-sm-0">
                                     <div class="col">
-                                        <div class="form-group">
+                                        <div class="form-group d-flex flex-wrap flex-column flex-sm-row align-items-start align-items-sm-center justify-content-sm-center ">
                                             {% for radio in form.cards_separator %}
                                                 <div class="form-check form-check-inline">
                                                     {{ radio.tag }}
@@ -87,11 +87,12 @@
                                                            for="{{ radio.id_for_label }}">{{ radio.choice_label }}</label>
                                                 </div>
                                             {% endfor %}
+                                            {#            <div class="w-100 d-block d-md-none"></div> <!-- Обеспечивает перенос custom поля на новую строку на маленьких экранах -->#}
                                             {{ form.cards_separator_custom }}
-
                                         </div>
                                     </div>
                                 </div>
+
                             </div>
                         </div>
                         <button type="submit" class="btn btn-outline-light btn-lg">Import</button>
@@ -99,7 +100,8 @@
 
                     <h3 id="card-count" class="mt-5">Cards for import: 0</h3>
 
-                    <div id="preview-container" class='content-block shadow-sm p-3 my-4 bg-body-tertiary rounded-5' style="display: none;">
+                    <div id="preview-container" class='content-block shadow-sm p-3 my-4 bg-body-tertiary rounded-5'
+                         style="display: none;">
                         <div id="preview"></div>
                     </div>
 

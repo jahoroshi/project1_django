@@ -33,10 +33,19 @@ ALLOWED_HOSTS = [
     'localhost',
     '127.0.0.1',
     'b114-46-53-254-108.ngrok-free.app',
-    'engaging-mastodon-accurate.ngrok-free.app'
+    'engaging-mastodon-accurate.ngrok-free.app',
+    'jahoroshi4y.pagekite.me',
     # Добавьте этот домен
     # Можно добавить и другие домены, если нужно
 ]
+
+INTERNAL_IPS = [
+    # ...
+    "127.0.0.1",
+    # ...
+]
+
+SECURE_CROSS_ORIGIN_OPENER_POLICY = "same-origin-allow-popups"
 
 # Application definition
 
@@ -55,6 +64,8 @@ INSTALLED_APPS = [
     'users',
     'rest_framework',
 ]
+if DEBUG:
+    INSTALLED_APPS += ['debug_toolbar']
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -67,6 +78,8 @@ MIDDLEWARE = [
     # 'cards.middleware.DeckEmptyMiddleware',
 
 ]
+if DEBUG:
+    MIDDLEWARE += ["debug_toolbar.middleware.DebugToolbarMiddleware"]
 
 ROOT_URLCONF = 'project_1.urls'
 
@@ -88,15 +101,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'project_1.wsgi.application'
 
-# Database
-# https://docs.djangoproject.com/en/5.0/ref/settings/#databases
-
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': BASE_DIR / 'db.sqlite3',
-#     }
-# }
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',

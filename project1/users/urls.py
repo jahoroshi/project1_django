@@ -14,5 +14,6 @@ urlpatterns = [
     path('registration/', views.registration, name='registration'),
     path('prifile/', views.profile, name='profile'),
     path('logout/', views.logout, name='logout'),
-    path('api/v1/', include(router.urls)),
+    path('telegram/callback/', views.telegram_auth, name='telegram_auth'),
+    path('', include(router.urls)),
 ]

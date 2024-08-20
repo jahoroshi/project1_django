@@ -3,7 +3,8 @@ from django.core.exceptions import PermissionDenied
 from cards.models import Categories
 def check_category_ownership(user, slug):
     try:
-        category = Categories.objects.get(slug=slug, user=user)
+        # category = Categories.objects.get(slug=slug, user=user)
+        ...
     except Categories.DoesNotExist:
         raise PermissionDenied
 

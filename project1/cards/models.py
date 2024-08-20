@@ -1,6 +1,7 @@
 import re
 
 from autoslug import AutoSlugField
+from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.db import models
 from transliterate import detect_language, translit
@@ -53,7 +54,7 @@ class Users(models.Model):
 
 class Categories(models.Model):
     name = models.CharField(max_length=100)
-    user = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
+    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, blank=True, null=True)
     # slug = models.SlugField(unique=True, blank=True)
     slug = AutoSlugField(populate_from='name', unique=True, always_update=True, slugify=custom_slugify, max_length=50)
 
@@ -85,8 +86,7 @@ class Cards(models.Model):
     side1 = models.CharField(max_length=255)
     side2 = models.CharField(max_length=255)
     transcription = models.CharField(max_length=255)
-    audio_side1 = models.URLField(blank=True, null=True, max_length=255)
-    audio_side2 = models.URLField(blank=True, null=True, max_length=255)
+    audio = models.URLField(blank=True, null=True, max_length=255)
 
     def __str__(self):
         return self.side1
@@ -100,7 +100,8 @@ class Cards(models.Model):
 class Mappings(models.Model):
     category = models.ForeignKey(Categories, on_delete=models.CASCADE)
     card = models.ForeignKey(Cards, on_delete=models.CASCADE)
-    is_back_side = models.BooleanField(default=False)
+    # is_back_side = models.BooleanField(default=False)
+    has_two_sides = models.BooleanField(default=False)
     repetition = models.IntegerField(default='0')
     mem_rating = models.IntegerField(default='0')
     easiness = models.FloatField(default='0.0')

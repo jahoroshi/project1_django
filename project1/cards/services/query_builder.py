@@ -55,22 +55,39 @@ def get_card_queryset(*args, **kwargs):
     max_limit = randint(1, cards_in_process + 1) if cards_in_process <= 5 else round(cards_in_process * 0.4)
 
     subquery2 = Mappings.objects.filter(id__in=Subquery(subquery1)).order_by('upd_date').values('id')[:max_limit]
-    subquery3 = Mappings.objects.filter(id__in=Subquery(subquery2)).order_by('easiness', 'upd_date').values('card_id')
+    # subquery3 = Mappings.objects.filter(id__in=Subquery(subquery2)).order_by('easiness', 'upd_date').values('card_id')
 
-    card = subquery3.annotate(
-        front_side=Case(
-            When(is_back_side=True, then=F('card__side2')),
-            default=F('card__side1'),
-            output_field=CharField(),
-        ),
-        back_side=Case(
-            When(is_back_side=True, then=F('card__side1')),
-            default=F('card__side2'),
-            output_field=CharField(),
-        ),
-    ).values(
-        'review_date', 'front_side', 'back_side', 'card__id', 'id', 'category__name', 'easiness'
-    ).first() or {}
+    card = (
+            Mappings.objects.filter(id__in=Subquery(subquery2))
+            .order_by('easiness', 'upd_date')
+            .annotate(
+                front_side=F('card__side1'),
+                back_side=F('card__side2')
+            )
+            .values(
+                'review_date', 'front_side', 'back_side',
+                'card__id', 'id', 'category__name', 'easiness'
+            )
+            .first() or {}
+    )
+
+    # card = subquery3.annotate(
+    #     front_side=Case(
+    #         When(is_back_side=True, then=F('card__side2')),
+    #         default=F('card__side1'),
+    #         output_field=CharField(),
+    #     ),
+    #     back_side=Case(
+    #         When(is_back_side=True, then=F('card__side1')),
+    #         default=F('card__side2'),
+    #         output_field=CharField(),
+    #     ),
+    # ).values(
+    #     'review_date', 'front_side', 'back_side', 'card__id', 'id', 'category__name', 'easiness'
+    # ).first() or {}
+    # card = subquery3.annotate(front_side=F('card__side1'), back_side=F('card__side2')).values(
+    #     'review_date', 'front_side', 'back_side', 'card__id', 'id', 'category__name', 'easiness'
+    # ).first() or {}
 
     ####
     my_debug(subquery1, card.get('id'))

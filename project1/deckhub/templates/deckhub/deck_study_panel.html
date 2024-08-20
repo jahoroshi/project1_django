@@ -78,19 +78,19 @@
 {% endif %}
 
 <div class="row">
-    <div class="col-8">
+    <div class="col-sm-8 col-12">
         {% if stats_box.0.new_cards_count > 0 %}
                 <strong><a href="{% url 'cardmode' stats_box.0.slug %}?mode=new" role="button" class="buttons-study-panel">Study new cards</a></strong>
         {% else %}
-            <a href="#" class="btn btn-secondary buttons-study-panel disabled text-dark" tabindex="-1" role="button"
+            <a href="#" class="btn btn-secondary buttons-study-panel disabled text-dark text-nowrap" tabindex="-1" role="button"
                aria-disabled="true" style="background-color: transparent;">Study new cards </a>
         {% endif %}
     </div>
-    <div class="col-4">
+    <div class="col-sm-4 col-12">
         {% if stats_box.0.cards_review_count > 0 %}
                 <strong><a href="{% url 'cardmode' stats_box.0.slug %}?mode=review" class="buttons-study-panel">Review cards</a></strong>
         {% else %}
-            <a href="#" class="btn btn-secondary buttons-study-panel disabled text-dark" tabindex="-1" role="button"
+            <a href="#" class="btn btn-secondary buttons-study-panel disabled text-dark text-nowrap" tabindex="-1" role="button"
                aria-disabled="true" style="background-color: transparent;">Review cards</a>
         {% endif %}
     </div>
@@ -98,11 +98,11 @@
 </div>
 <div class="row">
     <div class="col">
-            <a href="{% url 'import_cards' stats_box.0.slug %}"class="buttons-study-panel">Import cards</a>
+            <a href="{% url 'import_cards' stats_box.0.slug %}"class="buttons-study-panel text-nowrap">Import cards</a>
     </div>
     <div class="col">
 {#        <div class="buttons-study-panel">#}
-            <a href="{% url 'card_create' stats_box.0.slug %}" class="buttons-study-panel">Add new card</a>
+            <a href="{% url 'card_create' stats_box.0.slug %}" class="buttons-study-panel text-nowrap">Add new card</a>
 {#        </div>#}
 
     </div>

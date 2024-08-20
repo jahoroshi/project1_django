@@ -46,7 +46,10 @@ class CardForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         self.slug = kwargs.pop('slug', None)
+        user = kwargs.pop('user', None)
+
         super(CardForm, self).__init__(*args, **kwargs)
+        self.fields['category'].queryset = Categories.objects.filter(user=user).order_by('pk')
 
         if self.slug:
             category = get_object_or_404(Categories, slug=self.slug)
@@ -94,7 +97,7 @@ class ImportCardsForm(forms.Form):
     words_separator_custom = forms.CharField(
         max_length=255,
         required=False,
-        widget=forms.TextInput(attrs={'placeholder': 'Custom: e.g. -', 'class': 'form-control w-25'}),
+        widget=forms.TextInput(attrs={'placeholder': 'Custom: e.g. -', 'class': 'form-control w-25', 'style': 'min-width: 130px;'}),
         label=False,
         strip=False,
 
@@ -108,7 +111,7 @@ class ImportCardsForm(forms.Form):
     cards_separator_custom = forms.CharField(
         max_length=255,
         required=False,
-        widget=forms.TextInput(attrs={'placeholder': 'Custom: e.g. -', 'class': 'form-control w-25'}),
+        widget=forms.TextInput(attrs={'placeholder': 'Custom: e.g. -', 'class': 'form-control w-25', 'style': 'min-width: 130px;'}),
         label=False,
         strip=False
 

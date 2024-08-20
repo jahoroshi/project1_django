@@ -1,6 +1,5 @@
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.core.exceptions import PermissionDenied
 from django.db.models import Count, Case, When, F, IntegerField, Q
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy, reverse
@@ -12,8 +11,8 @@ from django.views.generic import (
 )
 
 from cards.models import Cards, Categories
-from cards.services.check_post_request import CheckReuqest, is_post_unique
 from cards.services.check_permission import check_permission_with_slug, CheckPermission
+from cards.services.check_post_request import CheckReuqest, is_post_unique
 
 
 class DecksListView(LoginRequiredMixin, ListView):
@@ -22,18 +21,27 @@ class DecksListView(LoginRequiredMixin, ListView):
 
     def get_queryset(self):
         user = self.request.user
-        queryset = Categories.objects.filter(user=user).annotate(cards_count=Count('mappings'), reviews_count=Count(
-            Case(
-                When(mappings__review_date__lte=now().date(), then=1),
-                output_field=IntegerField(),
+        queryset = Categories.objects.filter(user=user).annotate(
+            cards_count=Count(
+                Case(
+                    When(~Q(mappings__study_mode='known'), then=1),
+                    output_field=IntegerField()
+                )
+            ),
+            reviews_count=Count(
+                Case(
+                    When(
+                        mappings__review_date__lte=now().date(),
+                        then=1
+                    ),
+                    output_field=IntegerField(),
+                )
             )
-        ))
+        )
         return queryset
 
     def get_ordering(self):
         return ['name']
-
-
 
 
 class DeckCreateView(LoginRequiredMixin, CheckReuqest, CreateView):
@@ -71,7 +79,6 @@ class DeckContentView(LoginRequiredMixin, CheckPermission, ListView):
 
         queryset = Cards.objects.filter(
             mappings__category__slug=slug,
-            mappings__is_back_side=False,
         ).filter(~Q(mappings__study_mode='known')).values(
             'mappings__review_date', 'id', 'mappings', 'mappings__category__name', front_side=F('side1'),
             back_side=F('side2')
@@ -86,8 +93,6 @@ class DeckContentView(LoginRequiredMixin, CheckPermission, ListView):
         return context
 
 
-
-
 @login_required
 @check_permission_with_slug
 def deck_delete(request, slug):
@@ -98,4 +103,3 @@ def deck_delete(request, slug):
         cards.delete()
         return redirect(reverse('decks_list'))
     return render(request, 'cards/delete_object.html', {'deck_name': deck.name, 'slug': slug})
-

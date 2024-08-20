@@ -18,16 +18,23 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
+from debug_toolbar.toolbar import debug_toolbar_urls
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('cards/', include("cards.urls")),
     path('speech/', include("speech.urls")),
     path('deck/', include("deckhub.urls")),
-    path('', include("deckhub.urls")),
     path('study/', include("cardmode.urls")),
     path('users/', include("users.urls", namespace='users')),
-]
+    path('api/v1/cards/', include("cards.urls")),
+    path('api/v1/speech/', include("speech.urls")),
+    path('api/v1/deck/', include("deckhub.urls")),
+    path('api/v1/study/', include("cardmode.urls")),
+    path('api/v1/users/', include("users.urls", namespace='users-api')),
+    path('', include("deckhub.urls")),
+
+              ] + debug_toolbar_urls()
 
 
 if settings.DEBUG:
