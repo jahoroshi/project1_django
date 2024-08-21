@@ -1,7 +1,7 @@
 {% load static %}
 <nav class="navbar navbar-expand-md bg-body-tertiary">
     <div class="container" style="padding-inline: 20px;">
-        <a class="navbar-brand" href="#">AnkiChat</a>
+        <a class="navbar-brand" href="/">AnkiChat</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
                 aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Переключатель навигации">
             <span class="navbar-toggler-icon"></span>
@@ -19,7 +19,7 @@
                         <i></i>Telegram AnkiChatBot
                     </a>
                 </div>
-                
+
             </div>
 
             <ul class="navbar-nav me-auto">
@@ -29,24 +29,69 @@
             <div class="row gx-2 mt-md-0 mt-3">
                 {% if user.is_authenticated %}
                     <div class="btn-group">
-                        <a href="{% url 'users:profile' %}" type="button" class="profile-icon dropdown-toggle"
-                           data-bs-toggle="dropdown" aria-expanded="false">
+                        <!-- Ссылка с изображением профиля -->
+                        <a href="{% url 'users:profile' %}" type="button"
+                           class="profile-icon dropdown-toggle d-none d-md-block"
+                           data-bs-toggle="dropdown" aria-expanded="false" style="z-index: 9999;">
                             <img src="{% static 'profile.png' %}" width="70" height="70" alt="Person">
-
                         </a>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item d-flex align-items-center fw-medium"
-                                   href="{% url 'users:profile' %}">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor"
-                                     class="bi bi-person-square" viewBox="0 0 16 16">
-                                    <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0"/>
-                                    <path d="M2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2zm12 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1v-1c0-1-1-4-6-4s-6 3-6 4v1a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1z"/>
-                                </svg>
 
+                        <!-- Кнопка, отображаемая на sm и меньше -->
+
+                        {#                        <ul class="nav justify-content-center d-block d-md-none">#}
+                        {#                            <li class="nav-item">#}
+                        {#                                <a class="nav-link active" aria-current="page"#}
+                        {#                                   href="{% url 'users:profile' %}">Profile</a>#}
+                        {#                            </li>#}
+                        {#                            <li class="nav-item">#}
+                        {#                                <a class="nav-link" href="#">Contact with us</a>#}
+                        {#                            </li>#}
+                        {#                            <li class="nav-item">#}
+                        {#                                <a class="nav-link" href="{% url 'users:logout' %}">Logout</a>#}
+                        {#                            </li>#}
+                        {##}
+                        {#                        </ul>#}
+
+                        <ul class="nav mx-auto d-flex flex-row d-block d-md-none justify-content-center">
+                            <li class="nav-item">
+                                <a class="nav-link" aria-current="page"
+                                   href="{% url 'users:profile' %}">Profile</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#">Contact with us</a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'users:logout' %}">Logout</a>
+                            </li>
+                        </ul>
+
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item d-flex align-items-center fw-semibold"
+                                   href="{% url 'users:profile' %}">
+                                <svg xmlns="http://www.w3.org/2000/svg" height="20" width="17.5" viewBox="0 0 448 512">
+                                    <!--!Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.-->
+                                    <path fill="#ffffff"
+                                          d="M304 128a80 80 0 1 0 -160 0 80 80 0 1 0 160 0zM96 128a128 128 0 1 1 256 0A128 128 0 1 1 96 128zM49.3 464l349.5 0c-8.9-63.3-63.3-112-129-112l-91.4 0c-65.7 0-120.1 48.7-129 112zM0 482.3C0 383.8 79.8 304 178.3 304l91.4 0C368.2 304 448 383.8 448 482.3c0 16.4-13.3 29.7-29.7 29.7L29.7 512C13.3 512 0 498.7 0 482.3z"/>
+                                </svg>
                                 <span class="ms-2">Profile</span></a></li>
+
+                            <li>
+                                <a class="dropdown-item d-flex align-items-center fw-semibold"
+                                   href="{% url 'users:logout' %}">
+                                    <svg xmlns="http://www.w3.org/2000/svg" height="20" width="20"
+                                         viewBox="0 0 512 512">
+                                        <!--!Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.-->
+                                        <path fill="#ffffff"
+                                              d="M160 368c26.5 0 48 21.5 48 48l0 16 72.5-54.4c8.3-6.2 18.4-9.6 28.8-9.6L448 368c8.8 0 16-7.2 16-16l0-288c0-8.8-7.2-16-16-16L64 48c-8.8 0-16 7.2-16 16l0 288c0 8.8 7.2 16 16 16l96 0zm48 124l-.2 .2-5.1 3.8-17.1 12.8c-4.8 3.6-11.3 4.2-16.8 1.5s-8.8-8.2-8.8-14.3l0-21.3 0-6.4 0-.3 0-4 0-48-48 0-48 0c-35.3 0-64-28.7-64-64L0 64C0 28.7 28.7 0 64 0L448 0c35.3 0 64 28.7 64 64l0 288c0 35.3-28.7 64-64 64l-138.7 0L208 492z"/>
+                                    </svg>
+                                    <span class="ms-2">Contact with us</span>
+                                </a>
+                            </li>
                             <li>
                                 <hr class="dropdown-divider">
                             </li>
+
                             <li>
                                 <a class="dropdown-item d-flex align-items-center fw-semibold"
                                    href="{% url 'users:logout' %}">
@@ -57,10 +102,9 @@
                                         <path fill-rule="evenodd"
                                               d="M.146 8.354a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L1.707 7.5H10.5a.5.5 0 0 1 0 1H1.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3z"/>
                                     </svg>
-                                    <span class="ms-2">Exit</span> <!-- Добавляем отступ слева для текста -->
+                                    <span class="ms-2">Exit</span>
                                 </a>
                             </li>
-
                         </ul>
                     </div>
 
@@ -76,6 +120,7 @@
                     </div>
                 {% endif %}
             </div>
+
             </dif>
         </div>
     </div>

@@ -19,7 +19,6 @@ class UserLoginForm(AuthenticationForm):
     password = forms.CharField(
         widget=forms.PasswordInput(attrs={
             'class': "form-control",
-            # 'id': "floatingPassword",
             'placeholder': "Password",
             'required': True,
         }),
@@ -30,67 +29,6 @@ class UserLoginForm(AuthenticationForm):
         model = User
         fields = ('username', 'password')
 
-
-# class UserRegistrationForm(forms.ModelForm):
-#     """
-#     A form that creates a user, with no privileges, from the given username and
-#     password.
-#     """
-#     email = forms.CharField(
-#         widget=forms.EmailInput(attrs={
-#             'type': "email",
-#             'class': "form-control",
-#             'placeholder': "email@email.com",
-#             'required': True,
-#             # 'autocomplete': 'email',
-#         }))
-#
-#     password = forms.CharField(
-#         widget=forms.PasswordInput(attrs={
-#             'class': "form-control",
-#             'placeholder': "Password",
-#             'required': True,
-#             'autocomplete': 'off',
-#         }),
-#         label='Password'
-#     )
-#
-#     class Meta:
-#         model = User
-#         # fields = ('username', 'email', 'password1', 'password2')
-#         fields = ('username', 'email', 'password')
-#
-#     def __init__(self, *args, **kwargs):
-#         super().__init__(*args, **kwargs)
-#         if self._meta.model.USERNAME_FIELD in self.fields:
-#             self.fields[self._meta.model.USERNAME_FIELD].widget.attrs[
-#                 "autofocus"
-#             ] = True
-#
-#     # def clean_password2(self):
-#     #     password = self.cleaned_data.get("password")
-#     #
-#     #     return password
-#
-#     def _post_clean(self):
-#         super()._post_clean()
-#         # Validate the password after self.instance is updated with form data
-#         # by super().
-#         password = self.cleaned_data.get("password")
-#         if password:
-#             try:
-#                 password_validation.validate_password(password, self.instance)
-#             except ValidationError as error:
-#                 self.add_error("password", error)
-#
-#     def save(self, commit=True):
-#         user = super().save(commit=False)
-#         user.set_password(self.cleaned_data["password"])
-#         if commit:
-#             user.save()
-#             if hasattr(self, "save_m2m"):
-#                 self.save_m2m()
-#         return user
 
 
 class UserRegistrationForm(UserCreationForm):
@@ -137,32 +75,34 @@ class UserRegistrationForm(UserCreationForm):
 
 
 class UserProfileForm(UserChangeForm):
-    # username = forms.CharField(
-    #     widget=forms.TextInput(attrs={
-    #         'type': "username",
-    #         'class': "form-control",
-    #         'required': True,
-    #         'autocomplete': 'new-username',
-    #     }))
     email = forms.CharField(
+        required=False,
         widget=forms.EmailInput(attrs={
             'type': "email",
             'class': "form-control",
-            'required': True,
             # 'autocomplete': 'email',
         }))
 
     password = forms.CharField(
+        required=False,
         widget=forms.PasswordInput(attrs={
             'class': "form-control",
-            'required': True,
             'autocomplete': 'off',
         }),
         label='Password'
     )
+
+    new_password = forms.CharField(
+        required=False,
+        widget=forms.PasswordInput(attrs={
+            'class': "form-control",
+            'autocomplete': 'off',
+        }),
+        label='New password'
+    )
     class Meta:
         model = User
-        fields = ('email', 'password')
+        fields = ('email', 'password', 'new_password')
 
 
 class TelegramUserForm(forms.Form):

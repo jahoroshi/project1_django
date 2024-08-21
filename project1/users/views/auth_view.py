@@ -18,7 +18,7 @@ def login(request):
                 auth.login(request, user)
                 return HttpResponseRedirect(reverse('decks_list'))
         else:
-            messages.error(request, 'There was an error with your registration.')
+            messages.error(request, 'There was an error with your authentication. Please try again.')
     else:
         form = UserLoginForm()
 
@@ -31,10 +31,14 @@ def registration(request):
         form = UserRegistrationForm(data=request.POST)
         if form.is_valid():
             form.save()
-            messages.success(request, 'Registration successful! Welcome to our community.')
-            return HttpResponseRedirect(reverse('users:login'))
+            username = form.cleaned_data.get('email')
+            password = form.cleaned_data.get('password1')
+            user = auth.authenticate(username=username, password=password)
+            if user:
+                auth.login(request, user)
+                return HttpResponseRedirect(reverse('decks_list'))
         else:
-            messages.error(request, 'There was an error with your registration.')
+            messages.error(request, 'There was an error with your registration. Please try again.')
     form = UserRegistrationForm()
     context = {'title': 'Registration', 'form': form}
     return render(request, 'users/user_auth_base.html', context)
@@ -45,14 +49,35 @@ def profile(request):
     if request.method == 'POST':
         form = UserProfileForm(instance=request.user, data=request.POST)
         if form.is_valid():
-            form.save()
-            messages.success(request, 'Data was successfully changed.')
+            user = form.save(commit=False)
+            new_password = form.cleaned_data.get('new_password')
+            current_password = form.cleaned_data.get('password')
+            password_is_valid = None
+            if current_password:
+                password_is_valid = user.check_password(current_password)
+                if password_is_valid:
+                    if new_password:
+                        user.set_password(new_password)
+                        user.save()
+                        user = auth.authenticate(username=user.email, password=new_password)
+                        messages.success(request, 'Data was successfully changed.')
+
+                else:
+                    messages.error(request, 'The current password is incorrect.')
+            else:
+                if 'email' in form.changed_data:
+                    user.save()
+                    messages.success(request, 'Data was successfully changed.')
+            if password_is_valid:
+                auth.login(request, user)
+            else:
+                auth.login(request, request.user)
             return HttpResponseRedirect(reverse('users:profile'))
         else:
             print(form.errors)
     form = UserProfileForm(instance=request.user)
     context = {'title': 'Profile', 'form': form}
-    return render(request, 'users/user_auth_base.html', context)
+    return render(request, 'users/profile.html', context)
 
 
 def logout(request):
