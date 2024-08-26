@@ -30,6 +30,23 @@ class UserLoginForm(AuthenticationForm):
         fields = ('username', 'password')
 
 
+class UserFirstStepLoginForm(forms.Form):
+    email = forms.EmailField(
+        required=True,
+        widget=forms.EmailInput(attrs={
+        'class': 'form-control form-control-lg',
+        'placeholder': 'Email',
+    }))
+
+class UserSecondStepLoginForm(forms.Form):
+    password = forms.CharField(
+        required=True,
+        widget=forms.PasswordInput(attrs={
+        'class': 'form-control form-control-lg',
+        'placeholder': 'Password',
+        'required': True,
+    }))
+
 
 class UserRegistrationForm(UserCreationForm):
     # username = forms.CharField(
@@ -72,6 +89,30 @@ class UserRegistrationForm(UserCreationForm):
         fields = ('email', 'password1')
 
 
+class EmptyUserProfileForm(UserChangeForm):
+    email = forms.CharField(
+        required=True,
+        widget=forms.EmailInput(attrs={
+            'type': "email",
+            'class': "form-control",
+            # 'autocomplete': 'email',
+        }),
+        label='Enter Your Email'
+    )
+
+    first_password = forms.CharField(
+        required=True,
+        widget=forms.PasswordInput(attrs={
+            'class': "form-control",
+            'autocomplete': 'off',
+        }),
+        label='Enter Your Password'
+    )
+
+    class Meta:
+        model = User
+        fields = ('email', 'first_password')
+
 
 
 class UserProfileForm(UserChangeForm):
@@ -81,15 +122,17 @@ class UserProfileForm(UserChangeForm):
             'type': "email",
             'class': "form-control",
             # 'autocomplete': 'email',
-        }))
+        }),
+        label='Your Email'
+    )
 
-    password = forms.CharField(
+    current_password = forms.CharField(
         required=False,
         widget=forms.PasswordInput(attrs={
             'class': "form-control",
             'autocomplete': 'off',
         }),
-        label='Password'
+        label='Current Password'
     )
 
     new_password = forms.CharField(
@@ -100,10 +143,28 @@ class UserProfileForm(UserChangeForm):
         }),
         label='New password'
     )
+
+
     class Meta:
         model = User
-        fields = ('email', 'password', 'new_password')
+        fields = ('email', 'current_password', 'new_password')
 
+    def clean_current_password(self):
+        password = self.cleaned_data.get('current_password')
+        if password:
+            if not self.instance.check_password(password):
+                raise forms.ValidationError('The current password is incorrect.')
+        return password
+
+class DeleteUserForm(forms.Form):
+    current_password = forms.CharField(
+        required=False,
+        widget=forms.PasswordInput(attrs={
+            'class': "form-control",
+            'autocomplete': 'off',
+        }),
+        label='Current Password'
+    )
 
 class TelegramUserForm(forms.Form):
     id = forms.IntegerField()

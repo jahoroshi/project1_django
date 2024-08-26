@@ -27,31 +27,31 @@
 {% if stats_box.0.next_review_date %}
 
     <div class="row">
-        <div class="col-6">
+        <div class="col-12 col-md-6 countdown-negative-margin">
             <div class="alert alert-light" role="alert">
                 <div class="row">
-                    <h5 class="countdown-title alert-heading">Cards will be available in:</h5>
+                    <h5 class="countdown-title alert-heading text-nowrap">Cards will be available in:</h5>
                 </div>
                 <div class="row justify-content-center align-items-center" id="countdown">
-                    <div class="col-3">
+                    <div class="col-6 col-sm-3">
                         <div class="countdown-item text-center">
                             <div id="days" class="countdown-number text-bg-light"></div>
                             <div class="countdown-label">days</div>
                         </div>
                     </div>
-                    <div class="col-3">
+                    <div class="col-6 col-sm-3">
                         <div class="countdown-item text-center">
                             <div id="hours" class="countdown-number text-bg-light"></div>
                             <div class="countdown-label">hours</div>
                         </div>
                     </div>
-                    <div class="col-3">
+                    <div class="col-6 col-sm-3">
                         <div class="countdown-item text-center">
                             <div id="minutes" class="countdown-number text-bg-light"></div>
                             <div class="countdown-label">minutes</div>
                         </div>
                     </div>
-                    <div class="col-3">
+                    <div class="col-6 col-sm-3">
                         <div class="countdown-item text-center">
                             <div id="seconds" class="countdown-number text-bg-primary"></div>
                             <div class="countdown-label">seconds</div>
@@ -60,7 +60,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-6">
+        <div class="col-6 d-none d-md-block">
             <div class="row">
                 <div class="col">
                     <div class="spinner-border" style="width: 3rem; height: 3rem;" role="status"></div>

@@ -24,7 +24,7 @@ class DecksListView(LoginRequiredMixin, ListView):
         queryset = Categories.objects.filter(user=user).annotate(
             cards_count=Count(
                 Case(
-                    When(~Q(mappings__study_mode='known'), then=1),
+                    When(~Q(mappings__isnull=True) & ~Q(mappings__study_mode='known'), then=1),
                     output_field=IntegerField()
                 )
             ),

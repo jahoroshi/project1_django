@@ -2,45 +2,158 @@
 
 {% block content %}
     <div class="row">
-        <div class="col-12">
+        <div class="col-12 col-md-8 mx-auto">
             <div class="content">
-                {% include 'users/messages.html' with error_message=form.non_field_errors %}
+                {% include 'users/messages.html' with error_message=form.non_field_errors extra_tag='profile'%}
+                {% if page_mode == 'profile' %}
+                    {% if has_credentials %}
+                        <div class="row">
+                            <div class="col">
+                                <div class="content-block shadow-sm bg-body-tertiary text-center">
+                                    <div class="row">
+                                        <div class="col-12 col-md-10 col-sm-9 mx-auto">
+                                            <div class="d-flex flex-column">
+                                                <h2>Profile</h2>
+                                                <form method="post">
+                                                    {% csrf_token %}
+                                                    <div class="form-floating mb-3 mt-2">
+                                                        {{ form.username }}
+                                                        <label for="{{ form.username.id_for_label }}">{{ form.username.label }}</label>
+                                                    </div>
 
-                <div class="row">
-                    <div class="col">
-                        <div class="content-block shadow-sm bg-body-tertiary text-center">
-                            <div class="d-flex flex-column  mx-auto w-50">
-                                <h2>Profile</h2>
-                                <form method="post">
-                                    {% csrf_token %}
-                                    <div class="form-floating mb-3 mt-2">
-                                        {{ form.username }}
-                                        <label for="{{ form.username.id_for_label }}">{{ form.username.label }}</label>
+                                                    <div class="form-floating mb-3 mt-2">
+                                                        {{ form.email }}
+                                                        <label for="{{ form.email.id_for_label }}">{{ form.email.label }}</label>
+                                                    </div>
+
+                                                    <div class="form-floating mb-3">
+                                                        {{ form.current_password }}
+                                                        <label for="{{ form.current_password.id_for_label }}">{{ form.current_password.label }}</label>
+                                                    </div>
+
+                                                    <div class="form-floating mb-3">
+                                                        {{ form.new_password }}
+                                                        <label for="{{ form.new_password.id_for_label }}">{{ form.new_password.label }}</label>
+                                                    </div>
+
+
+                                                    <button type="submit" class="btn btn-warning w-100 mb-4 btn-sm">Change Profile
+                                                    </button>
+                                                </form>
+
+                                            </div>
+                                        </div>
                                     </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="row">
+                            <div class="col">
+                                <div class="content-block shadow-sm bg-body-tertiary text-center">
+                                    <div class="row">
+                                        <div class="col-12 col-md-10 col-sm-9 mx-auto">
+                                            <div class="d-flex flex-column">
+                                                <h2>Profile</h2>
+                                                <form method="post">
+                                                    {% csrf_token %}
 
-                                    <div class="form-floating mb-3 mt-2">
-                                        {{ form.email }}
-                                        <label for="{{ form.email.id_for_label }}">{{ form.email.label }}</label>
+                                                    <div class="form-floating mb-3 mt-2">
+                                                        {{ form.email }}
+                                                        <label for="{{ form.email.id_for_label }}">{{ form.email.label }}</label>
+                                                    </div>
+
+                                                    <div class="form-floating mb-3">
+                                                        {{ form.first_password }}
+                                                        <label for="{{ form.first_password.id_for_label }}">{{ form.first_password.label }}</label>
+                                                    </div>
+
+                                                    <button type="submit" class="btn btn-warning w-100 mb-4 btn-lg">Continue</button>
+                                                </form>
+
+                                            </div>
+                                        </div>
                                     </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
 
-                                    <div class="form-floating mb-3">
-                                        {{ form.password }}
-                                        <label for="{{ form.password.id_for_label }}">{{ form.password.label }}</label>
+
+                    <div class="row">
+                        <div class="col">
+                            <div class="content-block shadow-sm bg-body-tertiary text-center mt-2">
+                                <div class="row">
+                                    <div class="col-12 col-md-10 col-sm-9 mx-auto">
+                                        <div class="d-flex flex-column my-3 px-2 px-sm-0">
+                                            {% if user.telegram_id %}
+                                                <a class="btn btn-primary telegram-button-navbar  w-100 text-nowrap btn-sm"
+                                                   href="https://t.me/Anki4bot?start=some_parameter">
+                                                    <i></i>Open Telegram AnkiChatBot
+                                                </a>
+                                            {% else %}
+                                                <a class="btn btn-primary telegram-button-navbar  w-100 text-nowrap btn-sm"
+                                                   href="/users/telegram-connect/?id=7390715192&first_name=Platon&last_name=Cross&username=platon_cross&auth_date=1723746975&hash=e1a2cd49dd85aa71ce5edf003f3a358103fcecca0bb7e15dec78c7a7bc3e8fa4">
+                                                    <i></i>Connect Telegram Account
+                                                </a>
+                                            {% endif %}
+                                        </div>
                                     </div>
-                                    
-                                      <div class="form-floating mb-3">
-                                        {{ form.new_password }}
-                                        <label for="{{ form.new_password.id_for_label }}">{{ form.new_password.label }}</label>
-                                    </div>
-
-
-                                    <button type="submit" class="btn btn-warning">ok</button>
-                                </form>
-
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
+
+                    <div class="row">
+                        <div class="col">
+                            <div class=" text-center mt-3" style="margin-bottom: -10px !important;">
+                                <div class="row">
+                                    <div class="col-12 col-md-10 col-sm-9 mx-auto">
+                                        <a href="/users/delete/" class="btn btn-outline-light btn-sm"
+                                           style="border: None">Delete
+                                            account</a>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                {% elif page_mode == 'delete_account' %}
+                    <div class="row">
+                        <div class="col">
+                            <div class="content-block shadow-sm bg-body-tertiary text-center">
+                                <div class="row">
+                                    <div class="col-12 col-md-10 col-sm-9 mx-auto">
+                                        <div class="d-flex flex-column">
+                                            <h2>Confirm Account Deletion</h2>
+                                            <form method="post">
+                                                {% csrf_token %}
+
+
+                                                <div class="form-floating mb-3">
+                                                    {{ form.current_password }}
+                                                    <label for="{{ form.current_password.id_for_label }}">{{ form.current_password.label }}</label>
+                                                </div>
+
+
+                                                <div class="d-flex justify-content-center">
+                                                    <button type="submit" class="btn btn-outline-danger me-2">Delete
+                                                        Account
+                                                    </button>
+                                                    <a href="/users/profile/" class="btn btn-warning">Cancel</a>
+                                                </div>
+
+
+                                            </form>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
             </div>
         </div>
     </div>

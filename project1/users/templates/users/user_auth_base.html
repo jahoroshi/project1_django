@@ -4,16 +4,17 @@
     <div class="row">
         <div class="col-12 col-md-8 mx-auto">
             <div class="content">
-                {% include 'users/messages.html' with error_message=form.errors messages=messages %}
+                {% include 'users/messages.html' with error_message=form.errors messages=messages extra_tag='auth' %}
                 <div class="content-block shadow-sm bg-body-tertiary text-center">
                     <div class="row">
                         <div class="col-12 col-md-10 col-sm-9 mx-auto">
                             <div class="d-flex flex-column">
-                                <h2>{{ title }}</h2>
-                                {% if title == 'Registration' %}
+                                {% if page_mode == 'registration' %}
+                                    <h2>Registration</h2>
+
                                     <form method="post">
                                     {% csrf_token %}
-                                   
+
 
                                     <div class="form-floating mb-3 mt-2">
                                         {{ form.email }}
@@ -26,7 +27,8 @@
                                     </div>
 
 
-                                {% elif title == 'Login' %}
+                                {% elif page_mode == 'login' %}
+                                    <h2>Login</h2>
                                     <form method="post">
                                     {% csrf_token %}
                                     <div class="form-floating mb-3 mt-2">
@@ -59,18 +61,18 @@
 
 
                                 {% endif %}
-                                <button type="submit" class="btn btn-warning w-100">Continue</button>
+                                <button type="submit" class="btn-continue-login">Continue</button>
                                 </form>
                             </div>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col">
-                            {% if title == 'Registration' %}
+                            {% if page_mode == 'registration' %}
                                 <p class="other-page mt-4 mb-0">Already have an account?
                                     <a class="other-page-link" href="/users/login/">Sign in</a>
                                 </p>
-                            {% elif title == 'Login' %}
+                            {% elif page_mode == 'login' %}
                                 <p class="other-page mt-4 mb-0">Don't have an account?
                                     <a class="other-page-link" href="/users/registration/">Sign up</a>
                                 </p>
@@ -97,7 +99,7 @@
 
                                     <div class="d-flex flex-column">
 
-                                        <a href="http://localhost/users/telegram/callback/?id=7390715192&first_name=Platon&last_name=Cross&username=platon_cross&auth_date=1723746975&hash=e1a2cd49dd85aa71ce5edf003f3a358103fcecca0bb7e15dec78c7a7bc3e8fa4"
+                                        <a href="/users/telegram/callback/?id=7390715192&first_name=Platon&last_name=Cross&username=platon_cross&auth_date=1723746975&hash=e1a2cd49dd85aa71ce5edf003f3a358103fcecca0bb7e15dec78c7a7bc3e8fa4"
                                            class="telegram-button">
                                             <i></i>Войти через Telegram
                                         </a>

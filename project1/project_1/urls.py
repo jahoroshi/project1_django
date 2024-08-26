@@ -32,7 +32,8 @@ urlpatterns = [
     path('api/v1/deck/', include("deckhub.urls")),
     path('api/v1/study/', include("cardmode.urls")),
     path('api/v1/users/', include("users.urls", namespace='users-api')),
-    path('', include("deckhub.urls")),
+    path('', include("users.urls")),
+    # path('', include("deckhub.urls")),
 
               ] + debug_toolbar_urls()
 

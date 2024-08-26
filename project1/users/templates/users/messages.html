@@ -1,6 +1,8 @@
 {% if messages %}
     <div class="messages">
         {% for message in messages %}
+            {% if extra_tag in message.tags %}
+
             {% if 'error' in message.tags %}
                 <div class="bd-callout bd-callout-warning mt-1 rounded-4">
             {% else %}
@@ -8,6 +10,7 @@
             {% endif %}
                 {{ message }}
             </div>
+            {% endif %}
         {% endfor %}
     </div>
 {% endif %}

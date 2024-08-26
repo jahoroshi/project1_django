@@ -1,10 +1,14 @@
 from django.contrib import auth
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import render, HttpResponseRedirect
+from django.contrib.auth.hashers import make_password
+from django.shortcuts import render, HttpResponseRedirect, redirect
 from django.urls import reverse
 
-from users.forms import UserLoginForm, UserRegistrationForm, UserProfileForm, TelegramUserForm
+from cards.models import Categories
+from users.forms import UserLoginForm, UserRegistrationForm, UserProfileForm, TelegramUserForm, DeleteUserForm, \
+    EmptyUserProfileForm
+from users.models import User
 
 
 def login(request):
@@ -13,16 +17,15 @@ def login(request):
         if form.is_valid():
             username = request.POST['username']
             password = request.POST['password']
-            user = auth.authenticate(username=username, password=password)
+            user = auth.authenticate(email=username, password=password)
             if user:
                 auth.login(request, user)
                 return HttpResponseRedirect(reverse('decks_list'))
         else:
-            messages.error(request, 'There was an error with your authentication. Please try again.')
-    else:
-        form = UserLoginForm()
+            messages.error(request, 'There was an error with your authentication. Please try again.', extra_tags='auth')
 
-    context = {'title': 'Login', 'form': form}
+    form = UserLoginForm()
+    context = {'form': form, 'page_mode': 'login'}
     return render(request, 'users/user_auth_base.html', context)
 
 
@@ -31,52 +34,72 @@ def registration(request):
         form = UserRegistrationForm(data=request.POST)
         if form.is_valid():
             form.save()
-            username = form.cleaned_data.get('email')
+            email = form.cleaned_data.get('email')
             password = form.cleaned_data.get('password1')
-            user = auth.authenticate(username=username, password=password)
+            user = auth.authenticate(email=email, password=password)
             if user:
                 auth.login(request, user)
                 return HttpResponseRedirect(reverse('decks_list'))
         else:
-            messages.error(request, 'There was an error with your registration. Please try again.')
+            messages.error(request, 'There was an error with your registration. Please try again.', extra_tags='auth')
     form = UserRegistrationForm()
-    context = {'title': 'Registration', 'form': form}
+    context = {'form': form, 'page_mode': 'registration'}
     return render(request, 'users/user_auth_base.html', context)
 
 
 @login_required
 def profile(request):
+    has_credentials = True if request.user.password != 'knowledge' else False
     if request.method == 'POST':
-        form = UserProfileForm(instance=request.user, data=request.POST)
+        if has_credentials:
+            form = UserProfileForm(instance=request.user, data=request.POST)
+        else:
+            form = EmptyUserProfileForm(instance=request.user, data=request.POST)
         if form.is_valid():
             user = form.save(commit=False)
             new_password = form.cleaned_data.get('new_password')
-            current_password = form.cleaned_data.get('password')
-            password_is_valid = None
-            if current_password:
-                password_is_valid = user.check_password(current_password)
-                if password_is_valid:
-                    if new_password:
-                        user.set_password(new_password)
-                        user.save()
-                        user = auth.authenticate(username=user.email, password=new_password)
-                        messages.success(request, 'Data was successfully changed.')
-
-                else:
-                    messages.error(request, 'The current password is incorrect.')
-            else:
+            current_password = form.cleaned_data.get('current_password')
+            first_password = form.cleaned_data.get('first_password')
+            if current_password and new_password:
+                user.set_password(new_password)
+                user.save()
                 if 'email' in form.changed_data:
-                    user.save()
-                    messages.success(request, 'Data was successfully changed.')
-            if password_is_valid:
+                    messages.success(request, 'Email was successfully changed.', extra_tags='profile')
+                messages.success(request, 'Password was successfully changed.', extra_tags='profile')
                 auth.login(request, user)
-            else:
-                auth.login(request, request.user)
+            elif 'email' in form.changed_data:
+                if has_credentials:
+                    text = 'Email was successfully changed.'
+                else:
+                    text = 'Credentials have been successfully added.'
+                    user.set_password(first_password)
+                messages.success(request, text)
+                user.save()
+                auth.login(request, user)
             return HttpResponseRedirect(reverse('users:profile'))
         else:
-            print(form.errors)
-    form = UserProfileForm(instance=request.user)
-    context = {'title': 'Profile', 'form': form}
+            messages.error(request, '<br>'.join([' '.join(error) for error in form.errors.values()]), extra_tags='profile')
+    form = UserProfileForm(instance=request.user) if has_credentials else EmptyUserProfileForm()
+    context = {'form': form, 'page_mode': 'profile', 'has_credentials': has_credentials}
+    return render(request, 'users/profile.html', context)
+
+@login_required
+def delete_user(request):
+    if request.method == 'POST':
+        form = DeleteUserForm(data=request.POST)
+        if form.is_valid():
+            current_password = form.cleaned_data.get('current_password')
+            if request.user.check_password(current_password):
+                request.user.delete()
+                messages.success(request, 'Account was successfully deleted.', extra_tags='profile')
+                form = UserRegistrationForm()
+                # context = {'form': form, 'page_mode': 'registration'}
+                return redirect('decks_list')
+            else:
+                messages.error(request, 'The current password is incorrect.', extra_tags='profile')
+
+    form = DeleteUserForm()
+    context = {'form': form, 'page_mode': 'delete_account'}
     return render(request, 'users/profile.html', context)
 
 
@@ -89,8 +112,33 @@ def telegram_auth(request):
     if request.method == 'GET':
         form = TelegramUserForm(data=request.GET)
         if form.is_valid():
-            id = form.cleaned_data['id']
-            username = form.cleaned_data['username']
+            telegram_id = form.cleaned_data['id']
+            user, created = User.objects.get_or_create(telegram_id=telegram_id)
+            auth.login(request, user)
+            return HttpResponseRedirect(reverse('decks_list'))
 
-    return HttpResponseRedirect(request.path)
+    form = UserLoginForm()
+    context = {'form': form, 'page_mode': 'login'}
+    return render(request, 'users/user_auth_base.html', context)
 
+@login_required
+def telegram_connect(request):
+    if request.method == 'GET':
+        form = TelegramUserForm(data=request.GET)
+        if form.is_valid():
+            tg_user = form.cleaned_data['id']
+            current_user = request.user
+            user = User.objects.filter(telegram_id=tg_user).first()
+            if user:
+                Categories.objects.filter(user=user).update(user=current_user)
+                user.delete()
+            else:
+                current_user.telegram_id = tg_user
+                current_user.save()
+            messages.success(request, '🎉 Congratulations! Your Telegram account has been successfully linked to your current account. You can now study flashcards both on this web version and through the Telegram bot. To start the bot, click the AnkiChatBot button.',  extra_tags='profile')
+        else:
+            messages.error(request, 'We’re experiencing an issue with Telegram’s server. Please try again later.', extra_tags='profile')
+
+    form = UserProfileForm(instance=request.user)
+    context = {'form': form, 'page_mode': 'profile', 'has_credentials': True}
+    return render(request, 'users/profile.html', context)

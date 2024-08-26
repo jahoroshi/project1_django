@@ -1,3 +1,5 @@
+import time
+
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
@@ -18,7 +20,7 @@ class User(AbstractUser):
         return self.email
     def save(self, *args, **kwargs):
         if not self.email:
-            self.email = f'{self.telegram_id}@ankichat.com'
+            self.email = f'{self.telegram_id}_{int(time.time())}@ankichat.com'
         return super().save(*args, **kwargs)
 
 

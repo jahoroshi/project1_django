@@ -7,7 +7,7 @@
 {% block content %}
     <div class="row">
         <div class="col">
-            <h2 class="pb-2  mb-2 border-bottom display-3 text-center text-dark">
+            <h2 class="pb-2 mb-2 border-bottom display-3 text-center text-dark">
                 {{ deck_name }}
             </h2>
         </div>
@@ -21,12 +21,32 @@
         </div>
     </div>
 
-
-    <div class="content p-sm-4 p-3 ">
-        {% for card in object_list %}
-            <div class="content-block mb-sm-3 mb-2">
-                {% include "cards/card.html" %}
-            </div>
-        {% endfor %}
+<div class="content p-sm-4 p-3">
+    <div class="scrollable-container my-2 ms-1" style="max-height: 600px; overflow-y: auto;">
+        <div id="contentInner" class="">
+        {% if object_list %}
+            {% for card in object_list %}
+                <div class="content-block mb-sm-3 mb-2">
+                    {% include "cards/card.html" %}
+                </div>
+            {% endfor %}
+        {% else %}
+                    <h5 class="text-center my-auto">📂💫☁️  This deck is empty. Please add new cards to get started.</h5>
+        {% endif %}
+        </div>
     </div>
+</div>
+
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        var scrollableContainer = document.querySelector('.scrollable-container');
+        var contentInner = document.getElementById('contentInner');
+
+        if (scrollableContainer.scrollHeight > scrollableContainer.clientHeight) {
+            contentInner.classList.add('me-2');
+        }
+    });
+</script>
 {% endblock content %}
+

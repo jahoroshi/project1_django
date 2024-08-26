@@ -1,0 +1,539 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AnkiChat</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap"
+          rel="stylesheet">
+
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://getbootstrap.su/docs/5.3/assets/css/docs.css" rel="stylesheet">
+    <style>
+        body, html {
+            height: 100%;
+            margin: 0;
+            font-family: "Open Sans", sans-serif;
+            font-optical-sizing: auto;
+            font-weight: 400;
+            font-style: normal;
+            font-variation-settings: "wdth" 100;
+            overflow-x: hidden;
+            min-width: 380px;
+        }
+
+        .roboto-thin {
+            font-family: "Roboto", sans-serif;
+            font-weight: 100;
+            font-style: normal;
+        }
+
+        .roboto-light {
+            font-family: "Roboto", sans-serif;
+            font-weight: 300;
+            font-style: normal;
+        }
+
+        .roboto-regular {
+            font-family: "Roboto", sans-serif;
+            font-weight: 400;
+            font-style: normal;
+        }
+
+        .roboto-medium {
+            font-family: "Roboto", sans-serif;
+            font-weight: 500;
+            font-style: normal;
+        }
+
+        .roboto-bold {
+            font-family: "Roboto", sans-serif !important;
+            font-weight: 700 !important;
+            font-style: normal !important;
+        }
+
+        .roboto-black {
+            font-family: "Roboto", sans-serif;
+            font-weight: 900;
+            font-style: normal;
+        }
+
+        .roboto-thin-italic {
+            font-family: "Roboto", sans-serif;
+            font-weight: 100;
+            font-style: italic;
+        }
+
+        .roboto-light-italic {
+            font-family: "Roboto", sans-serif;
+            font-weight: 300;
+            font-style: italic;
+        }
+
+        .roboto-regular-italic {
+            font-family: "Roboto", sans-serif;
+            font-weight: 400;
+            font-style: italic;
+        }
+
+        .roboto-medium-italic {
+            font-family: "Roboto", sans-serif;
+            font-weight: 500;
+            font-style: italic;
+        }
+
+        .roboto-bold-italic {
+            font-family: "Roboto", sans-serif;
+            font-weight: 700;
+            font-style: italic;
+        }
+
+        .roboto-black-italic {
+            font-family: "Roboto", sans-serif;
+            font-weight: 900;
+            font-style: italic;
+        }
+
+        .left-section {
+            background-color: #dee2e6;
+            color: rgb(0, 0, 0);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: left;
+            padding: 20px;
+            position: relative;
+            background-image: url({% static 'background.jpg' %});
+            background-size: cover;
+            background-position: center;
+            background-repeat: repeat;
+        }
+
+        .right-section {
+            background-color: rgb(33, 37, 41);
+            color: #dee2e6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 30px;
+        }
+
+        .brand-logo {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #000000;
+            width: 100%;
+            text-align: left;
+        }
+
+        .text-content {
+            margin-top: 50px;
+            display: flex;
+            flex-direction: column;
+            width: 50%;
+            border-radius: 10px;
+            justify-content: flex-start;
+            max-height: 500px;
+            min-height: 458px;
+            min-width: 550px;
+        }
+
+        @media (max-width: 576px) {
+            .text-content {
+                width: 100%;
+                min-width: 380px;
+                min-height: 500px;
+            }
+        }
+
+        .text-block {
+            width: 75%;
+            background-color: #ffffff;
+            color: rgb(0, 0, 0);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        .text-block h2 {
+            font-size: 1.25rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .form-container {
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .form-control {
+            border-radius: 25px;
+            margin-bottom: 20px;
+        }
+
+        .btn-continue {
+            border-radius: 25px;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+        .separator {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .separator hr {
+            flex-grow: 1;
+            border: none;
+            border-top: 1px solid #fff;
+        }
+
+        .separator span {
+            margin: 0 10px;
+            color: #fff;
+            font-weight: bold;
+        }
+
+        .back-link {
+            display: block;
+            margin-top: 10px;
+            font-size: 0.9rem;
+            color: #d4b3ff;
+            text-decoration: none;
+        }
+
+        .back-link:hover {
+            text-decoration: none;
+        }
+
+        .email-container {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .email-field {
+            background-color: rgba(0, 0, 0, 0) !important;
+            color: #666;
+            cursor: not-allowed;
+            border: 2px solid #736cfc !important;
+        }
+
+        .carousel-block {
+        }
+
+        .color1 {
+            color: #6f42c1;
+        }
+
+        .color2 {
+            color: #c6303e;
+        }
+
+        .color3 {
+            color: #7FB5B5;
+        }
+
+        .color4 {
+            color: #5D9B9B;
+        }
+
+        .color5 {
+            color: #A18594;
+        }
+
+        .color6 {
+            color: #77DD77;
+        }
+
+        .color7 {
+            color: #FF7514;
+        }
+
+        .color8 {
+            color: #FF8C69;
+        }
+
+        .color9 {
+            color: #FF9BAA;
+        }
+
+        .color10 {
+            color: #FFB28B;
+        }
+
+        .color11 {
+            color: #FCE883;
+        }
+
+        .color12 {
+            color: #BEBD7F;
+        }
+
+        .color13 {
+            color: #C6DF90;
+        }
+
+        .color14 {
+            color: #99FF99;
+        }
+
+        .color15 {
+            color: #AFDAFC;
+        }
+
+        .color16 {
+            color: #E6E6FA;
+        }
+
+        .color17 {
+            color: #217074;
+        }
+
+        .color18 {
+            color: #37745B;
+        }
+
+        .color19 {
+            color: #8B9D77;
+        }
+
+        .color20 {
+            color: #E7EAEF;
+        }
+
+        .color21 {
+            color: #EDC5AB;
+        }
+
+        .color22 {
+            color: #02315E;
+        }
+
+        .color23 {
+            color: #00457E;
+        }
+
+        .color24 {
+            color: #2F70AF;
+        }
+
+        .color25 {
+            color: #B9848C;
+        }
+
+        .color26 {
+            color: #806491;
+        }
+
+        .color27 {
+            color: #680003;
+        }
+
+        .color28 {
+            color: #BC0000;
+        }
+
+        .color29 {
+            color: #F5704A;
+        }
+
+        .color30 {
+            color: #EFB9AD;
+        }
+
+        .color31 {
+            color: #828D00;
+        }
+
+        .color32 {
+            color: #2C5D37;
+        }
+
+        .color33 {
+            color: #E3C515;
+        }
+
+        .color34 {
+            color: #EE51B1;
+        }
+
+        .color35 {
+            color: #A59CD3;
+        }
+
+        .color36 {
+            color: #4B2D9F;
+        }
+
+        .arrows button:focus {
+            outline: none;
+            box-shadow: none;
+        }
+
+        .arrows button {
+            transition: transform 0.2s ease;
+        }
+
+        .arrows button:hover:first-of-type {
+            transform: translateX(-4px);
+        }
+
+        .arrows button:hover:last-of-type {
+            transform: translateX(4px);
+        }
+    </style>
+</head><body>
+<div class="container-fluid h-100">
+    <div class="row h-100">
+        <div class="col-md-8 left-section">
+            <div class="brand-logo">
+                AnkiChat
+            </div>
+
+            <div class="text-content">
+                <div class="arrows d-flex justify-sm-content-end justify-content-center mb-3">
+                    <button class="btn p-0 border-0 mr-2" data-bs-target="#carouselExampleFade"
+                            data-bs-slide="prev" style="background: none;">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="40" height="40">
+                            <path fill="#828D00"
+                                  d="M512 256A256 256 0 1 0 0 256a256 256 0 1 0 512 0zM271 135c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9l-87 87 87 87c9.4 9.4 9.4 24.6 0 33.9s-24.6 9.4-33.9 0L167 273c-9.4-9.4-9.4-24.6 0-33.9L271 135z"/>
+                        </svg>
+                    </button>
+                    <button class="btn p-0 border-0 ml-2" data-bs-target="#carouselExampleFade"
+                            data-bs-slide="next" style="background: none;">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="40" height="40">
+                            <path fill="#806491"
+                                  d="M0 256a256 256 0 1 0 512 0A256 256 0 1 0 0 256zM241 377c-9.4 9.4-24.6 9.4-33.9 0s-9.4-24.6 0-33.9l87-87-87-87c-9.4-9.4-9.4-24.6 0-33.9s24.6-9.4 33.9 0L345 239c9.4 9.4 9.4 24.6 0 33.9L241 377z"/>
+                        </svg>
+                    </button>
+                </div>
+
+                <div class="carousel-block" style="background-color: #f0f8ff87; border-radius: 10px; padding: 10px;">
+
+                    <div id="carouselExampleFade" class="carousel carousel-dark slide" data-bs-ride="carousel">
+
+                        <div class="carousel-inner">
+                            <div class="carousel-item active">
+                                <div class="d-block">
+                                    <h1><span class="color25">Anki</span><span class="color26">Chat</span> — это твой
+                                        мощный инструмент для
+                                        суперэффективного
+                                        запоминания!</h1>
+                                    <p class="fs-5">Создавай флэшкарты, используй <span class="color17">интервальные повторения</span>
+                                        и сохраняй
+                                        знания на всю
+                                        жизнь!</p>
+                                    <p class="fs-5">Наша платформа доступна в <span
+                                            class="color31"><b>web-версии</b></span>, и в <span class="color24"><b>Telegram</b></span>
+                                        —
+                                        выбирай свой стиль и учись
+                                        по-настоящему эффективно.</p>
+
+                                </div>
+                            </div>
+                            <div class="carousel-item">
+                                <div class="d-block mt-0" style="color: #000000">
+                                    <h2>В <span class="color28 fs-1">Anki</span><span class="color22 fs-1">Chat</span> обучение
+                                        выходит за рамки обычного переворачивания карточек.</h2>
+                                    <h3 class="lh-4 mt-4">Мы предлагаем
+                                        целый арсенал инструментов, чтобы сделать процесс запоминания максимально
+                                        <span class="color28">эффективным</span> и <span
+                                                class="color31">интересным</span>.</h3>
+
+                                </div>
+                            </div>
+                            <div class="carousel-item">
+                                <div class="d-block">
+                                    <p class="fs-4 mb-0"><strong><span class="color31">Подсказка</span> от
+                                        ChatGPT:</strong></p>
+                                    <p class="fs-6 mb-3">Получите интеллектуальную помощь от AI.</p>
+
+                                    <p class="fs-4 mb-0"><strong><span class="color36">Выбор</span> из <span
+                                            class="color35">нескольких вариантов</span>:</strong></p>
+                                    <p class="fs-6 mb-3">Выбирайте правильный ответ из нескольких похожих слов.</p>
+
+                                    <p class="color26 fs-4 mb-0"><strong><span class="color31">Разбивка слова</span>
+                                        <span class="color33">на буквы</span>:</strong></p>
+                                    <p class="fs-6 mb-3">Соберите слово по буквам.</p>
+
+                                    <p class="color29 fs-4 mb-0"><strong><span class="color29">Показ слова</span> <span
+                                            class="color28">по буквам</span>:</strong></p>
+                                    <p class="fs-6 mb-0">Видите слово по одной букве за раз.</p>
+                                </div>
+
+
+                            </div>
+                            <div class="carousel-item">
+                                <div class="d-block ">
+                                    <h2 class="fw-bold"><span class="color36">Режимы</span> <span
+                                            class="color36">показа</span> <span
+                                            class="color34">карточек</span> <span class="color4">в AnkiChat:</span></h2>
+                                    <p class="fs-5"><strong><span class="color1">Текстовый</span> <span class="color2">показ</span>:</strong>
+                                        Читайте информацию на карточках.</p>
+                                    <p class="fs-5 mt-1"><strong><span class="color1">Звуковое</span> <span class="color2">воспроизведение:</span></strong>
+                                        Слушайте озвученные карточки для аудиального восприятия.</p>
+                                    <p class="fs-5 mb-0 mt-5"><span class="color23"><strong>Anki</strong></span><span class="color24"><strong>Chat</strong></span>
+                                        предоставляет все необходимое для того, чтобы процесс обучения был не только
+                                        эффективным, но и разнообразным.</p>
+
+
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <div class="col-md-4 right-section">
+            {% if not email %}
+                <div class="form-container">
+                    <h3 class="mb-4">Enter your email</h3>
+                    <form method="post">
+                        {% csrf_token %}
+                        {{ form.email }}
+                        <button type="submit" class="btn btn-primary btn-lg btn-continue">Continue</button>
+                    </form>
+                    <div class="separator">
+                        <hr>
+                        <span>OR</span>
+                        <hr>
+                    </div>
+                    <button type="button" class="btn btn-secondary btn-lg btn-continue">Continue with Telegram</button>
+                </div>
+            {% else %}
+                <div class="form-container">
+                    <h3 class="mb-4">Enter password</h3>
+                    <!-- Неактивное поле с email -->
+                    <div class="email-container">
+                        <input type="text" class="form-control form-control-lg email-field" value="{{ email }}"
+                               disabled>
+                    </div>
+                    <form method="post">
+                        {% csrf_token %}
+                        {{ form.password }}
+                        <button type="submit" class="btn btn-primary btn-lg btn-continue">Continue</button>
+                    </form>
+                    <a href="{% url 'users:home' %}" class="back-link">Back</a>
+                    <!-- Ссылка для возврата на предыдущий шаг -->
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+</body>
+</html>

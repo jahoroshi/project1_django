@@ -128,9 +128,16 @@ header, footer, section {
     padding: 0 0 70px 0;
 }
 
+@media (max-width: 576px) {
+    header, footer, section {
+        padding: 0;
+    }
+}
+
+
 body {
     background-color: #dee2e6;
-    min-width: 370px;
+    min-width: 380px;
 }
 
 .container {
@@ -187,7 +194,7 @@ article {
     font-size: 16px; /* Размер текста */
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.5); /* Внешняя тень */
     position: relative;
-    transition: background-color 0.3s, color 0.3s,
+    transition: background-color 0.3s, color 0.15s,
     box-shadow 0.3s; /* Плавный переход */
     text-align: center; /* Центрирование текста */
 }
@@ -393,7 +400,7 @@ article {
 .deck-name:hover {
     background-color: rgb(0 0 0 / 13%);
     color: #fff; /* Цвет текста при наведении */
-    padding-left: 3px;
+    padding-left: 1px;
     border-radius: 3px;
     box-shadow: -7px 0 0 rgb(0 0 0 / 13%);
 }
@@ -946,4 +953,56 @@ button.btn-hint[disabled]:hover {
     .custom-w-100-w-sm-75 {
         width: 100%;
     }
+}
+
+
+.scrollable-container {
+    max-height: 600px;
+    overflow-y: auto;
+}
+
+.scrollable-container::-webkit-scrollbar {
+    width: 8px;
+}
+
+.scrollable-container::-webkit-scrollbar-track {
+    background-color: #505051;
+    border-radius: 10px;
+    margin-top: 12px;
+    margin-bottom: 12px;
+
+}
+
+.scrollable-container::-webkit-scrollbar-thumb {
+    background-color: #343a40;
+    border-radius: 10px;
+    border: 2px solid rgba(248, 249, 250, 0.18);
+
+}
+
+
+
+.shadow-container {
+    /*box-shadow: inset 0px 0px 15px rgba(0, 0, 0, 0.3); !* Внутренняя тень для всего блока ссылок *!*/
+    /*padding: 10px; !* Добавление внутреннего отступа для содержимого *!*/
+    /*border-radius: 10px; !* Скругление углов для лучшего визуального эффекта *!*/
+    /*background-color: #0d6efd; !* Темный фон для контраста с белым текстом *!*/
+}
+
+
+.btn-continue-login {
+    width: 100%; /* Ширина кнопки */
+    height: 58px; /* Высота кнопки */
+    border-radius: 6.7px; /* Радиус углов кнопки */
+    background-color: #313d49; /* Цвет фона кнопки */
+    border: 1.5px solid #495057; /* Цвет границы кнопки */
+    color: #b8b8b8; /* Цвет текста на кнопке */
+    font-size: 16px; /* Размер шрифта текста */
+    cursor: pointer; /* Указатель при наведении на кнопку */
+    transition: border-color 0.3s ease; /* Плавное изменение цвета границы */
+}
+
+.btn-continue-login:hover {
+    border-color: #f3f3f3; /* Изменение цвета границы при наведении */
+    color: #f3f3f3;
 }

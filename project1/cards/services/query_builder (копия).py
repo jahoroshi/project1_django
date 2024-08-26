@@ -37,20 +37,11 @@ def cards_counter(queryset):
 
 def get_card_queryset(*args, **kwargs):
     study_mode = kwargs['study_mode']
-    slug = kwargs['slug']
-    cache_data = cache.get(slug)
-    if cache_data:
-        last_card_id = cache_data['card_id']
-        cards_count = cache_data['count']
-        exclude_conditions = Q(card_id=last_card_id) if cards_count > 1 else Q()
-    else:
-        exclude_conditions = Q()
-
     if study_mode.endswith('all'):
         study_mode, tg_id, _ = study_mode.split('-')
         conditions = Q(category__user__telegram_id=tg_id)
     else:
-        conditions = Q(category__slug=slug)
+        conditions = Q(category__slug=kwargs['slug'])
 
     if study_mode == 'new':
         conditions &= Q(study_mode='new')
@@ -58,7 +49,7 @@ def get_card_queryset(*args, **kwargs):
         conditions &= Q(study_mode='review') & (
                 Q(review_date__lt=timezone.now()) | Q(mem_rating__gt=0))
 
-    subquery1 = Mappings.objects.filter(conditions).exclude(exclude_conditions).order_by('-mem_rating').values('id')[:10]
+    subquery1 = Mappings.objects.filter(conditions).order_by('-mem_rating').values('id')[:10]
 
     ratings_count_dict = cards_counter(subquery1)
     cards_in_process = sum(ratings_count_dict.values())
@@ -72,22 +63,15 @@ def get_card_queryset(*args, **kwargs):
             .order_by('easiness', 'upd_date')
             .annotate(
                 front_side=F('card__side1'),
-                back_side=F('card__side2'),
-                count=Count('*')
+                back_side=F('card__side2')
             )
             .values(
                 'review_date', 'front_side', 'back_side',
-                'card_id', 'id', 'category__name', 'easiness',
-                'count',
+                'card__id', 'id', 'category__name', 'easiness'
             )
             .first() or {}
     )
-    if card:
-        data = {
-            'card_id': card.get('card_id'),
-            'count': card.get('count'),
-        }
-        cache.set(slug, data, timeout=300)
+
 
     ####
     my_debug(subquery1, card.get('id'))

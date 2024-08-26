@@ -32,16 +32,28 @@ from django.db.models import IntegerField
 
 from django.db.models import Q, Case, When, Count
 from django.utils import timezone
-
-now = timezone.now()
-current_time = timezone.now()
+from django.utils.timezone import now
 
 
 
-card = Cards.objects.annotate(
-    front_side=F('side1')
-).values(
-    'front_side', 'audio', 'id'
-).get(mappings__id=2493)
+user = User.objects.get(id=155)
+queryset = Categories.objects.filter(user=user).annotate(
+            cards_count=Count(
+                Case(
+                    When(~Q(mappings__isnull=True) & ~Q(mappings__study_mode='known'), then=1),
+                    output_field=IntegerField()
+                )
+            ),
+            reviews_count=Count(
+                Case(
+                    When(
+                        mappings__review_date__lte=now().date(),
+                        then=1
+                    ),
+                    output_field=IntegerField(),
+                )
+            )
+        )
 
-print(card)
+for i in queryset:
+    print(i.cards_count)
