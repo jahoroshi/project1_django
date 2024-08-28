@@ -1,26 +1,16 @@
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
+from django.http import HttpResponse
+from django.shortcuts import get_object_or_404
+from django.urls import reverse
 from rest_framework import status
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from cards.models import Cards, Mappings
-from users.models import TelegramUser, User
-
-from django.db.models import Q, Subquery, Case, When, F, CharField, Count
-
-from django.shortcuts import get_object_or_404
-from django.http import HttpResponse
-from django.urls import reverse
-from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
-import logging
-from django.db import models
-
-
-
-
 from cards.services.query_builder import get_card_queryset
-from cardmode.permissions import IsOwner
+from open_ai.views import chatgpt_client
 from speech.views import synthesize_speech
+from users.models import User
 
 
 class GetCardAPIView(APIView):
@@ -37,8 +27,6 @@ class GetCardAPIView(APIView):
         study_mode = kwargs.get('mode')
         card, ratings_count = get_card_queryset(slug=slug, study_mode=study_mode)
         print(ratings_count)
-
-
 
         data = {
             'front_side': card.get('front_side'),
@@ -84,8 +72,6 @@ class GetStartConfigAPI(APIView):
             else:
                 return Response({"detail": "telegram_id must be a digit"}, status=status.HTTP_400_BAD_REQUEST)
 
-
-
         buttons_to_show = {
             'show_back': True,
             'show_hint': True,
@@ -126,8 +112,6 @@ class GetSoundAPI(APIView):
             sound_file_path = synthesize_speech(text=text, card_id=f"card_{card_id}")
             Cards.objects.filter(id=card_id).update(audio=sound_file_path)
 
-
-
         try:
             with open(sound_file_path, 'rb') as f:
                 response = HttpResponse(f.read(), content_type="audio/mpeg")
@@ -142,9 +126,30 @@ class GetSoundAPI(APIView):
 
 class GetHintAPI(APIView):
     permission_classes = [IsAuthenticated]
+
     def get(self, request, *args, **kwargs):
         mappings_id = int(kwargs.get('mappings_id'))
-        print(mappings_id)
-        card = Mappings.objects.filter(id=mappings_id).values_list('card__side1').first()
-        print(card)
-        return Response(card, status=status.HTTP_200_OK)
+        card = Mappings.objects.filter(id=mappings_id).values_list('card__side2', flat=True).first()
+        language = request.user.language
+        system_message = (
+                        "You provide brief hints to the user who can't recall a word or phrase. "
+                          "The hint should accurately describe the word or phrase in a way that allows "
+                          "the user to guess it on their own without naming it directly. "
+                          "The description should carry the same meaning as the user's message. "
+                          "The description should not exceed 16 words. You should not respond to or react "
+                          "to user messages; you should only describe them."
+        )
+
+        system_message += f'Descriptions should be in {language}, using simple and clear language.' \
+            if language else 'Descriptions should be in the user\'s language, written in simple and clear terms.'
+
+        tip_message = chatgpt_client.chatgpt_single_call(system_content=system_message, user_content=card)
+
+        if not tip_message:
+            tip_message = (
+                        "🤔 It looks like ChatGPT isn't responding at the moment. "
+                           "No worries—give it another try a bit later! If it still doesn't work, "
+                           "feel free to reach out to the AnkiChat support team. We're here to help!"
+            )
+
+        return Response(tip_message, status=status.HTTP_200_OK)

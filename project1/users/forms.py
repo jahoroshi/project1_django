@@ -34,7 +34,7 @@ class UserFirstStepLoginForm(forms.Form):
     email = forms.EmailField(
         required=True,
         widget=forms.EmailInput(attrs={
-        'class': 'form-control form-control-lg',
+        'class': 'form-control form-control-lg btn-main',
         'placeholder': 'Email',
     }))
 
@@ -42,7 +42,7 @@ class UserSecondStepLoginForm(forms.Form):
     password = forms.CharField(
         required=True,
         widget=forms.PasswordInput(attrs={
-        'class': 'form-control form-control-lg',
+        'class': 'form-control form-control-lg btn-main',
         'placeholder': 'Password',
         'required': True,
     }))

@@ -12,6 +12,8 @@ class User(AbstractUser):
     telegram_id = models.BigIntegerField(unique=True, blank=True, null=True)
     session_config = models.JSONField(blank=True, null=True)
     language = models.CharField(max_length=5, blank=True, null=True)
+    privilege_level = models.IntegerField(blank=False, default=0)
+
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []

@@ -36,24 +36,10 @@ from django.utils.timezone import now
 
 
 
-user = User.objects.get(id=155)
-queryset = Categories.objects.filter(user=user).annotate(
-            cards_count=Count(
-                Case(
-                    When(~Q(mappings__isnull=True) & ~Q(mappings__study_mode='known'), then=1),
-                    output_field=IntegerField()
-                )
-            ),
-            reviews_count=Count(
-                Case(
-                    When(
-                        mappings__review_date__lte=now().date(),
-                        then=1
-                    ),
-                    output_field=IntegerField(),
-                )
-            )
-        )
+import openai
+import requests
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
+from django.conf import settings
 
-for i in queryset:
-    print(i.cards_count)
+

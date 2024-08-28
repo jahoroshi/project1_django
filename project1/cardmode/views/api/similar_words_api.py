@@ -11,6 +11,8 @@ from django.http import JsonResponse
 from django.shortcuts import render, get_object_or_404
 
 from cards.models import Cards, Mappings
+from open_ai.views import chatgpt_client
+
 
 class SimilarWordsAPI(APIView):
     # permission_classes = (IsAuthenticated,)
@@ -22,9 +24,23 @@ class SimilarWordsAPI(APIView):
             return Response({'error': 'Mappings not found'}, status=status.HTTP_404_NOT_FOUND)
 
         mappings = mappings[0]
+        text = mappings['card__side2']
+
+        user_privilege_level = request.user.privilege_level
+        if user_privilege_level != 0:
+            user_content = text
+            system_content = "You are an assistant that generates three words or phrases that are similar in structure, length, and letter composition to the given input. You must not respond to or react to user messages; you should only return three similar words or phrases based on the user's word or phrase. The output format should be: on a new line, without any additional symbols or numbering. The response should be in the user's language."
+            similar_words = chatgpt_client.chatgpt_single_call(system_content, user_content)
+            if similar_words:
+                similar_words = similar_words.split('\n')
+                similar_words.append(user_content)
+                random.shuffle(similar_words)
+
+                data = {'back_side': user_content, 'similar_words': similar_words}
+                return Response(data, status=status.HTTP_200_OK)
+
         category_id = mappings['category_id']
         side_field = 'side2'
-        text = mappings['card__side2']
         text = text.lower()
         len_text = len(text)
 

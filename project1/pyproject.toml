@@ -154,6 +154,7 @@ widgetsnbextension = "4.0.10"
 wsproto = "1.2.0"
 yarl = "1.9.4"
 zipp = "3.18.1"
+django-environ = "^0.11.2"
 
 
 [tool.poetry.group.dev.dependencies]

@@ -130,7 +130,7 @@ header, footer, section {
 
 @media (max-width: 576px) {
     header, footer, section {
-        padding: 0;
+        padding: 0 0 10px 0;
     }
 }
 
@@ -580,6 +580,19 @@ button.btn-hint[disabled]:hover {
     border-radius: 0;
 
 }
+
+@media (max-width: 576px) {
+    #scramble-letters-btn {
+        border-bottom-right-radius: 15px;
+    }
+}
+
+@media (max-width: 576px) {
+    #show-first-letters-btn {
+        border-bottom-left-radius: 15px;
+    }
+}
+
 
 .content-block {
     display: flex;

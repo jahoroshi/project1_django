@@ -14,6 +14,18 @@ import logging
 import logging.config
 import os
 from pathlib import Path
+import environ
+
+env = environ.Env(
+    DEBUG=(bool, False)
+)
+
+environ.Env.read_env()
+
+DEBUG = env('DEBUG')
+SECRET_KEY = env('SECRET_KEY')
+BOT_API_KEY = env('BOT_API_KEY')
+OPENAI_API_KEY = env('OPENAI_API_KEY')
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -22,12 +34,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-b(%xa53*12m&u-t8^4%(ci)+x7gev=c*9$ffemn%-4#z@pg+j9'
-API_KEY = 'your-unique-api-key-here'
 
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
 
 ALLOWED_HOSTS = [
     'localhost',
@@ -63,6 +72,7 @@ INSTALLED_APPS = [
     'cardmode.apps.CardmodeConfig',
     'users',
     'rest_framework',
+    'open_ai',
 ]
 if DEBUG:
     INSTALLED_APPS += ['debug_toolbar']

@@ -5,397 +5,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AnkiChat</title>
+    <title>AnkiChat. Study smart.</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap"
           rel="stylesheet">
 
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://getbootstrap.su/docs/5.3/assets/css/docs.css" rel="stylesheet">
-    <style>
-        body, html {
-            height: 100%;
-            margin: 0;
-            font-family: "Open Sans", sans-serif;
-            font-optical-sizing: auto;
-            font-weight: 400;
-            font-style: normal;
-            font-variation-settings: "wdth" 100;
-            overflow-x: hidden;
-            min-width: 380px;
-        }
-
-        .roboto-thin {
-            font-family: "Roboto", sans-serif;
-            font-weight: 100;
-            font-style: normal;
-        }
-
-        .roboto-light {
-            font-family: "Roboto", sans-serif;
-            font-weight: 300;
-            font-style: normal;
-        }
-
-        .roboto-regular {
-            font-family: "Roboto", sans-serif;
-            font-weight: 400;
-            font-style: normal;
-        }
-
-        .roboto-medium {
-            font-family: "Roboto", sans-serif;
-            font-weight: 500;
-            font-style: normal;
-        }
-
-        .roboto-bold {
-            font-family: "Roboto", sans-serif !important;
-            font-weight: 700 !important;
-            font-style: normal !important;
-        }
-
-        .roboto-black {
-            font-family: "Roboto", sans-serif;
-            font-weight: 900;
-            font-style: normal;
-        }
-
-        .roboto-thin-italic {
-            font-family: "Roboto", sans-serif;
-            font-weight: 100;
-            font-style: italic;
-        }
-
-        .roboto-light-italic {
-            font-family: "Roboto", sans-serif;
-            font-weight: 300;
-            font-style: italic;
-        }
-
-        .roboto-regular-italic {
-            font-family: "Roboto", sans-serif;
-            font-weight: 400;
-            font-style: italic;
-        }
-
-        .roboto-medium-italic {
-            font-family: "Roboto", sans-serif;
-            font-weight: 500;
-            font-style: italic;
-        }
-
-        .roboto-bold-italic {
-            font-family: "Roboto", sans-serif;
-            font-weight: 700;
-            font-style: italic;
-        }
-
-        .roboto-black-italic {
-            font-family: "Roboto", sans-serif;
-            font-weight: 900;
-            font-style: italic;
-        }
-
-        .left-section {
-            background-color: #dee2e6;
-            color: rgb(0, 0, 0);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: left;
-            padding: 20px;
-            position: relative;
-            background-image: url({% static 'background.jpg' %});
-            background-size: cover;
-            background-position: center;
-            background-repeat: repeat;
-        }
-
-        .right-section {
-            background-color: rgb(33, 37, 41);
-            color: #dee2e6;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            padding: 30px;
-        }
-
-        .brand-logo {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: #000000;
-            width: 100%;
-            text-align: left;
-        }
-
-        .text-content {
-            margin-top: 50px;
-            display: flex;
-            flex-direction: column;
-            width: 50%;
-            border-radius: 10px;
-            justify-content: flex-start;
-            max-height: 500px;
-            min-height: 458px;
-            min-width: 550px;
-        }
-
-        @media (max-width: 576px) {
-            .text-content {
-                width: 100%;
-                min-width: 380px;
-                min-height: 500px;
-            }
-        }
-
-        .text-block {
-            width: 75%;
-            background-color: #ffffff;
-            color: rgb(0, 0, 0);
-            border-radius: 10px;
-            padding: 15px;
-            margin-bottom: 20px;
-        }
-
-        .text-block h2 {
-            font-size: 1.25rem;
-            font-weight: bold;
-            margin-bottom: 10px;
-        }
-
-        .form-container {
-            width: 100%;
-            max-width: 400px;
-        }
-
-        .form-control {
-            border-radius: 25px;
-            margin-bottom: 20px;
-        }
-
-        .btn-continue {
-            border-radius: 25px;
-            width: 100%;
-            margin-bottom: 10px;
-        }
-
-        .separator {
-            display: flex;
-            align-items: center;
-            text-align: center;
-            margin: 20px 0;
-        }
-
-        .separator hr {
-            flex-grow: 1;
-            border: none;
-            border-top: 1px solid #fff;
-        }
-
-        .separator span {
-            margin: 0 10px;
-            color: #fff;
-            font-weight: bold;
-        }
-
-        .back-link {
-            display: block;
-            margin-top: 10px;
-            font-size: 0.9rem;
-            color: #d4b3ff;
-            text-decoration: none;
-        }
-
-        .back-link:hover {
-            text-decoration: none;
-        }
-
-        .email-container {
-            position: relative;
-            margin-bottom: 20px;
-        }
-
-        .email-field {
-            background-color: rgba(0, 0, 0, 0) !important;
-            color: #666;
-            cursor: not-allowed;
-            border: 2px solid #736cfc !important;
-        }
-
-        .carousel-block {
-        }
-
-        .color1 {
-            color: #6f42c1;
-        }
-
-        .color2 {
-            color: #c6303e;
-        }
-
-        .color3 {
-            color: #7FB5B5;
-        }
-
-        .color4 {
-            color: #5D9B9B;
-        }
-
-        .color5 {
-            color: #A18594;
-        }
-
-        .color6 {
-            color: #77DD77;
-        }
-
-        .color7 {
-            color: #FF7514;
-        }
-
-        .color8 {
-            color: #FF8C69;
-        }
-
-        .color9 {
-            color: #FF9BAA;
-        }
-
-        .color10 {
-            color: #FFB28B;
-        }
-
-        .color11 {
-            color: #FCE883;
-        }
-
-        .color12 {
-            color: #BEBD7F;
-        }
-
-        .color13 {
-            color: #C6DF90;
-        }
-
-        .color14 {
-            color: #99FF99;
-        }
-
-        .color15 {
-            color: #AFDAFC;
-        }
-
-        .color16 {
-            color: #E6E6FA;
-        }
-
-        .color17 {
-            color: #217074;
-        }
-
-        .color18 {
-            color: #37745B;
-        }
-
-        .color19 {
-            color: #8B9D77;
-        }
-
-        .color20 {
-            color: #E7EAEF;
-        }
-
-        .color21 {
-            color: #EDC5AB;
-        }
-
-        .color22 {
-            color: #02315E;
-        }
-
-        .color23 {
-            color: #00457E;
-        }
-
-        .color24 {
-            color: #2F70AF;
-        }
-
-        .color25 {
-            color: #B9848C;
-        }
-
-        .color26 {
-            color: #806491;
-        }
-
-        .color27 {
-            color: #680003;
-        }
-
-        .color28 {
-            color: #BC0000;
-        }
-
-        .color29 {
-            color: #F5704A;
-        }
-
-        .color30 {
-            color: #EFB9AD;
-        }
-
-        .color31 {
-            color: #828D00;
-        }
-
-        .color32 {
-            color: #2C5D37;
-        }
-
-        .color33 {
-            color: #E3C515;
-        }
-
-        .color34 {
-            color: #EE51B1;
-        }
-
-        .color35 {
-            color: #A59CD3;
-        }
-
-        .color36 {
-            color: #4B2D9F;
-        }
-
-        .arrows button:focus {
-            outline: none;
-            box-shadow: none;
-        }
-
-        .arrows button {
-            transition: transform 0.2s ease;
-        }
-
-        .arrows button:hover:first-of-type {
-            transform: translateX(-4px);
-        }
-
-        .arrows button:hover:last-of-type {
-            transform: translateX(4px);
-        }
-    </style>
-</head><body>
+    
+        <link rel="icon" href="{% static 'favicon.ico' %}" type="image/x-icon">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/bootstrap.min.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/style_home_page.css' %}">
+</head>
+<style>
+    .left-section {
+        background-color: #dee2e6;
+        color: rgb(0, 0, 0);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: left;
+        padding: 20px;
+        position: relative;
+        background-image: url("{% static 'background.jpg' %}");
+        background-size: cover;
+        background-position: center;
+        background-repeat: repeat;
+    }
+</style>
+<body>
 <div class="container-fluid h-100">
     <div class="row h-100">
         <div class="col-md-8 left-section">
@@ -405,14 +44,14 @@
 
             <div class="text-content">
                 <div class="arrows d-flex justify-sm-content-end justify-content-center mb-3">
-                    <button class="btn p-0 border-0 mr-2" data-bs-target="#carouselExampleFade"
+                    <button class="btn p-0 border-0 me-2" data-bs-target="#carouselExampleFade"
                             data-bs-slide="prev" style="background: none;">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="40" height="40">
                             <path fill="#828D00"
                                   d="M512 256A256 256 0 1 0 0 256a256 256 0 1 0 512 0zM271 135c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9l-87 87 87 87c9.4 9.4 9.4 24.6 0 33.9s-24.6 9.4-33.9 0L167 273c-9.4-9.4-9.4-24.6 0-33.9L271 135z"/>
                         </svg>
                     </button>
-                    <button class="btn p-0 border-0 ml-2" data-bs-target="#carouselExampleFade"
+                    <button class="btn p-0 border-0 ms-2" data-bs-target="#carouselExampleFade"
                             data-bs-slide="next" style="background: none;">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="40" height="40">
                             <path fill="#806491"
@@ -421,75 +60,139 @@
                     </button>
                 </div>
 
-                <div class="carousel-block" style="background-color: #f0f8ff87; border-radius: 10px; padding: 10px;">
+                <div class="carousel-block mx-2 mx-sm-0">
 
                     <div id="carouselExampleFade" class="carousel carousel-dark slide" data-bs-ride="carousel">
 
                         <div class="carousel-inner">
-                            <div class="carousel-item active">
-                                <div class="d-block">
-                                    <h1><span class="color25">Anki</span><span class="color26">Chat</span> — это твой
-                                        мощный инструмент для
-                                        суперэффективного
-                                        запоминания!</h1>
-                                    <p class="fs-5">Создавай флэшкарты, используй <span class="color17">интервальные повторения</span>
-                                        и сохраняй
-                                        знания на всю
-                                        жизнь!</p>
-                                    <p class="fs-5">Наша платформа доступна в <span
-                                            class="color31"><b>web-версии</b></span>, и в <span class="color24"><b>Telegram</b></span>
-                                        —
-                                        выбирай свой стиль и учись
-                                        по-настоящему эффективно.</p>
-
+                            <div class="carousel-item active" data-bs-interval="8000">
+                                <div>
+                                    <div class="roboto-bold fs-2 color3"><span
+                                            class="roboto-black"><span class="color28">Anki</span><span
+                                            class="color22">Chat</span></span> — это твой мощный инструмент для
+                                        суперэффективного запоминания!
+                                    </div>
+                                    <br>
+                                    <span class="roboto-medium fs-5"> Создавай <span style="color: #198754">флэшкарты</span>, <span style="color: #23367f">используй интервальные повторения</span> и сохраняй знания на всю
+                                                                       жизнь!</span><br><br>
+                                    <span class="roboto-medium fs-5">Наша платформа доступна в <span class="color28">web-версии</span>, и в <span
+                                            class="color23">Telegram</span> — выбирай свой стиль и учись
+                                                                        по-настоящему эффективно.</span>
                                 </div>
+
                             </div>
-                            <div class="carousel-item">
+                            <div class="carousel-item" data-bs-interval="10000">
                                 <div class="d-block mt-0" style="color: #000000">
-                                    <h2>В <span class="color28 fs-1">Anki</span><span class="color22 fs-1">Chat</span> обучение
-                                        выходит за рамки обычного переворачивания карточек.</h2>
-                                    <h3 class="lh-4 mt-4">Мы предлагаем
+                                    <div class="roboto-black fs-2">В <span class="color28">Anki</span><span
+                                            class="color22">Chat</span>
+                                        обучение
+                                        выходит за рамки обычного переворачивания карточек.
+                                    </div>
+                                    <div class="roboto-medium fs-5 mt-4">Мы предлагаем
                                         целый арсенал инструментов, чтобы сделать процесс запоминания максимально
                                         <span class="color28">эффективным</span> и <span
-                                                class="color31">интересным</span>.</h3>
+                                                class="color31">интересным</span> >>
+                                    </div>
 
                                 </div>
                             </div>
-                            <div class="carousel-item">
+
+
+                            <div class="carousel-item" data-bs-interval="10000">
                                 <div class="d-block">
-                                    <p class="fs-4 mb-0"><strong><span class="color31">Подсказка</span> от
-                                        ChatGPT:</strong></p>
-                                    <p class="fs-6 mb-3">Получите интеллектуальную помощь от AI.</p>
+                                    <div class="d-flex align-items-start mb-2">
+        <span class="me-2 my-auto" style="width: 24px; height: 24px;">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                <path d="M256 48a208 208 0 1 1 0 416 208 208 0 1 1 0-416zm0 464A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM369 209c9.4-9.4 9.4-24.6 0-33.9s-24.6-9.4-33.9 0l-111 111-47-47c-9.4-9.4-24.6-9.4-33.9 0s-9.4 24.6 0 33.9l64 64c9.4 9.4 24.6 9.4 33.9 0L369 209z"/>
+            </svg>
+        </span>
+                                        <div>
+                                            <p class="fs-4 mb-0"><strong><span class="color31">Подсказка</span> от
+                                                ChatGPT:</strong></p>
+                                            <p class="fs-6 mb-0 roboto-medium">Получите интеллектуальную помощь от
+                                                AI.</p>
+                                        </div>
+                                    </div>
 
-                                    <p class="fs-4 mb-0"><strong><span class="color36">Выбор</span> из <span
-                                            class="color35">нескольких вариантов</span>:</strong></p>
-                                    <p class="fs-6 mb-3">Выбирайте правильный ответ из нескольких похожих слов.</p>
+                                    <div class="d-flex align-items-start mb-2">
+        <span class="me-2 my-auto" style="width: 24px !important; height: 24px !important;">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                <path d="M256 48a208 208 0 1 1 0 416 208 208 0 1 1 0-416zm0 464A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM369 209c9.4-9.4 9.4-24.6 0-33.9s-24.6-9.4-33.9 0l-111 111-47-47c-9.4-9.4-24.6-9.4-33.9 0s-9.4 24.6 0 33.9l64 64c9.4 9.4 24.6 9.4 33.9 0L369 209z"/>
+            </svg>
+        </span>
+                                        <div class="w-100">
+                                            <p class="fs-4 mb-0"><strong><span class="color36">Выбор</span> из <span
+                                                    class="color35">нескольких вариантов</span>:</strong></p>
+                                            <p class="fs-6 mb-0 roboto-medium">Выбирайте правильный ответ из нескольких
+                                                похожих слов.</p>
+                                        </div>
+                                    </div>
 
-                                    <p class="color26 fs-4 mb-0"><strong><span class="color31">Разбивка слова</span>
-                                        <span class="color33">на буквы</span>:</strong></p>
-                                    <p class="fs-6 mb-3">Соберите слово по буквам.</p>
+                                    <div class="d-flex align-items-start mb-2">
+        <span class="me-2 my-auto" style="width: 24px; height: 24px;">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                <path d="M256 48a208 208 0 1 1 0 416 208 208 0 1 1 0-416zm0 464A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM369 209c9.4-9.4 9.4-24.6 0-33.9s-24.6-9.4-33.9 0l-111 111-47-47c-9.4-9.4-24.6-9.4-33.9 0s-9.4 24.6 0 33.9l64 64c9.4 9.4 24.6 9.4 33.9 0L369 209z"/>
+            </svg>
+        </span>
+                                        <div>
+                                            <p class="fs-4 mb-0"><strong><span class="color31">Разбивка слова</span>
+                                                <span class="color17">на буквы</span>:</strong></p>
+                                            <p class="fs-6 mb-0 roboto-medium">Соберите слово по буквам.</p>
+                                        </div>
+                                    </div>
 
-                                    <p class="color29 fs-4 mb-0"><strong><span class="color29">Показ слова</span> <span
-                                            class="color28">по буквам</span>:</strong></p>
-                                    <p class="fs-6 mb-0">Видите слово по одной букве за раз.</p>
+                                    <div class="d-flex align-items-start">
+        <span class="me-2 my-auto" style="width: 24px; height: 24px;">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                <path d="M256 48a208 208 0 1 1 0 416 208 208 0 1 1 0-416zm0 464A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM369 209c9.4-9.4 9.4-24.6 0-33.9s-24.6-9.4-33.9 0l-111 111-47-47c-9.4-9.4-24.6-9.4-33.9 0s-9.4 24.6 0 33.9l64 64c9.4 9.4 24.6 9.4 33.9 0L369 209z"/>
+            </svg>
+        </span>
+                                        <div>
+                                            <p class="fs-4 mb-0"><strong><span class="color27">Показ слова</span> <span
+                                                    class="color28">по буквам</span>:</strong></p>
+                                            <p class="fs-6 mb-0 roboto-medium">Видите слово по одной букве за раз.</p>
+                                        </div>
+                                    </div>
                                 </div>
 
 
                             </div>
-                            <div class="carousel-item">
-                                <div class="d-block ">
-                                    <h2 class="fw-bold"><span class="color36">Режимы</span> <span
-                                            class="color36">показа</span> <span
-                                            class="color34">карточек</span> <span class="color4">в AnkiChat:</span></h2>
-                                    <p class="fs-5"><strong><span class="color1">Текстовый</span> <span class="color2">показ</span>:</strong>
-                                        Читайте информацию на карточках.</p>
-                                    <p class="fs-5 mt-1"><strong><span class="color1">Звуковое</span> <span class="color2">воспроизведение:</span></strong>
-                                        Слушайте озвученные карточки для аудиального восприятия.</p>
-                                    <p class="fs-5 mb-0 mt-5"><span class="color23"><strong>Anki</strong></span><span class="color24"><strong>Chat</strong></span>
+                            <div class="carousel-item" data-bs-interval="10000">
+                                <div class="d-block">
+                                    <div class="roboto-bold fs-3 color3">Режимы показа карточек <span class="color28">Anki</span><span
+                                            class="color22">Chat</span></div>
+                                    <ul class="list-unstyled mt-3">
+                                        <li class="d-flex align-items-start mb-3">
+            <span class="me-2 my-auto" style="width: 24px; height: 24px;">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" width="24" height="24">
+<path fill="#2F70AF"
+      d="M64 32C28.7 32 0 60.7 0 96L0 416c0 35.3 28.7 64 64 64l448 0c35.3 0 64-28.7 64-64l0-320c0-35.3-28.7-64-64-64L64 32zM213.5 173.3l72 144c5.9 11.9 1.1 26.3-10.7 32.2s-26.3 1.1-32.2-10.7l-9.4-18.9-82.2 0-9.4 18.9c-5.9 11.9-20.3 16.7-32.2 10.7s-16.7-20.3-10.7-32.2l72-144c4.1-8.1 12.4-13.3 21.5-13.3s17.4 5.1 21.5 13.3zm-.4 106.6L192 237.7l-21.1 42.2 42.2 0zM304 184c0-13.3 10.7-24 24-24l56 0c53 0 96 43 96 96s-43 96-96 96l-56 0c-13.3 0-24-10.7-24-24l0-144zm48 24l0 96 32 0c26.5 0 48-21.5 48-48s-21.5-48-48-48l-32 0z"/>                </svg>
+            </span>
+                                            <div>
+                                                <p class="fs-5 roboto-medium mb-0"><strong><span class="color1">Текстовый</span>
+                                                    <span class="color2">показ</span>:</strong>
+                                                    Читайте информацию на карточках.</p>
+                                            </div>
+                                        </li>
+                                        <li class="d-flex align-items-start mb-3">
+
+            <span class="me-2 my-auto" style="width: 24px; height: 24px;">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" width="24" height="24">
+                    <path fill="#2F70AF"
+                          d="M301.1 34.8C312.6 40 320 51.4 320 64l0 384c0 12.6-7.4 24-18.9 29.2s-25 3.1-34.4-5.3L131.8 352 64 352c-35.3 0-64-28.7-64-64l0-64c0-35.3 28.7-64 64-64l67.8 0L266.7 40.1c9.4-8.4 22.9-10.4 34.4-5.3zM412.6 181.5C434.1 199.1 448 225.9 448 256s-13.9 56.9-35.4 74.5c-10.3 8.4-25.4 6.8-33.8-3.5s-6.8-25.4 3.5-33.8C393.1 284.4 400 271 400 256s-6.9-28.4-17.7-37.3c-10.3-8.4-11.8-23.5-3.5-33.8s23.5-11.8 33.8-3.5z"/>
+                </svg>
+            </span>
+                                            <div>
+                                                <p class="fs-5 roboto-medium mb-0"><strong><span
+                                                        class="color1">Звуковое</span> <span class="color2">воспроизведение:</span></strong>
+                                                    Слушайте озвученные карточки для аудиального восприятия.</p>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                    <p class="fs-6 mb-0 mt-5 roboto-medium"><span class="color23"><strong>Anki</strong></span><span
+                                            class="color24"><strong>Chat</strong></span>
                                         предоставляет все необходимое для того, чтобы процесс обучения был не только
                                         эффективным, но и разнообразным.</p>
-
-
                                 </div>
                             </div>
                         </div>
@@ -506,27 +209,27 @@
                     <form method="post">
                         {% csrf_token %}
                         {{ form.email }}
-                        <button type="submit" class="btn btn-primary btn-lg btn-continue">Continue</button>
+                        <button type="submit" class="btn btn-success btn-lg btn-continue btn-main">Continue</button>
                     </form>
                     <div class="separator">
                         <hr>
                         <span>OR</span>
                         <hr>
                     </div>
-                    <button type="button" class="btn btn-secondary btn-lg btn-continue">Continue with Telegram</button>
+                    <button type="button" class="btn btn-primary btn-lg btn-continue btn-main">Continue with Telegram</button>
                 </div>
             {% else %}
                 <div class="form-container">
                     <h3 class="mb-4">Enter password</h3>
                     <!-- Неактивное поле с email -->
                     <div class="email-container">
-                        <input type="text" class="form-control form-control-lg email-field" value="{{ email }}"
+                        <input type="text" class="form-control form-control-lg email-field btn-main" value="{{ email }}"
                                disabled>
                     </div>
                     <form method="post">
                         {% csrf_token %}
                         {{ form.password }}
-                        <button type="submit" class="btn btn-primary btn-lg btn-continue">Continue</button>
+                        <button type="submit" class="btn btn-primary btn-lg btn-continue btn-main">Continue</button>
                     </form>
                     <a href="{% url 'users:home' %}" class="back-link">Back</a>
                     <!-- Ссылка для возврата на предыдущий шаг -->
@@ -535,5 +238,8 @@
         </div>
     </div>
 </div>
+
+<script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+
 </body>
 </html>

@@ -6,6 +6,9 @@ from users.models import User
 
 
 def home(request):
+    if request.user.is_authenticated:
+        return redirect('decks_list')
+
     if request.method == 'POST':
         form = UserFirstStepLoginForm(request.POST)
         if form.is_valid():

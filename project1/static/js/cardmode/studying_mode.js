@@ -41,6 +41,8 @@ document.addEventListener('DOMContentLoaded', async function () {
     let soundUrlCache = null;
     let audio = null;
     let count = 0;
+    let revealIndex = 0;
+
 
 
     function hideButtons() {
@@ -92,6 +94,7 @@ document.addEventListener('DOMContentLoaded', async function () {
             actionButtons.forEach(button => button.disabled = false);
             soundUrlCache = null;
             audio = null;
+            revealIndex = 0;
             similarWordsContainer.innerHTML = '';
             lettersContainer.innerHTML = '';
             showKnownButton();
@@ -138,9 +141,7 @@ document.addEventListener('DOMContentLoaded', async function () {
     loadCard();
 
 
-    //     if (cardData.rating_count[5]) {
-    //         knownButton.classList.add('known-btn-active');
-    // }
+
 
     const showBackButton = document.getElementById('show-back-btn');
     if (showBackButton) {
@@ -158,7 +159,9 @@ document.addEventListener('DOMContentLoaded', async function () {
             fetch(hintUrl).then(response => response.json()).then(data => {
                 hintContainer.innerText = data;
                 hintContainer.classList.remove('hidden');
-                makeButtonsInactive();
+                disableOtherActionButtons(showBackButton.id);
+
+
 
             });
         });
@@ -204,7 +207,6 @@ document.addEventListener('DOMContentLoaded', async function () {
     }
 
 
-    let revealIndex = 0;
 
     const showFirstLettersButton = document.getElementById('show-first-letters-btn');
     if (showFirstLettersButton) {

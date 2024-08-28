@@ -94,7 +94,7 @@ def delete_user(request):
                 messages.success(request, 'Account was successfully deleted.', extra_tags='profile')
                 form = UserRegistrationForm()
                 # context = {'form': form, 'page_mode': 'registration'}
-                return redirect('decks_list')
+                return redirect('registration')
             else:
                 messages.error(request, 'The current password is incorrect.', extra_tags='profile')
 
