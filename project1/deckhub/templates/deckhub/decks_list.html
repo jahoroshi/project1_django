@@ -16,9 +16,10 @@
     </div>
 
     <div class="content">
-    {% if not object_list %}
-        <div class="text-center my-auto fs-6">The deck is empty. Please, create a new deck.</div>
-    {% endif %}
+        {% if not object_list %}
+            <div class="text-center my-auto fs-6">The deck is empty. Please, create a new deck.</div>
+        {% endif %}
+        {% include 'users/messages.html' with error_message=form.errors messages=messages extra_tag='decks-list' %}
 
         {% for deck in object_list %}
             {% ifchanged %}
@@ -67,7 +68,8 @@
                                                           d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5z"/>
                                                 </svg>
                                             </a>
-                                            <a href="{% url 'deck_delete' deck.slug %}" class="link-button-hover me-2 me-sm-0"
+                                            <a href="{% url 'deck_delete' deck.slug %}"
+                                               class="link-button-hover me-2 me-sm-0"
                                                role="button"
                                                data-bs-toggle="tooltip" data-bs-placement="top" title="Delete">
                                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"

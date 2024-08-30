@@ -35,3 +35,4 @@ def telegram_web_app_start(request, *args, **kwargs):
         else:
             return render(request, 'deckhub/error_page.html')
 
+

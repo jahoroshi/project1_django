@@ -1,3 +1,4 @@
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Count, Case, When, F, IntegerField, Q
@@ -102,4 +103,5 @@ def deck_delete(request, slug):
         deck.delete()
         cards.delete()
         return redirect(reverse('decks_list'))
+
     return render(request, 'cards/delete_object.html', {'deck_name': deck.name, 'slug': slug})

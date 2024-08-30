@@ -119,8 +119,8 @@ article {
 
 .link-button-hover, #qqq {
     text-decoration: none;
-    width: 30px;
-    height: 30px;
+    width: 30px !important;
+    height: 30px!important;
     position: relative;
     transition: background-color 0.1s, color 0.3s; /* Плавный переход */
     border-radius: 5px;
@@ -134,18 +134,24 @@ article {
 .link-button-hover[title="Rename"] {
     /*color: var(--bs-purple);*/
     color: #fff;
+        width: 30px !important;
+    height: 30px!important;
 
 }
 
 .link-button-hover[title="Delete"] {
     /*color: var(--bs-red);*/
     color: #fff;
+        width: 30px !important;
+    height: 30px!important;
 }
 
 /* Стили для состояния hover */
 .link-button-hover:hover {
     background-color: rgb(33, 37, 41); /* Цвет фона при наведении */
     color: #fff; /* Цвет текста при наведении */
+        width: 30px !important;
+    height: 30px!important;
 }
 
 
@@ -915,4 +921,10 @@ button.btn-hint[disabled]:hover {
     max-width: 100%; /* Обеспечивает, что контейнер не выйдет за границы */
     overflow-y: auto; /* Включает только вертикальную прокрутку */
     overflow-x: hidden; /* Отключает горизонтальную прокрутку */
+}
+
+.bd-callout-info {
+    --bd-callout-color: var(--bs-info-text-emphasis);
+    --bd-callout-bg: var(--bs-info-bg-subtle);
+    --bd-callout-border: var(--bs-info-border-subtle);
 }

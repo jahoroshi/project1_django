@@ -6,9 +6,11 @@ from django.shortcuts import render, HttpResponseRedirect, redirect
 from django.urls import reverse
 
 from cards.models import Categories
+from cards.services.first_deck_fill import deck_filling
 from users.forms import UserLoginForm, UserRegistrationForm, UserProfileForm, TelegramUserForm, DeleteUserForm, \
     EmptyUserProfileForm
 from users.models import User
+from deckhub.views import first_deck_fill
 
 
 def login(request):
@@ -39,6 +41,11 @@ def registration(request):
             user = auth.authenticate(email=email, password=password)
             if user:
                 auth.login(request, user)
+
+                language_code = request.META.get('LANG')
+                language = 'ru' if 'ru' in language_code else 'en'
+                deck_filling(user, language)
+                messages.info(request, "👋 | WELCOME<br><br>🎁 Мы сделали для вас тестовую категорию, чтобы вы могли познакомиться со всеми возможностями нашего приложения. <br><br>🤓 Когда освоитесь, можете удалить её и создать свои собственные уникальные категории.<br><br>🫶 Удачи! 😎", extra_tags='decks-list')
                 return HttpResponseRedirect(reverse('decks_list'))
         else:
             messages.error(request, 'There was an error with your registration. Please try again.', extra_tags='auth')

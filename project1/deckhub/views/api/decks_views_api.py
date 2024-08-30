@@ -14,6 +14,7 @@ from cards.models import Categories
 from cards.models import Mappings
 from cards.services.handle_card_import import import_handler
 from deckhub.serializers import DeckSetSerializer, DeckContentSerializer
+from cards.services.first_deck_fill import deck_filling
 from users.models import User
 
 @api_view(['GET'])
@@ -38,29 +39,10 @@ def reset_deck_progress(request, *args, **kwargs):
 @api_view(['GET'])
 def first_deck_fill(request, *args, **kwargs):
     tg_id = kwargs.get('tg_user')
-    language = kwargs.get('language')
-    deck_name = 'First Deck for Test' if language == 'en' else 'Первая тестовая категория'
+    language = kwargs.get('language', 'en')
     user = User.objects.get(telegram_id=tg_id)
-    deck = Categories.objects.create(name=deck_name, user=user)
+    success_count = deck_filling(user, language)
 
-    cur_dir = Path(__file__).parent.parent.parent.parent.absolute()
-    data_fill = f'{cur_dir}/static/services/deck_data_first_fill/{language}.csv'
-    text = ''
-    with open(data_fill, 'r', encoding='utf-8') as f:
-        cards_data = csv.reader(f)
-        for row in cards_data:
-            text += ';'.join(row) + '\n'
-
-    data = {
-        'text': text,
-        'cards_separator': 'new_line',
-        'words_separator': 'semicolon',
-        'words_separator_custom': '',
-        'cards_separator_custom': '',
-
-    }
-    slug = deck.slug
-    success_count = import_handler(data, slug)
     if success_count > 1:
         return Response(data={'detail': f'Have been added: {success_count}'}, status=status.HTTP_201_CREATED)
     else:

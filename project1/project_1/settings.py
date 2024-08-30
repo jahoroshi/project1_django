@@ -211,3 +211,13 @@ LOGGING = {
 #         'project_1.authentication.APIKeyAuthentication',
 #     ],
 # }
+
+# LANGUAGES = [
+#     ('en', _('English')),
+#     ('de', _('German')),
+#     # Добавьте другие языки, которые вам нужны
+# ]
+
+LOCALE_PATHS = [
+    os.path.join(BASE_DIR, 'locale'),
+]

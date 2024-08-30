@@ -5,6 +5,8 @@
 
             {% if 'error' in message.tags %}
                 <div class="bd-callout bd-callout-warning mt-1 rounded-4">
+            {% elif 'info' in message.tags %}
+                <div class="bd-callout bd-callout-info mt-1 rounded-4">
             {% else %}
                 <div class="bd-callout bd-callout-success mt-1 rounded-4">
             {% endif %}
