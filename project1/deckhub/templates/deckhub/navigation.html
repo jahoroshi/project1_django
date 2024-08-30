@@ -1,4 +1,5 @@
 {% load static %}
+{% if request.session.auth_method != 'telegram' %}
 <nav class="navbar navbar-expand-md bg-body-tertiary">
     <div class="container" style="padding-inline: 20px;">
         <a class="navbar-brand" href="/">AnkiChat</a>
@@ -17,12 +18,12 @@
                     <div class="col">
                         {% if user.telegram_id %}
                             <a class="btn btn-primary telegram-button-navbar  w-100 text-nowrap btn-sm"
-                               href="https://t.me/Anki4bot?start=some_parameter">
+                               href="https://t.me/{{ BOT_NAME }}?start=some_parameter">
                                 <i></i>Telegram AnkiChatBot
                             </a>
                         {% else %}
                             <a class="btn btn-primary telegram-button-navbar  w-100 text-nowrap btn-sm"
-                               href="/users/profile/">
+                               href="{% url 'users:profile' %}">
                                 <i></i>Connect Telegram Account
                             </a>
                         {% endif %}
@@ -143,6 +144,9 @@
         </div>
     </div>
 </nav>
+    {% else %}
+    <div class="my-5"></div>
+{% endif %}
 
 
 <!-- Modal -->

@@ -21,7 +21,7 @@ def home(request):
 def second_step(request):
     email = request.session.get('email')
     if not email:
-        return redirect('home')
+        return redirect('users:home')
 
     if request.method == 'POST':
         form = UserSecondStepLoginForm(request.POST)

@@ -151,10 +151,4 @@ class DeckContentViewApi(viewsets.ModelViewSet):
                 side2=F('card__side2')
             ).values('side1', 'side2', 'card_id')
 
-        # mappings = Mappings.objects.filter(
-        #     category__user__telegram_id=tg_user,
-        #     category__slug=slug, is_back_side=False
-        # ).select_related('card').only('card__side1', 'card__side2')
-        # cards = [mapping.card for mapping in mappings]
-
         return cards

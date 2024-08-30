@@ -1,128 +1,9 @@
-/*:root {*/
-/*    --accent: #6e48ad;*/
-/*    --accent-bg: white;*/
-/*    --bg: #fff;*/
-/*    --text: #212121;*/
-/*    --text-light: #585858;*/
-/*    --border: #d8dae1;*/
-/*    --code: #d81b60;*/
-/*    --preformatted: #444;*/
-/*}*/
-
-/*article {*/
-/*    background-color: var(--marked);*/
-/*    border: 1px solid var(--border);*/
-/*    border-radius: 5px;*/
-/*    padding: 1em;*/
-/*    margin: 1em 0;*/
-/*}*/
-
-/*h2 {*/
-/*    text-align: center;*/
-/*}*/
-
-/*h6 {*/
-/*    text-align: center;*/
-/*}*/
-
-/*h2, h4 {*/
-/*    margin-top: 0;*/
-/*}*/
-
-/*hr {*/
-/*    background: var(--accent);*/
-/*    border-color: var(--accent);*/
-/*}*/
-
-
-/*select, textarea {*/
-/*    width: 100%;*/
-/*}*/
-
-/*input {*/
-/*    width: 100%;*/
-/*}*/
-
-/*.button-container input {*/
-/*    display: inline-block;*/
-/*    width: 150px;*/
-/*    height: 40px;*/
-/*    font-size: 16px;*/
-/*    margin-right: 10px; !* Добавляет небольшое расстояние между кнопками *!*/
-/*}*/
-
-
-/*.button-container {*/
-/*    display: flex;*/
-/*    justify-content: space-between; !* Распределить кнопки равномерно по контейнеру *!*/
-/*}*/
-
-/*.inline-radio {*/
-/*    display: inline-block;*/
-/*    margin-right: 10px;*/
-/*}*/
-
-/*.inline-text {*/
-/*    display: inline-block;*/
-/*    width: 200px; !* Вы можете изменить ширину по мере необходимости *!*/
-/*    margin-left: 10px;*/
-/*    margin-top: 0px;*/
-/*}*/
-
-/*label[for='id_text'] {*/
-/*    font-size: 0.7em;*/
-/*}*/
-
-/*h7 {*/
-/*    display: block;*/
-/*}*/
-
-/*.countdown-container {*/
-/*    display: flex;*/
-/*    justify-content: center;*/
-/*    gap: 20px;*/
-/*    font-family: Arial, sans-serif;*/
-/*}*/
-
-/*.countdown-item {*/
-/*    text-align: center;*/
-/*}*/
-
-/*.countdown-number {*/
-/*    font-size: 2em;*/
-/*    font-weight: bold;*/
-/*}*/
-
-/*.countdown-label {*/
-/*    font-size: 1em;*/
-/*}*/
-
-/*.countdown-title {*/
-/*    text-align: center;*/
-/*    font-size: 0.8em;*/
-/*}*/
 
 .hidden {
     display: none !important;
 }
 
 
-/*.rating-button {*/
-/*    margin: 10px;*/
-/*    padding: 10px 20px;*/
-/*    cursor: pointer;*/
-/*}*/
-
-/*.wrong-letter {*/
-/*    background-color: red;*/
-/*}*/
-
-
-/*.correct-word {*/
-/*    background-color: lightgreen;*/
-/*    color: green;*/
-/*    font-weight: bold;*/
-/*}*/
 
 header, footer, section {
     padding: 0 0 70px 0;
@@ -137,7 +18,8 @@ header, footer, section {
 
 body {
     background-color: #dee2e6;
-    min-width: 380px;
+    min-width: 365px;
+    max-height: 400px;
 }
 
 .container {
@@ -148,7 +30,7 @@ body {
     border-radius: 46px;
 
     background-color: rgb(33, 37, 41);
-    padding: 1rem !important; /* 16px */
+    padding: 0.8rem !important; /* 16px */
     margin-bottom: 1.5rem !important;
 }
 
@@ -583,13 +465,13 @@ button.btn-hint[disabled]:hover {
 
 @media (max-width: 576px) {
     #scramble-letters-btn {
-        border-bottom-right-radius: 15px;
+        border-bottom-right-radius: 37px;
     }
 }
 
 @media (max-width: 576px) {
     #show-first-letters-btn {
-        border-bottom-left-radius: 15px;
+        border-bottom-left-radius: 37px;
     }
 }
 
@@ -1018,4 +900,19 @@ button.btn-hint[disabled]:hover {
 .btn-continue-login:hover {
     border-color: #f3f3f3; /* Изменение цвета границы при наведении */
     color: #f3f3f3;
+}
+
+
+
+
+.btn-main{
+    border-radius: 5px !important;
+    height: 50px !important;
+
+}
+
+.scrollable-container {
+    max-width: 100%; /* Обеспечивает, что контейнер не выйдет за границы */
+    overflow-y: auto; /* Включает только вертикальную прокрутку */
+    overflow-x: hidden; /* Отключает горизонтальную прокрутку */
 }

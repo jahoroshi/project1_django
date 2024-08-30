@@ -3,8 +3,11 @@ document.addEventListener('DOMContentLoaded', async function () {
         try {
             const currentUrl = new URL(window.location.href);
 
-            const pathParts = currentUrl.pathname.split('/');
-            const slug = pathParts[4];
+            // const pathParts = currentUrl.pathname.split('/');
+            //             console.error('currentUrl:  ', currentUrl, 'pathParts  ', pathParts);
+
+            // const slug = pathParts[4];
+            const slug = currentUrl.searchParams.get('slug');
 
             const studyMode = currentUrl.searchParams.get('mode');
 

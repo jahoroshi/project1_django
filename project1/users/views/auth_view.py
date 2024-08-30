@@ -92,9 +92,7 @@ def delete_user(request):
             if request.user.check_password(current_password):
                 request.user.delete()
                 messages.success(request, 'Account was successfully deleted.', extra_tags='profile')
-                form = UserRegistrationForm()
-                # context = {'form': form, 'page_mode': 'registration'}
-                return redirect('registration')
+                return redirect('users:registration')
             else:
                 messages.error(request, 'The current password is incorrect.', extra_tags='profile')
 

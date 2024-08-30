@@ -2,7 +2,6 @@ from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from rest_framework import status
-from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -89,7 +88,13 @@ class GetStartConfigAPI(APIView):
             'urls': {
                 'get_card': reverse('get_card', kwargs={'slug': slug, 'mode': study_mode}),
                 'get_hint': reverse('get_hint', kwargs={'mappings_id': 'dummy_mappings_id'}),
+                'get_hint_with_telegram_id': reverse('get_hint_with_telegram_id',
+                                                     kwargs={'mappings_id': 'dummy_mappings_id',
+                                                             'telegram_id': 'dummy_telegram_id'}),
                 'get_similar_words': reverse('get_similar_words', kwargs={'mappings_id': 'dummy_mappings_id'}),
+                'get_similar_with_telegram_id': reverse('get_similar_with_telegram_id',
+                                                        kwargs={'mappings_id': 'dummy_mappings_id',
+                                                                'telegram_id': 'dummy_telegram_id'}),
                 'get_sound': reverse('get_sound', kwargs={'mappings_id': 'dummy_mappings_id'})
             },
             'buttons_to_show': buttons_to_show
@@ -125,31 +130,40 @@ class GetSoundAPI(APIView):
 
 
 class GetHintAPI(APIView):
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
 
     def get(self, request, *args, **kwargs):
-        mappings_id = int(kwargs.get('mappings_id'))
-        card = Mappings.objects.filter(id=mappings_id).values_list('card__side2', flat=True).first()
-        language = request.user.language
-        system_message = (
-                        "You provide brief hints to the user who can't recall a word or phrase. "
-                          "The hint should accurately describe the word or phrase in a way that allows "
-                          "the user to guess it on their own without naming it directly. "
-                          "The description should carry the same meaning as the user's message. "
-                          "The description should not exceed 16 words. You should not respond to or react "
-                          "to user messages; you should only describe them."
-        )
+        mappings_id = kwargs.get('mappings_id')
+        telegram_id = kwargs.get('telegram_id')
 
-        system_message += f'Descriptions should be in {language}, using simple and clear language.' \
-            if language else 'Descriptions should be in the user\'s language, written in simple and clear terms.'
+        card = Mappings.objects.filter(id=mappings_id).values_list('card__side2', flat=True).first()
+        try:
+            if telegram_id:
+                user = User.objects.get(telegram_id=telegram_id)
+                language = user.language
+            else:
+                language = request.user.language
+        except User.DoesNotExist:
+            language = 'the user language'
+
+        system_message = (
+            "You provide brief hints to the user who can't recall a word or phrase. "
+            "The hint should accurately describe the word or phrase in a way that allows "
+            "the user to guess it on their own without naming it directly. "
+            "The description should carry the same meaning as the user's message. "
+            "The description should not exceed 16 words. You should not respond to or react "
+            "to user messages; you should only describe them. "
+            f"Descriptions should be in {language}, using simple and clear language."
+        )
 
         tip_message = chatgpt_client.chatgpt_single_call(system_content=system_message, user_content=card)
 
         if not tip_message:
-            tip_message = (
-                        "🤔 It looks like ChatGPT isn't responding at the moment. "
-                           "No worries—give it another try a bit later! If it still doesn't work, "
-                           "feel free to reach out to the AnkiChat support team. We're here to help!"
+            message = (
+                "🤔 It looks like ChatGPT isn't responding at the moment. "
+                "No worries—give it another try a bit later! If it still doesn't work, "
+                "feel free to reach out to the AnkiChat support team. We're here to help!"
             )
+            return Response(message, status=status.HTTP_404_NOT_FOUND)
 
         return Response(tip_message, status=status.HTTP_200_OK)

@@ -12,11 +12,15 @@ from django.shortcuts import render, get_object_or_404
 
 from cards.models import Cards, Mappings
 from open_ai.views import chatgpt_client
+from users.models import User
 
 
 class SimilarWordsAPI(APIView):
     # permission_classes = (IsAuthenticated,)
-    def get(self, request, mappings_id, segment_length=3):
+    def get(self, request, *args, segment_length=3, **kwargs):
+        mappings_id = kwargs.get('mappings_id')
+        telegram_id = kwargs.get('telegram_id')
+
         mappings = Mappings.objects.filter(id=mappings_id).values(
             'card__side2', 'category_id'
         )
@@ -26,10 +30,23 @@ class SimilarWordsAPI(APIView):
         mappings = mappings[0]
         text = mappings['card__side2']
 
-        user_privilege_level = request.user.privilege_level
+        try:
+            if telegram_id:
+                user = User.objects.get(telegram_id=telegram_id)
+                user_privilege_level = user.privilege_level
+            else:
+                user_privilege_level = request.user.privilege_level
+        except (User.DoesNotExist, AttributeError):
+            user_privilege_level = 0
+
         if user_privilege_level != 0:
             user_content = text
-            system_content = "You are an assistant that generates three words or phrases that are similar in structure, length, and letter composition to the given input. You must not respond to or react to user messages; you should only return three similar words or phrases based on the user's word or phrase. The output format should be: on a new line, without any additional symbols or numbering. The response should be in the user's language."
+            system_content = ("You are an assistant that generates three words or phrases that are similar "
+                              "in structure, length, and letter composition to the given input. You must "
+                              "not respond to or react to user messages; you should only return three similar "
+                              "words or phrases based on the user's word or phrase. The output format should be: "
+                              "on a new line, without any additional symbols or numbering. The response should be "
+                              "in the user's language.")
             similar_words = chatgpt_client.chatgpt_single_call(system_content, user_content)
             if similar_words:
                 similar_words = similar_words.split('\n')
@@ -73,7 +90,7 @@ class SimilarWordsAPI(APIView):
             :4])
 
         if len(content) < 4 and segment_length >= 0:
-            return self.get(request, mappings_id, segment_length - 1)
+            return self.get(request, segment_length=segment_length - 1, mappings_id=mappings_id)
 
         content.append(text)
         random.shuffle(content)

@@ -19,9 +19,9 @@ class ImportCardsAPIView(APIView):
         serializer = ImportCardsSerializer(data=request.data)
         if serializer.is_valid():
             count = Mappings.objects.filter(category__slug=slug).count()
-            if count > 500 and len(serializer.validated_data['text']) > 600:
+            if count > 500 and len(serializer.validated_data['text']) > 400:
                 return Response(
-                    {'detail': 'Import not allowed: The category contains more than 500 cards.'},
+                    {'detail': 'Import isn\'t possible right now because the deck has over 500 cards. However, you can import the cards into other decks.'},
                     status=status.HTTP_405_METHOD_NOT_ALLOWED
                 )
             imports = import_handler(serializer.validated_data, slug)

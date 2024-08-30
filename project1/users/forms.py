@@ -173,3 +173,6 @@ class TelegramUserForm(forms.Form):
     username = forms.CharField()
     auth_date = forms.IntegerField()
     hash = forms.CharField()
+
+class TelegramWebAppForm(forms.Form):
+    id = forms.IntegerField()

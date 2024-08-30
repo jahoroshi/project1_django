@@ -27,6 +27,8 @@ SECRET_KEY = env('SECRET_KEY')
 BOT_API_KEY = env('BOT_API_KEY')
 OPENAI_API_KEY = env('OPENAI_API_KEY')
 
+BOT_NAME = 'Anki4bot'
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -47,6 +49,11 @@ ALLOWED_HOSTS = [
     # Добавьте этот домен
     # Можно добавить и другие домены, если нужно
 ]
+
+CSRF_TRUSTED_ORIGINS = [
+    'https://jahoroshi4y.pagekite.me',
+]
+
 
 INTERNAL_IPS = [
     # ...
@@ -104,6 +111,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'project_1.context_processors.current_bot_name',
             ],
         },
     },
