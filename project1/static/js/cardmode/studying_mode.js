@@ -3,16 +3,13 @@ document.addEventListener('DOMContentLoaded', async function () {
         try {
             const currentUrl = new URL(window.location.href);
 
-            // const pathParts = currentUrl.pathname.split('/');
-            //             console.error('currentUrl:  ', currentUrl, 'pathParts  ', pathParts);
-
-            // const slug = pathParts[4];
             const slug = currentUrl.searchParams.get('slug');
 
             const studyMode = currentUrl.searchParams.get('mode');
 
+            const studyFormat = currentUrl.searchParams.get('format') || 'text';
 
-            const configUrl = `/api/v1/study/get_start_config/${slug}/${studyMode}/`;
+            const configUrl = `/api/v1/study/get_start_config/${slug}/${studyMode}/${studyFormat}/`;
 
             const response = await fetch(configUrl);
             if (!response.ok) {
@@ -28,6 +25,7 @@ document.addEventListener('DOMContentLoaded', async function () {
 
 
     const config = await initializeConfig();
+    const studyFormat = config.study_format;
     const csrfToken = config.csrf_token;
     const urls = config.urls;
     const getUrl = urls.get_card;
@@ -45,7 +43,6 @@ document.addEventListener('DOMContentLoaded', async function () {
     let audio = null;
     let count = 0;
     let revealIndex = 0;
-
 
 
     function hideButtons() {
@@ -85,8 +82,12 @@ document.addEventListener('DOMContentLoaded', async function () {
                 }, 3000);
                 return;
             }
-
-            cardFront.innerText = data.front_side;
+            if (studyFormat === 'audio') {
+                cardFront.innerText = 'Play';
+            } else {
+                cardFront.innerText = data.front_side;
+            }
+            // cardFront.innerText = data.front_side;
             cardBack.classList.add('hidden');
             cardBack.innerText = '';
             hintContainer.classList.add('hidden');
@@ -144,11 +145,12 @@ document.addEventListener('DOMContentLoaded', async function () {
     loadCard();
 
 
-
-
     const showBackButton = document.getElementById('show-back-btn');
     if (showBackButton) {
         showBackButton.addEventListener('click', function () {
+            if (studyFormat === 'audio') {
+                cardFront.innerText = cardData.front_side;
+            }
             cardBack.innerText = cardData.back_side;
             cardBack.classList.remove('hidden');
             makeButtonsInactive();
@@ -163,7 +165,6 @@ document.addEventListener('DOMContentLoaded', async function () {
                 hintContainer.innerText = data;
                 hintContainer.classList.remove('hidden');
                 disableOtherActionButtons(showBackButton.id);
-
 
 
             });
@@ -208,7 +209,6 @@ document.addEventListener('DOMContentLoaded', async function () {
             button.disabled = true;
         });
     }
-
 
 
     const showFirstLettersButton = document.getElementById('show-first-letters-btn');

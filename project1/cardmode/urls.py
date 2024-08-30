@@ -15,6 +15,8 @@ urlpatterns = [
     path('get_start_config/<str:telegram_id>/', views.GetStartConfigAPI.as_view(), name='get_start_config_tg'),
     path('get_start_config/<slug:slug>/<str:mode>/',
          views.GetStartConfigAPI.as_view(), name='get_start_config'),
+    path('get_start_config/<slug:slug>/<str:mode>/<str:st_format>/',
+         views.GetStartConfigAPI.as_view(), name='get_start_config_slug'),
     path('get_start_config/<slug:slug>/<str:mode>/<str:st_format>/<str:telegram_id>/',
          views.GetStartConfigAPI.as_view(), name='get_start_config_tg_slug'),
 ]

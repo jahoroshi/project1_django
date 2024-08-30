@@ -56,6 +56,7 @@
                                         <div class="col-12 col-md-10 col-sm-9 mx-auto">
                                             <div class="d-flex flex-column">
                                                 <h2>Profile</h2>
+                                                <div class="fs-7 text-center">Please enter your login details</div>
                                                 <form method="post">
                                                     {% csrf_token %}
 
@@ -89,7 +90,7 @@
                                     <div class="row">
                                         <div class="col-12 col-md-10 col-sm-9 mx-auto">
                                             <div class="d-flex flex-column mt-3 px-2 px-sm-0">
-                                                    <div class="text-center">
+                                                <div class="text-center">
                                                     <h4>Connect Telegram Account</h4>
                                                     <div class="fs-7 mb-4">To link your Telegram account, simply
                                                         authorize it through Telegram.
@@ -111,21 +112,22 @@
                         </div>
                     {% endif %}
 
+                    {% if has_credentials %}
+                        <div class="row">
+                            <div class="col">
+                                <div class="text-center mt-1 mt-sm-3" style="margin-bottom: -10px !important;">
+                                    <div class="row">
+                                        <div class="col-12 col-md-10 col-sm-9 mx-auto">
+                                            <a href="{% url 'users:delete' %}" class="btn btn-outline-light btn-sm"
+                                               style="border: None">Delete
+                                                account</a>
 
-                    <div class="row">
-                        <div class="col">
-                            <div class="text-center mt-1 mt-sm-3" style="margin-bottom: -10px !important;">
-                                <div class="row">
-                                    <div class="col-12 col-md-10 col-sm-9 mx-auto">
-                                        <a href="{% url 'users:delete' %}" class="btn btn-outline-light btn-sm"
-                                           style="border: None">Delete
-                                            account</a>
-
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    {% endif %}
 
                 {% elif page_mode == 'delete_account' %}
                     <div class="row">
@@ -134,7 +136,7 @@
                                 <div class="row">
                                     <div class="col-12 col-md-10 col-sm-9 mx-auto">
                                         <div class="d-flex flex-column">
-                                            <h2>Confirm Account Deletion</h2>
+                                            <div class="fs-3 mb-2">Confirm Account Deletion</div>
                                             <form method="post">
                                                 {% csrf_token %}
 
