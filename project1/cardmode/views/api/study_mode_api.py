@@ -6,13 +6,13 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from cards.models import Cards, Mappings
-from cards.services.query_builder import get_card_queryset
+from cards.services.query_builder import get_card_queryset, get_card_queryset_telegram
 from open_ai.views import chatgpt_client
 from speech.views import synthesize_speech
 from users.models import User
 
 
-class GetCardAPIView(APIView):
+class GetCardAPIViewTelegram(APIView):
     # permission_classes = [IsAuthenticated, IsOwner]
     def post(self, request, slug, *args, **kwargs):
         body_data = request.data
@@ -20,12 +20,31 @@ class GetCardAPIView(APIView):
         mappings_id = body_data['mappings_id']
         mappings = get_object_or_404(Mappings, pk=mappings_id)
         mappings.move(rating)
+        return Response(status=status.HTTP_200_OK)
+
+    def get(self, request, slug, *args, **kwargs):
+        study_mode = kwargs.get('mode')
+        card, ratings_count = get_card_queryset_telegram(slug=slug, study_mode=study_mode)
+
+        data = {
+            'cards': card,
+            'ratings_count': ratings_count,
+        }
+
+        return Response(data, status=status.HTTP_200_OK)
+
+
+
+
+class GetCardAPIView(GetCardAPIViewTelegram, APIView):
+    # permission_classes = [IsAuthenticated, IsOwner]
+    def post(self, request, slug, *args, **kwargs):
+        super().post(request, slug, *args, **kwargs)
         return self.get(request, slug, *args, **kwargs)
 
     def get(self, request, slug, *args, **kwargs):
         study_mode = kwargs.get('mode')
         card, ratings_count = get_card_queryset(slug=slug, study_mode=study_mode)
-        print(ratings_count)
 
         data = {
             'front_side': card.get('front_side'),
@@ -36,6 +55,31 @@ class GetCardAPIView(APIView):
 
         return Response(data, status=status.HTTP_200_OK)
 
+
+
+# class GetCardAPIView(APIView):
+#     # permission_classes = [IsAuthenticated, IsOwner]
+#     def post(self, request, slug, *args, **kwargs):
+#         body_data = request.data
+#         rating = body_data['rating']
+#         mappings_id = body_data['mappings_id']
+#         mappings = get_object_or_404(Mappings, pk=mappings_id)
+#         mappings.move(rating)
+#         return self.get(request, slug, *args, **kwargs)
+#
+#     def get(self, request, slug, *args, **kwargs):
+#         study_mode = kwargs.get('mode')
+#         card, ratings_count = get_card_queryset(slug=slug, study_mode=study_mode)
+#         print(ratings_count)
+#
+#         data = {
+#             'front_side': card.get('front_side'),
+#             'back_side': card.get('back_side'),
+#             'mappings_id': card.get('id'),
+#             'ratings_count': ratings_count,
+#         }
+#
+#         return Response(data, status=status.HTTP_200_OK)
 
 class GetStartConfigAPI(APIView):
     # permission_classes = [IsAuthenticated]
@@ -86,6 +130,7 @@ class GetStartConfigAPI(APIView):
             'study_mode': study_mode,
             'study_format': study_format,
             'urls': {
+                'card_process': reverse('card_process', kwargs={'slug': slug, 'mode': study_mode}),
                 'get_card': reverse('get_card', kwargs={'slug': slug, 'mode': study_mode}),
                 'get_hint': reverse('get_hint', kwargs={'mappings_id': 'dummy_mappings_id'}),
                 'get_hint_with_telegram_id': reverse('get_hint_with_telegram_id',
@@ -101,6 +146,72 @@ class GetStartConfigAPI(APIView):
         }
         return Response(start_config, status=status.HTTP_200_OK)
 
+
+
+
+# class GetStartConfigAPI(APIView):
+#     # permission_classes = [IsAuthenticated]
+#
+#     def get(self, request, *args, **kwargs):
+#         study_mode = kwargs.get('mode')
+#         study_format = kwargs.get('st_format')
+#         slug = kwargs.get('slug')
+#         telegram_id = kwargs.get('telegram_id')
+#         if telegram_id is not None:
+#             if telegram_id.isdigit():
+#                 telegram_id = int(telegram_id)
+#                 if slug and study_mode:
+#                     session_config = {
+#                         'slug': slug,
+#                         'study_mode': study_mode,
+#                         'study_format': study_format
+#                     }
+#
+#                     user, created = User.objects.update_or_create(
+#                         telegram_id=telegram_id,
+#                         defaults={'session_config': session_config}
+#                     )
+#
+#                 else:
+#                     telegram_user = User.objects.get(telegram_id=telegram_id)
+#                     config = telegram_user.session_config
+#                     if config:
+#                         slug = config.get('slug')
+#                         study_mode = config.get('study_mode')
+#                         study_format = config.get('study_format')
+#
+#             else:
+#                 return Response({"detail": "telegram_id must be a digit"}, status=status.HTTP_400_BAD_REQUEST)
+#
+#         buttons_to_show = {
+#             'show_back': True,
+#             'show_hint': True,
+#             'show_similar': True,
+#             'show_first_letters': True,
+#             'scramble_letters': True,
+#             'speech': True
+#         }
+#
+#         start_config = {
+#             'csrf_token': request.COOKIES.get('csrftoken'),
+#             'slug': slug,
+#             'study_mode': study_mode,
+#             'study_format': study_format,
+#             'urls': {
+#                 'get_card': reverse('get_card', kwargs={'slug': slug, 'mode': study_mode}),
+#                 'get_hint': reverse('get_hint', kwargs={'mappings_id': 'dummy_mappings_id'}),
+#                 'get_hint_with_telegram_id': reverse('get_hint_with_telegram_id',
+#                                                      kwargs={'mappings_id': 'dummy_mappings_id',
+#                                                              'telegram_id': 'dummy_telegram_id'}),
+#                 'get_similar_words': reverse('get_similar_words', kwargs={'mappings_id': 'dummy_mappings_id'}),
+#                 'get_similar_with_telegram_id': reverse('get_similar_with_telegram_id',
+#                                                         kwargs={'mappings_id': 'dummy_mappings_id',
+#                                                                 'telegram_id': 'dummy_telegram_id'}),
+#                 'get_sound': reverse('get_sound', kwargs={'mappings_id': 'dummy_mappings_id'})
+#             },
+#             'buttons_to_show': buttons_to_show
+#         }
+#         return Response(start_config, status=status.HTTP_200_OK)
 
 class GetSoundAPI(APIView):
     # permission_classes = [IsAuthenticated]

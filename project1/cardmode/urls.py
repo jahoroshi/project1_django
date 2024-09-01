@@ -12,6 +12,7 @@ urlpatterns = [
     path('get_hint/<str:mappings_id>/', views.GetHintAPI.as_view(), name='get_hint'),
     path('get_sound/<str:mappings_id>/', views.GetSoundAPI.as_view(), name='get_sound'),
     path('get_card/<slug:slug>/<str:mode>/', views.GetCardAPIView.as_view(), name='get_card'),
+    path('card_process/<slug:slug>/<str:mode>/', views.GetCardAPIViewTelegram.as_view(), name='card_process'),
     path('get_start_config/<str:telegram_id>/', views.GetStartConfigAPI.as_view(), name='get_start_config_tg'),
     path('get_start_config/<slug:slug>/<str:mode>/',
          views.GetStartConfigAPI.as_view(), name='get_start_config'),

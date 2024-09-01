@@ -128,6 +128,10 @@ def telegram_auth(request):
 
 @login_required
 def telegram_connect(request):
+
+    form = UserProfileForm(instance=request.user)
+    context = {'form': form, 'page_mode': 'profile', 'has_credentials': True}
+
     if request.method == 'GET':
         form = TelegramUserForm(data=request.GET)
         if form.is_valid():
@@ -141,9 +145,9 @@ def telegram_connect(request):
                 current_user.telegram_id = tg_user
                 current_user.save()
             messages.success(request, '🎉 Congratulations! Your Telegram account has been successfully linked to your current account. You can now study flashcards both on this web version and through the Telegram bot. To start the bot, click the AnkiChatBot button.',  extra_tags='profile')
+            return redirect('users:profile')
         else:
             messages.error(request, 'We’re experiencing an issue with Telegram’s server. Please try again later.', extra_tags='profile')
 
-    form = UserProfileForm(instance=request.user)
-    context = {'form': form, 'page_mode': 'profile', 'has_credentials': True}
+
     return render(request, 'users/profile.html', context)

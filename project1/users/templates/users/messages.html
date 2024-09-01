@@ -10,7 +10,7 @@
             {% else %}
                 <div class="bd-callout bd-callout-success mt-1 rounded-4">
             {% endif %}
-                {{ message }}
+                {{ message|safe }}
             </div>
             {% endif %}
         {% endfor %}

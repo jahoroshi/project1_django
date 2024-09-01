@@ -325,7 +325,8 @@ button.wrong-choice {
     border: 1px solid #080707;
     cursor: pointer;
     background-color: #6c757d;
-    width: max-content;
+    width: min-content;
+    min-width: 46px;
     height: 40px;
     position: relative;
     display: flex;

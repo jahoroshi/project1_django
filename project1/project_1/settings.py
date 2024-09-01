@@ -42,6 +42,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 ALLOWED_HOSTS = [
     'localhost',
+    'localhost:8000',
     '127.0.0.1',
     'b114-46-53-254-108.ngrok-free.app',
     'engaging-mastodon-accurate.ngrok-free.app',
@@ -206,18 +207,9 @@ LOGGING = {
 
 
 
-# REST_FRAMEWORK = {
-#     'DEFAULT_AUTHENTICATION_CLASSES': [
-#         'project_1.authentication.APIKeyAuthentication',
-#     ],
-# }
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'project_1.authentication.APIKeyAuthentication',
+    ],
+}
 
-# LANGUAGES = [
-#     ('en', _('English')),
-#     ('de', _('German')),
-#     # Добавьте другие языки, которые вам нужны
-# ]
-
-LOCALE_PATHS = [
-    os.path.join(BASE_DIR, 'locale'),
-]

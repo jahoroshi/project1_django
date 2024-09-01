@@ -31,8 +31,23 @@ def telegram_web_app_start(request, *args, **kwargs):
             if user:
                 auth.login(request, user)
                 request.session['auth_method'] = 'telegram'
-                return render(request, 'cardmode/studying_mode.html')
+                return render(request, 'cardmode/studying_mode_tg.html')
         else:
             return render(request, 'deckhub/error_page.html')
+
+
+
+
+# def telegram_web_app_start(request, *args, **kwargs):
+#     if request.method == 'GET':
+#         telegram_id = kwargs.get('telegram_id')
+#         if telegram_id:
+#             user = User.objects.filter(telegram_id=telegram_id).first()
+#             if user:
+#                 auth.login(request, user)
+#                 request.session['auth_method'] = 'telegram'
+#                 return render(request, 'cardmode/studying_mode.html')
+#         else:
+#             return render(request, 'deckhub/error_page.html')
 
 

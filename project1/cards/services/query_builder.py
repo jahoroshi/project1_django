@@ -35,6 +35,51 @@ def cards_counter(queryset):
     return dic
 
 
+def get_card_queryset_telegram(*args, **kwargs):
+    study_mode = kwargs['study_mode']
+    slug = kwargs['slug']
+
+    if study_mode.endswith('all'):
+        study_mode, tg_id, _ = study_mode.split('-')
+        conditions = Q(category__user__telegram_id=tg_id)
+    else:
+        conditions = Q(category__slug=slug)
+
+    if study_mode == 'new':
+        conditions &= Q(study_mode='new')
+    elif study_mode == 'review':
+        conditions &= Q(study_mode='review') & (
+                Q(review_date__lt=timezone.now()) | Q(mem_rating__gt=0))
+
+    subquery = Mappings.objects.filter(conditions).order_by('-mem_rating').values('id')[:10]
+
+    ratings_count_dict = cards_counter(subquery)
+
+
+    card = (
+            Mappings.objects.filter(id__in=Subquery(subquery))
+            .order_by('easiness', 'upd_date')
+            .values(
+                'card__side1', 'card__side2',
+                'card_id', 'id', 'easiness',
+            )
+
+    )
+
+
+    ####
+    # my_debug(subquery1, card.get('id'))
+    ####
+    # if not card.get('easiness') and study_mode == 'new':
+    #     ratings_count_dict[5] = 1
+    # ratings_count_dict.pop(0, None)
+
+    return card, ratings_count_dict
+
+
+
+
+
 def get_card_queryset(*args, **kwargs):
     study_mode = kwargs['study_mode']
     slug = kwargs['slug']
@@ -65,7 +110,6 @@ def get_card_queryset(*args, **kwargs):
     max_limit = randint(1, cards_in_process + 1) if cards_in_process <= 5 else round(cards_in_process * 0.4)
 
     subquery2 = Mappings.objects.filter(id__in=Subquery(subquery1)).order_by('upd_date').values('id')[:max_limit]
-    # subquery3 = Mappings.objects.filter(id__in=Subquery(subquery2)).order_by('easiness', 'upd_date').values('card_id')
 
     card = (
             Mappings.objects.filter(id__in=Subquery(subquery2))
@@ -97,5 +141,3 @@ def get_card_queryset(*args, **kwargs):
     ratings_count_dict.pop(0, None)
 
     return card, ratings_count_dict
-
-
