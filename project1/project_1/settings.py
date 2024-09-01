@@ -26,6 +26,11 @@ DEBUG = env('DEBUG')
 SECRET_KEY = env('SECRET_KEY')
 BOT_API_KEY = env('BOT_API_KEY')
 OPENAI_API_KEY = env('OPENAI_API_KEY')
+DB_NAME = env('DB_NAME')
+DB_USER = env('DB_USER')
+DB_PASSWORD = env('DB_PASSWORD')
+DB_ENDPOINT = env('DB_ENDPOINT')
+
 
 BOT_NAME = 'Anki4bot'
 
@@ -40,16 +45,19 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # SECURITY WARNING: don't run with debug turned on in production!
 
+# ALLOWED_HOSTS = [
+#     'localhost',
+#     '54.205.95.62',
+#     'localhost:8000',
+#     '127.0.0.1',
+#     'b114-46-53-254-108.ngrok-free.app',
+#     'engaging-mastodon-accurate.ngrok-free.app',
+#     'jahoroshi4y.pagekite.me',
+#
+# ]
+
 ALLOWED_HOSTS = [
-    'localhost',
-    '54.205.95.62',
-    'localhost:8000',
-    '127.0.0.1',
-    'b114-46-53-254-108.ngrok-free.app',
-    'engaging-mastodon-accurate.ngrok-free.app',
-    'jahoroshi4y.pagekite.me',
-    # Добавьте этот домен
-    # Можно добавить и другие домены, если нужно
+    '*'
 ]
 
 CSRF_TRUSTED_ORIGINS = [
@@ -94,7 +102,6 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    # 'cards.middleware.DeckEmptyMiddleware',
 
 ]
 if DEBUG:
@@ -124,10 +131,10 @@ WSGI_APPLICATION = 'project_1.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'project1',
-        'USER': 'project1',
-        'PASSWORD': '123',
-        'HOST': 'localhost',
+        'NAME': DB_NAME,
+        'USER': DB_USER,
+        'PASSWORD': DB_PASSWORD,
+        'HOST': DB_ENDPOINT,
         'PORT': '5432',
     }
 }
