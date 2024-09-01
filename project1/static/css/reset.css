@@ -1,12 +1,13 @@
+/* Styles for various button elements when they are enabled and hovered over */
 button:enabled:hover,
-.button:not([aria-disabled=true]):hover,
+.button:not([aria-disabled=true]):hover, /* Targets elements with class 'button' that are not aria-disabled */
 input[type=submit]:enabled:hover,
 input[type=reset]:enabled:hover,
 input[type=button]:enabled:hover,
 label[type=button]:hover {
-    background-color: transparent; /* Убирает цвет фона */
-    border-color: transparent; /* Убирает цвет границы */
-    color: inherit; /* Наследует цвет текста */
-    box-shadow: none; /* Убирает тень, если она есть */
-    text-decoration: none; /* Убирает подчеркивание, если есть */
+    background-color: transparent; /* Removes the background color */
+    border-color: transparent; /* Removes the border color */
+    color: inherit; /* Inherits the color of the text from the parent element */
+    box-shadow: none; /* Removes any box shadow */
+    text-decoration: none; /* Removes any text decoration like underlines */
 }

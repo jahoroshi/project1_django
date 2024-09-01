@@ -1,29 +1,33 @@
 document.addEventListener('DOMContentLoaded', async function () {
+    // Function to initialize configuration by fetching data from the server
     async function initializeConfig() {
         try {
             const currentUrl = new URL(window.location.href);
 
+            // Extracting parameters from the URL
             const slug = currentUrl.searchParams.get('slug');
-
             const studyMode = currentUrl.searchParams.get('mode');
-
             const studyFormat = currentUrl.searchParams.get('format') || 'text';
 
+            // Construct the URL to fetch the configuration
             const configUrl = `/api/v1/study/get_start_config/${slug}/${studyMode}/${studyFormat}/`;
 
+            // Fetch the configuration data from the server
             const response = await fetch(configUrl);
             if (!response.ok) {
                 throw new Error('Network response was not ok');
             }
+
+            // Parse the response JSON data
             const data = await response.json();
             return data;
         } catch (error) {
-            console.error('Ошибка при получении конфигурации:', error);
+            console.error('Error fetching configuration:', error);
             return null;
         }
     }
 
-
+    // Initialize configuration and store key values
     const config = await initializeConfig();
     const studyFormat = config.study_format;
     const csrfToken = config.csrf_token;
@@ -44,7 +48,7 @@ document.addEventListener('DOMContentLoaded', async function () {
     let count = 0;
     let revealIndex = 0;
 
-
+    // Function to hide or show buttons based on configuration
     function hideButtons() {
         const buttonsToShow = config.buttons_to_show;
 
@@ -57,6 +61,7 @@ document.addEventListener('DOMContentLoaded', async function () {
             speech: 'speech-btn'
         };
 
+        // Iterate over the buttons and hide or show them based on the config
         for (const [key, value] of Object.entries(buttonIds)) {
             const button = document.getElementById(value);
             if (button && buttonsToShow[key]) {
@@ -67,12 +72,14 @@ document.addEventListener('DOMContentLoaded', async function () {
 
     hideButtons();
 
+    // Function to load a new card or update the current card
     const loadCard = (data = null) => {
         if (data) {
             cardData = data;
-            console.log(cardData)
+
+            // Check if there is content for the front side of the card
             if (!data.front_side) {
-                console.log(data.front_side)
+                // If no front side content, show a message and redirect
                 document.getElementById('hidden-container').classList.add('hidden');
                 document.getElementById('show-container-message').classList.remove('hidden');
                 document.getElementById('show-container-trophy').classList.remove('hidden');
@@ -82,12 +89,9 @@ document.addEventListener('DOMContentLoaded', async function () {
                 }, 3000);
                 return;
             }
-            if (studyFormat === 'audio') {
-                cardFront.innerText = 'Play';
-            } else {
-                cardFront.innerText = data.front_side;
-            }
-            // cardFront.innerText = data.front_side;
+
+            // Display the front side of the card or a 'Play' button for audio
+            cardFront.innerText = studyFormat === 'audio' ? 'Play' : data.front_side;
             cardBack.classList.add('hidden');
             cardBack.innerText = '';
             hintContainer.classList.add('hidden');
@@ -104,47 +108,49 @@ document.addEventListener('DOMContentLoaded', async function () {
             showKnownButton();
             updateCounters(cardData.ratings_count);
         } else {
+            // Fetch the card data from the server if not provided
             fetch(getUrl).then(response => response.json()).then(data => {
                 cardData = data;
                 updateCounters(cardData.ratings_count);
-
                 loadCard(data);
             });
         }
     };
 
+    // Function to show or hide certain elements based on conditions
     const hideElements = () => {
         const hiddenContainer = document.getElementById('hidden-container').classList.add('hidden');
         const showMessage = document.getElementById('show-container-message').classList.remove('hidden');
         const showTrophy = document.getElementById('show-container-trophy').classList.remove('hidden');
-        hiddenContainer.classList.add('hidden');
-        showMessage.classList.remove('hidden');
-        showTrophy.classList.remove('hidden');
     };
 
+    // Function to show the 'Known' button based on certain conditions
     const showKnownButton = () => {
         if (cardData) {
             knownButton.classList.add('hidden');
             if (cardData.ratings_count.hasOwnProperty(5)) {
-                knownButton.classList.remove('hidden')
+                knownButton.classList.remove('hidden');
             }
         }
     };
 
+    // Function to update rating counters on the page
     const updateCounters = (ratings) => {
         document.getElementById('again-count').innerText = ratings[1] || 0;
         document.getElementById('hard-count').innerText = ratings[2] || 0;
         document.getElementById('good-count').innerText = ratings[3] || 0;
     };
 
+    // Increment the 'easy' rating count when the 'easy' button is clicked
     document.getElementById('easy-btn').addEventListener('click', function () {
         count++;
         document.getElementById('easy-count').innerText = count;
     });
 
+    // Load the initial card
     loadCard();
 
-
+    // Event listener for showing the back side of the card
     const showBackButton = document.getElementById('show-back-btn');
     if (showBackButton) {
         showBackButton.addEventListener('click', function () {
@@ -157,6 +163,7 @@ document.addEventListener('DOMContentLoaded', async function () {
         });
     }
 
+    // Event listener for showing a hint for the current card
     const showHintButton = document.getElementById('show-hint-btn');
     if (showHintButton) {
         showHintButton.addEventListener('click', function () {
@@ -165,12 +172,11 @@ document.addEventListener('DOMContentLoaded', async function () {
                 hintContainer.innerText = data;
                 hintContainer.classList.remove('hidden');
                 disableOtherActionButtons(showBackButton.id);
-
-
             });
         });
     }
 
+    // Event listener for showing similar words related to the current card
     const showSimilarButton = document.getElementById('show-similar-btn');
     if (showSimilarButton) {
         showSimilarButton.addEventListener('click', function () {
@@ -183,14 +189,16 @@ document.addEventListener('DOMContentLoaded', async function () {
                     button.className = 'list-group-item list-group-item-action similar-words';
                     button.setAttribute('type', 'button');
                     button.innerText = word;
+
+                    // Add click event to check if the selected word is correct
                     button.addEventListener('click', function () {
                         if (word === data.back_side) {
-                            button.classList.add('correct-choice'); // Добавление стиля для правильного ответа
+                            button.classList.add('correct-choice'); // Correct choice styling
                         } else {
-                            button.classList.add('wrong-choice'); // Добавление стиля для ошибочного ответа
+                            button.classList.add('wrong-choice'); // Wrong choice styling
                             const correctButton = Array.from(similarWordsContainer.querySelectorAll('button')).find(btn => btn.innerText === data.back_side);
                             if (correctButton) {
-                                correctButton.classList.add('correct-choice'); // Добавление стиля для правильного ответа
+                                correctButton.classList.add('correct-choice'); // Correct choice styling
                             }
                         }
                         makeButtonsInactive();
@@ -203,6 +211,7 @@ document.addEventListener('DOMContentLoaded', async function () {
         });
     }
 
+    // Disable all similar word buttons after a selection is made
     function disableSimilarWordButtons() {
         const buttons = similarWordsContainer.querySelectorAll('button');
         buttons.forEach(button => {
@@ -210,7 +219,7 @@ document.addEventListener('DOMContentLoaded', async function () {
         });
     }
 
-
+    // Event listener for showing the first letters of the answer
     const showFirstLettersButton = document.getElementById('show-first-letters-btn');
     if (showFirstLettersButton) {
         showFirstLettersButton.addEventListener('click', function () {
@@ -218,8 +227,8 @@ document.addEventListener('DOMContentLoaded', async function () {
             const sentence = cardData.back_side;
             const words = sentence.split(' ');
 
+            // Reveal letters incrementally based on the word count
             if (words.length < 3) {
-                // Слово состоит из одной части
                 revealIndex += 2;
                 if (revealIndex > sentence.length) revealIndex = sentence.length;
                 const revealed = sentence.slice(0, revealIndex);
@@ -228,9 +237,7 @@ document.addEventListener('DOMContentLoaded', async function () {
                     makeButtonsInactive();
                     revealIndex = 0;
                 }
-
             } else {
-                // Слово состоит из нескольких частей
                 revealIndex += 1;
                 if (revealIndex > words.length) revealIndex = words.length;
                 const revealed = words.slice(0, revealIndex).join(' ');
@@ -246,6 +253,7 @@ document.addEventListener('DOMContentLoaded', async function () {
         });
     }
 
+    // Utility function to shuffle an array (used for scrambling letters)
     function shuffleArray(array) {
         for (let i = array.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
@@ -253,7 +261,7 @@ document.addEventListener('DOMContentLoaded', async function () {
         }
     }
 
-
+    // Event listener for scrambling the letters of the answer
     const scrambleLettersButton = document.getElementById('scramble-letters-btn');
     if (scrambleLettersButton) {
         scrambleLettersButton.addEventListener('click', function () {
@@ -261,18 +269,20 @@ document.addEventListener('DOMContentLoaded', async function () {
             lettersContainer.innerHTML = '';
             const input = cardData.back_side.trim();
             const words = input.split(' ');
-            const isSentence = words.length > 2; // проверка, является ли это предложение (более 2 слов)
+            const isSentence = words.length > 2; // Check if it's a sentence (more than 2 words)
             let elements;
 
+            // Split into words or letters based on input type
             if (isSentence) {
-                elements = words.slice(); // используем копию массива слов
+                elements = words.slice(); // Use a copy of the word array
             } else {
-                elements = input.split(''); // используем буквы
+                elements = input.split(''); // Use letters for single words
             }
 
             shuffleArray(elements);
-            let userInput = isSentence ? [] : ''; // массив для предложений, строка для слов
+            let userInput = isSentence ? [] : ''; // Array for sentences, string for words
 
+            // Create buttons for each element (letter/word) and add event listeners
             elements.forEach(element => {
                 const span = document.createElement('span');
                 span.className = 'letter';
@@ -281,6 +291,7 @@ document.addEventListener('DOMContentLoaded', async function () {
                     const currentIndex = userInput.length;
                     const originalElement = isSentence ? words[currentIndex] : input[currentIndex];
 
+                    // Check if the clicked element matches the original input
                     if (element === originalElement) {
                         if (isSentence) {
                             userInput.push(element);
@@ -291,13 +302,12 @@ document.addEventListener('DOMContentLoaded', async function () {
                         }
                         span.classList.add('inactive');
 
-                        // Проверка полного соответствия ввода
+                        // Check if the user has fully reconstructed the word/sentence
                         if ((isSentence && userInput.join(' ') === input) || (!isSentence && userInput === input)) {
                             resultContainer.innerHTML = `${isSentence ? userInput.join(' ') : userInput} <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-check2-all" viewBox="0 0 16 16">
                               <path d="M12.354 4.354a.5.5 0 0 0-.708-.708L5 10.293 1.854 7.146a.5.5 0 1 0-.708.708l3.5 3.5a.5.5 0 0 0 .708 0l7-7zm-4.208 7-.896-.897.707-.707.543.543 6.646-6.647a.5.5 0 0 1 .708.708l-7 7a.5.5 0 0 1-.708 0z"/>
                               <path d="m5.354 7.146.896.897-.707.707-.897-.896a.5.5 0 1 1 .708-.708"/>
                             </svg>`;
-
 
                             resultContainer.classList.add('correct-word');
                             lettersContainer.classList.add('hidden');
@@ -316,6 +326,7 @@ document.addEventListener('DOMContentLoaded', async function () {
         });
     }
 
+    // Disable all action buttons except the one that was just activated
     function disableOtherActionButtons(activeButtonId) {
         actionButtons.forEach(button => {
             if (button.id !== activeButtonId) {
@@ -324,10 +335,12 @@ document.addEventListener('DOMContentLoaded', async function () {
         });
     }
 
+    // Make all action buttons inactive
     function makeButtonsInactive() {
         actionButtons.forEach(button => button.disabled = true);
     }
 
+    // Event listeners for rating buttons (e.g., "Again", "Hard", "Good")
     document.querySelectorAll('.rating-button').forEach(button => {
         button.addEventListener('click', function () {
             const rating = parseInt(this.getAttribute('data-rating'));
@@ -346,6 +359,7 @@ document.addEventListener('DOMContentLoaded', async function () {
         });
     });
 
+    // Event listener for playing the sound of the card front
     const playSoundButton = document.getElementById('card-front');
     playSoundButton.addEventListener('click', function () {
         if (!soundUrlCache) {

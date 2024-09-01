@@ -1,17 +1,20 @@
-import logging
 from random import randint
 
-from django.db.models import Q, Subquery, Case, When, F, CharField, Count
-from django.shortcuts import redirect
-from django.urls import reverse
+from django.core.cache import cache
+from django.db.models import Q, Subquery, F, Count
 from django.utils import timezone
 
-from cards.exceptions import DeckEmptyException
-from cards.models import Mappings, Cards
-from django.core.cache import cache
+from cards.models import Mappings
 
+
+# Uncomment the logger if needed for debugging
 # logger = logging.getLogger('cards.query_builder')
+
 def my_debug(subquery, map_id):
+    """
+    Debugging function to print details of Mappings queryset.
+    Highlights the mapping with the given map_id.
+    """
     queryset = Mappings.objects.filter(id__in=Subquery(subquery)).order_by('easiness')
     for el in queryset:
         data = (
@@ -29,13 +32,29 @@ def my_debug(subquery, map_id):
 
 
 def cards_counter(queryset):
-    query_rating_count = Mappings.objects.filter(id__in=(Subquery(queryset))).values('mem_rating').annotate(count=Count('mem_rating')).order_by('mem_rating')
-    dic = {}.fromkeys(range(1, 5), 0)
+    """
+    Count the number of cards per mem_rating in the given queryset.
+
+    :param queryset: A queryset of Mappings.
+    :return: A dictionary mapping mem_rating values to their counts.
+    """
+    query_rating_count = Mappings.objects.filter(id__in=Subquery(queryset)) \
+        .values('mem_rating') \
+        .annotate(count=Count('mem_rating')) \
+        .order_by('mem_rating')
+
+    dic = {rating: 0 for rating in range(1, 5)}
     dic.update({el['mem_rating']: el['count'] for el in query_rating_count})
     return dic
 
 
 def get_card_queryset_telegram(*args, **kwargs):
+    """
+    Retrieve a queryset of cards for Telegram users based on the study mode and category slug.
+
+    :param kwargs: Dictionary containing 'study_mode' and 'slug'.
+    :return: A tuple containing the card queryset and a dictionary of ratings count.
+    """
     study_mode = kwargs['study_mode']
     slug = kwargs['slug']
 
@@ -49,41 +68,36 @@ def get_card_queryset_telegram(*args, **kwargs):
         conditions &= Q(study_mode='new')
     elif study_mode == 'review':
         conditions &= Q(study_mode='review') & (
-                Q(review_date__lt=timezone.now()) | Q(mem_rating__gt=0))
+                Q(review_date__lt=timezone.now()) | Q(mem_rating__gt=0)
+        )
 
     subquery = Mappings.objects.filter(conditions).order_by('-mem_rating').values('id')[:10]
-
     ratings_count_dict = cards_counter(subquery)
 
-
     card = (
-            Mappings.objects.filter(id__in=Subquery(subquery))
-            .order_by('easiness', 'upd_date')
-            .values(
-                'card__side1', 'card__side2',
-                'card_id', 'id', 'easiness',
-            )
-
+        Mappings.objects.filter(id__in=Subquery(subquery))
+        .order_by('easiness', 'upd_date')
+        .values('card__side1', 'card__side2', 'card_id', 'id', 'easiness')
     )
 
-
-    ####
-    # my_debug(subquery1, card.get('id'))
-    ####
-    # if not card.get('easiness') and study_mode == 'new':
-    #     ratings_count_dict[5] = 1
-    # ratings_count_dict.pop(0, None)
+    # Uncomment for debugging
+    # my_debug(subquery, card.get('id'))
 
     return card, ratings_count_dict
 
 
-
-
-
 def get_card_queryset(*args, **kwargs):
+    """
+    Retrieve a queryset of cards based on the study mode and category slug.
+    Uses caching to avoid returning the same card repeatedly.
+
+    :param kwargs: Dictionary containing 'study_mode' and 'slug'.
+    :return: A tuple containing the card dictionary and a dictionary of ratings count.
+    """
     study_mode = kwargs['study_mode']
     slug = kwargs['slug']
     cache_data = cache.get(slug)
+
     if cache_data:
         last_card_id = cache_data['card_id']
         cards_count = cache_data['count']
@@ -101,11 +115,13 @@ def get_card_queryset(*args, **kwargs):
         conditions &= Q(study_mode='new')
     elif study_mode == 'review':
         conditions &= Q(study_mode='review') & (
-                Q(review_date__lt=timezone.now()) | Q(mem_rating__gt=0))
+                Q(review_date__lt=timezone.now()) | Q(mem_rating__gt=0)
+        )
 
-    subquery1 = Mappings.objects.filter(conditions).exclude(exclude_conditions).order_by('-mem_rating').values('id')[:10]
-
+    subquery1 = Mappings.objects.filter(conditions).exclude(exclude_conditions).order_by('-mem_rating').values('id')[
+                :10]
     ratings_count_dict = cards_counter(subquery1)
+
     cards_in_process = sum(ratings_count_dict.values())
     max_limit = randint(1, cards_in_process + 1) if cards_in_process <= 5 else round(cards_in_process * 0.4)
 
@@ -126,6 +142,7 @@ def get_card_queryset(*args, **kwargs):
             )
             .first() or {}
     )
+
     if card:
         data = {
             'card_id': card.get('card_id'),
@@ -133,11 +150,12 @@ def get_card_queryset(*args, **kwargs):
         }
         cache.set(slug, data, timeout=300)
 
-    ####
-    my_debug(subquery1, card.get('id'))
-    ####
+    # Uncomment for debugging
+    # my_debug(subquery1, card.get('id'))
+
     if not card.get('easiness') and study_mode == 'new':
         ratings_count_dict[5] = 1
+
     ratings_count_dict.pop(0, None)
 
     return card, ratings_count_dict

@@ -13,16 +13,30 @@ from users.models import User
 
 
 class GetCardAPIViewTelegram(APIView):
+    """
+    API view for handling card requests from Telegram.
+    """
+
     # permission_classes = [IsAuthenticated, IsOwner]
+
     def post(self, request, slug, *args, **kwargs):
+        """
+        Handle POST requests to update card rating based on Telegram input.
+        """
         body_data = request.data
         rating = body_data['rating']
         mappings_id = body_data['mappings_id']
+
+        # Update the mapping rating based on the provided data
         mappings = get_object_or_404(Mappings, pk=mappings_id)
         mappings.move(rating)
+
         return Response(status=status.HTTP_200_OK)
 
     def get(self, request, slug, *args, **kwargs):
+        """
+        Handle GET requests to retrieve card information for Telegram users.
+        """
         study_mode = kwargs.get('mode')
         card, ratings_count = get_card_queryset_telegram(slug=slug, study_mode=study_mode)
 
@@ -34,15 +48,24 @@ class GetCardAPIViewTelegram(APIView):
         return Response(data, status=status.HTTP_200_OK)
 
 
-
-
 class GetCardAPIView(GetCardAPIViewTelegram, APIView):
+    """
+    API view for handling card requests. Inherits from GetCardAPIViewTelegram.
+    """
+
     # permission_classes = [IsAuthenticated, IsOwner]
+
     def post(self, request, slug, *args, **kwargs):
+        """
+        Handle POST requests to update card rating, then retrieve card data.
+        """
         super().post(request, slug, *args, **kwargs)
         return self.get(request, slug, *args, **kwargs)
 
     def get(self, request, slug, *args, **kwargs):
+        """
+        Handle GET requests to retrieve card information.
+        """
         study_mode = kwargs.get('mode')
         card, ratings_count = get_card_queryset(slug=slug, study_mode=study_mode)
 
@@ -56,39 +79,22 @@ class GetCardAPIView(GetCardAPIViewTelegram, APIView):
         return Response(data, status=status.HTTP_200_OK)
 
 
-
-# class GetCardAPIView(APIView):
-#     # permission_classes = [IsAuthenticated, IsOwner]
-#     def post(self, request, slug, *args, **kwargs):
-#         body_data = request.data
-#         rating = body_data['rating']
-#         mappings_id = body_data['mappings_id']
-#         mappings = get_object_or_404(Mappings, pk=mappings_id)
-#         mappings.move(rating)
-#         return self.get(request, slug, *args, **kwargs)
-#
-#     def get(self, request, slug, *args, **kwargs):
-#         study_mode = kwargs.get('mode')
-#         card, ratings_count = get_card_queryset(slug=slug, study_mode=study_mode)
-#         print(ratings_count)
-#
-#         data = {
-#             'front_side': card.get('front_side'),
-#             'back_side': card.get('back_side'),
-#             'mappings_id': card.get('id'),
-#             'ratings_count': ratings_count,
-#         }
-#
-#         return Response(data, status=status.HTTP_200_OK)
-
 class GetStartConfigAPI(APIView):
+    """
+    API view to retrieve the start configuration for the user session.
+    """
+
     # permission_classes = [IsAuthenticated]
 
     def get(self, request, *args, **kwargs):
+        """
+        Handle GET requests to retrieve the session start configuration.
+        """
         study_mode = kwargs.get('mode')
         study_format = kwargs.get('st_format')
         slug = kwargs.get('slug')
         telegram_id = kwargs.get('telegram_id')
+
         if telegram_id is not None:
             if telegram_id.isdigit():
                 telegram_id = int(telegram_id)
@@ -99,11 +105,11 @@ class GetStartConfigAPI(APIView):
                         'study_format': study_format
                     }
 
+                    # Update or create user session configuration based on Telegram ID
                     user, created = User.objects.update_or_create(
                         telegram_id=telegram_id,
                         defaults={'session_config': session_config}
                     )
-
                 else:
                     telegram_user = User.objects.get(telegram_id=telegram_id)
                     config = telegram_user.session_config
@@ -111,7 +117,6 @@ class GetStartConfigAPI(APIView):
                         slug = config.get('slug')
                         study_mode = config.get('study_mode')
                         study_format = config.get('study_format')
-
             else:
                 return Response({"detail": "telegram_id must be a digit"}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -147,78 +152,19 @@ class GetStartConfigAPI(APIView):
         return Response(start_config, status=status.HTTP_200_OK)
 
 
-
-
-# class GetStartConfigAPI(APIView):
-#     # permission_classes = [IsAuthenticated]
-#
-#     def get(self, request, *args, **kwargs):
-#         study_mode = kwargs.get('mode')
-#         study_format = kwargs.get('st_format')
-#         slug = kwargs.get('slug')
-#         telegram_id = kwargs.get('telegram_id')
-#         if telegram_id is not None:
-#             if telegram_id.isdigit():
-#                 telegram_id = int(telegram_id)
-#                 if slug and study_mode:
-#                     session_config = {
-#                         'slug': slug,
-#                         'study_mode': study_mode,
-#                         'study_format': study_format
-#                     }
-#
-#                     user, created = User.objects.update_or_create(
-#                         telegram_id=telegram_id,
-#                         defaults={'session_config': session_config}
-#                     )
-#
-#                 else:
-#                     telegram_user = User.objects.get(telegram_id=telegram_id)
-#                     config = telegram_user.session_config
-#                     if config:
-#                         slug = config.get('slug')
-#                         study_mode = config.get('study_mode')
-#                         study_format = config.get('study_format')
-#
-#             else:
-#                 return Response({"detail": "telegram_id must be a digit"}, status=status.HTTP_400_BAD_REQUEST)
-#
-#         buttons_to_show = {
-#             'show_back': True,
-#             'show_hint': True,
-#             'show_similar': True,
-#             'show_first_letters': True,
-#             'scramble_letters': True,
-#             'speech': True
-#         }
-#
-#         start_config = {
-#             'csrf_token': request.COOKIES.get('csrftoken'),
-#             'slug': slug,
-#             'study_mode': study_mode,
-#             'study_format': study_format,
-#             'urls': {
-#                 'get_card': reverse('get_card', kwargs={'slug': slug, 'mode': study_mode}),
-#                 'get_hint': reverse('get_hint', kwargs={'mappings_id': 'dummy_mappings_id'}),
-#                 'get_hint_with_telegram_id': reverse('get_hint_with_telegram_id',
-#                                                      kwargs={'mappings_id': 'dummy_mappings_id',
-#                                                              'telegram_id': 'dummy_telegram_id'}),
-#                 'get_similar_words': reverse('get_similar_words', kwargs={'mappings_id': 'dummy_mappings_id'}),
-#                 'get_similar_with_telegram_id': reverse('get_similar_with_telegram_id',
-#                                                         kwargs={'mappings_id': 'dummy_mappings_id',
-#                                                                 'telegram_id': 'dummy_telegram_id'}),
-#                 'get_sound': reverse('get_sound', kwargs={'mappings_id': 'dummy_mappings_id'})
-#             },
-#             'buttons_to_show': buttons_to_show
-#         }
-#         return Response(start_config, status=status.HTTP_200_OK)
-
 class GetSoundAPI(APIView):
+    """
+    API view to retrieve or synthesize audio for a given card.
+    """
+
     # permission_classes = [IsAuthenticated]
+
     def get(self, request, mappings_id, *args, **kwargs):
-        card = Cards.objects.values(
-            'side1', 'audio', 'id'
-        ).get(mappings__id=mappings_id)
+        """
+        Handle GET requests to retrieve the sound file associated with a card.
+        If the sound file does not exist, synthesize it.
+        """
+        card = Cards.objects.values('side1', 'audio', 'id').get(mappings__id=mappings_id)
 
         sound_file_path = card.get('audio')
 
@@ -241,19 +187,29 @@ class GetSoundAPI(APIView):
 
 
 class GetHintAPI(APIView):
+    """
+    API view to retrieve a hint for a given card.
+    """
+
     # permission_classes = [IsAuthenticated]
 
     def get(self, request, *args, **kwargs):
+        """
+        Handle GET requests to provide a hint for the given card.
+        """
         mappings_id = kwargs.get('mappings_id')
         telegram_id = kwargs.get('telegram_id')
 
+        # Retrieve the card's side2 content
         card = Mappings.objects.filter(id=mappings_id).values_list('card__side2', flat=True).first()
+
         try:
             if telegram_id:
                 user = User.objects.get(telegram_id=telegram_id)
                 language = user.language
             else:
-                language = request.user.language
+                user_lang = request.user.language
+                language = user_lang if user_lang else 'the user language'
         except User.DoesNotExist:
             language = 'the user language'
 
