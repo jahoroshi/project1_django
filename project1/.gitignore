@@ -3,3 +3,5 @@ jahoroshi.github.io/
 project_1/.env
 project_1/test.py
 .gitignore
+cards/migrations
+.venv
