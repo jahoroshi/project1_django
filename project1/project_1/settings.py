@@ -30,6 +30,8 @@ DB_NAME = env('DB_NAME')
 DB_USER = env('DB_USER')
 DB_PASSWORD = env('DB_PASSWORD')
 DB_ENDPOINT = env('DB_ENDPOINT')
+ALLOWED_HOSTS = env('ALLOWED_HOSTS')
+CSRF_TRUSTED_ORIGINS = env('CSRF_TRUSTED_ORIGINS')
 
 
 BOT_NAME = 'Anki4bot'
@@ -56,13 +58,13 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 #
 # ]
 
-ALLOWED_HOSTS = [
-    '*'
-]
-
-CSRF_TRUSTED_ORIGINS = [
-    'https://jahoroshi4y.pagekite.me',
-]
+# ALLOWED_HOSTS = [
+#     '*'
+# ]
+#
+# CSRF_TRUSTED_ORIGINS = [
+#     'https://jahoroshi4y.pagekite.me',
+# ]
 
 
 INTERNAL_IPS = [
@@ -175,9 +177,9 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
 STATIC_URL = 'static/'
-STATICFILES_DIRS = [
-    BASE_DIR / "static",
-]
+# STATICFILES_DIRS = [
+#     BASE_DIR / "static",
+# ]
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 MEDIA_URL = '/media/'
