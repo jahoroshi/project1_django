@@ -1,0 +1,90 @@
+sudo nano /etc/nginx/sites-available/default
+
+--change permissions--
+sudo chmod o+rx /home/ubuntu
+
+sudo systemctl restart nginx
+
+
+sudo apt-get update
+sudo apt-get install supervisor
+
+sudo mkdir -p /etc/supervisor/conf.d/
+sudo ln /home/ubuntu/project1/project1/config/project1.conf
+sudo update-rc.d supervisor enable
+sudo service supervisor start
+
+sudo supervisorctl reread
+sudo supervisorctl update
+sudo supervisorctl status
+
+--after changing--
+sudo supervisorctl restart
+
+
+####### Deletions ########
+
+sudo apt-get remove --purge supervisor
+sudo apt-get autoremove
+
+
+sudo apt-get remove --purge nginx nginx-common nginx-core
+sudo apt-get autoremove
+
+
+
+#### Install #####
+
+sudo apt-get update
+sudo apt-get install supervisor
+
+sudo apt-get update
+sudo apt-get install nginx
+
+
+
+
+
+poetry run gunicorn --workers 3 --bind 0.0.0.0:8000 project_1.wsgi:application
+
+sudo lsof -i :8000
+sudo kill -9 <PID>
+
+poetry env info --path
+
+
+
+
+
+
+
+  GNU nano 7.2                                                                          /etc/nginx/sites-available/default
+server {
+    listen 80;
+    server_name 34.192.159.54;  # Укажите здесь ваш IP-адрес
+
+    location / {
+        proxy_pass http://0.0.0.0:8000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    location /static/ {
+        alias /home/ubuntu/project1/project1/static/;
+    }
+
+    location /media/ {
+        alias /home/ubuntu/project1/project1/media/;
+    }
+
+    error_log /home/ubuntu/project1/project1/logs/nginx_error.log;
+    access_log /home/ubuntu/project1/project1/logs/nginx_access.log;
+}
+
+
+
+
+
+

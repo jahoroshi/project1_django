@@ -5,3 +5,4 @@ project_1/test.py
 .gitignore
 cards/migrations
 .venv
+notes.txt
