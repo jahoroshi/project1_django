@@ -1,3 +1,7 @@
+sudo lsof -i :8000
+lsof -t -i :8000 | xargs -r kill -9
+
+
 sudo nano /etc/nginx/sites-available/default
 
 --change permissions--
@@ -9,17 +13,21 @@ sudo systemctl restart nginx
 sudo apt-get update
 sudo apt-get install supervisor
 
-sudo mkdir -p /etc/supervisor/conf.d/
-sudo ln /home/ubuntu/project1/project1/config/project1.conf
+sudo nano /etc/supervisor/conf.d/
+
+chmod +x /home/ubuntu/ankichat/deployment_configs/check_and_run.sh
+chmod -x /home/ubuntu/ankichat/deployment_configs/check_and_run.sh
+
 sudo update-rc.d supervisor enable
 sudo service supervisor start
+sudo service supervisor status
 
 sudo supervisorctl reread
 sudo supervisorctl update
 sudo supervisorctl status
 
 --after changing--
-sudo supervisorctl restart
+sudo supervisorctl restart all
 
 
 ####### Deletions ########
@@ -56,12 +64,11 @@ poetry env info --path
 
 
 
+#### Nginx settings ####
 
-
-  GNU nano 7.2                                                                          /etc/nginx/sites-available/default
 server {
     listen 80;
-    server_name 34.192.159.54;  # Укажите здесь ваш IP-адрес
+    server_name 18.153.77.166;
 
     location / {
         proxy_pass http://0.0.0.0:8000;
@@ -85,6 +92,22 @@ server {
 
 
 
+#### SSL Cerbot ####
+sudo apt update
+sudo apt install certbot python3-certbot-nginx
+
+sudo certbot --nginx -d ankichat.com -d www.ankichat.com -d api.ankichat.com -d bot.ankichat.com
+
+...autorestart...
+sudo certbot renew --dry-run
+sudo systemctl restart nginx
 
 
+
+
+#### Poetry install ####
+sudo apt update
+sudo apt install pipx
+pipx ensurepath
+pipx install poetry
 
