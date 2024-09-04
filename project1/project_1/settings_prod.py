@@ -30,7 +30,7 @@ DB_NAME = env('DB_NAME')
 DB_USER = env('DB_USER')
 DB_PASSWORD = env('DB_PASSWORD')
 DB_ENDPOINT = env('DB_ENDPOINT')
-ALLOWED_HOSTS = ['http://ankichat.com/', 'https://ankichat.com/', 'http://localhost', 'http://127.0.0.1']
+ALLOWED_HOSTS = ['ankichat.com', 'localhost', '127.0.0.1']
 CSRF_TRUSTED_ORIGINS = ['http://ankichat.com/', 'https://ankichat.com/', 'http://localhost', 'http://127.0.0.1']
 
 
