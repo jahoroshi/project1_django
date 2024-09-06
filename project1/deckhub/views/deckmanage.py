@@ -133,7 +133,7 @@ def deck_delete(request, slug):
     :return: Redirects to the list of decks after deletion, or renders the deletion confirmation page.
     """
     deck = get_object_or_404(Categories, slug=slug)
-    if request.method == 'POST' and is_post_unique(request):
+    if request.method == 'POST':
         # Delete the deck and any orphaned cards (cards with no associated mappings)
         cards = Cards.objects.filter(mappings__isnull=True)
         deck.delete()

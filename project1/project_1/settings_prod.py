@@ -34,7 +34,7 @@ ALLOWED_HOSTS = ['ankichat.com', 'localhost', '127.0.0.1']
 CSRF_TRUSTED_ORIGINS = ['http://ankichat.com/', 'https://ankichat.com/', 'http://localhost', 'http://127.0.0.1']
 
 
-BOT_NAME = 'Anki4bot'
+BOT_NAME = 'AnkiChatBot'
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
