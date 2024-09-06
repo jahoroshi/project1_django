@@ -57,8 +57,13 @@ def registration(request):
             if user:
                 auth.login(request, user)
 
-                language_code = request.META.get('LANG')
+                if request.META:
+                    language_code = request.META.get('LANG', 'en')
+                else:
+                    language_code = 'en'
+
                 language = 'ru' if 'ru' in language_code else 'en'
+
                 deck_filling(user, language)
                 messages.info(
                     request,
